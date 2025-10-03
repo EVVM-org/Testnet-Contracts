@@ -14,49 +14,6 @@ library SignatureUtils {
      *       by the users
      */
 
-    /**
-     *  @notice This function is used to verify the message signed for the withdrawal
-     *  @param signer user who signed the message
-     *  @param addressToReceive address of the receiver
-     *  @param _token address of the token to withdraw
-     *  @param _amount amount to withdraw
-     *  @param _priorityFee priorityFee to send to the white fisher
-     *  @param _nonce nonce of the transaction
-     *  @param _priorityFlag if the transaction is priority or not
-     *  @param signature signature of the user who wants to send the message
-     *  @return true if the signature is valid
-     */
-    function verifyMessageSignedForWithdrawal(
-        address signer,
-        address addressToReceive,
-        address _token,
-        uint256 _amount,
-        uint256 _priorityFee,
-        uint256 _nonce,
-        bool _priorityFlag,
-        bytes memory signature
-    ) internal pure returns (bool) {
-        return
-            SignatureRecover.signatureVerification(
-                string.concat(
-                    _priorityFlag ? "920f3d76" : "52896a1f",
-                    ",",
-                    AdvancedStrings.addressToString(addressToReceive),
-                    ",",
-                    AdvancedStrings.addressToString(_token),
-                    ",",
-                    Strings.toString(_amount),
-                    ",",
-                    Strings.toString(_priorityFee),
-                    ",",
-                    Strings.toString(_nonce),
-                    ",",
-                    _priorityFlag ? "true" : "false"
-                ),
-                signature,
-                signer
-            );
-    }
 
     /**
      *  @notice This function is used to verify the message signed for the payment
