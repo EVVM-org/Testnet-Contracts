@@ -51,6 +51,16 @@ deployTestnet:
 		echo "Unknown network: $(NETWORK). Use 'eth' or 'arb'"; exit 1; \
 	fi
 
+deployTestnetCrossChainHost: 
+	@echo "Deploying contracts on host chain (ETH Sepolia)"
+	@forge clean
+	@forge script script/DeployTestnetCrossChain.s.sol:DeployTestnetCrossChain $(ETH_SEPOLIA_TESTNET_ARGS) -vvvvvv
+	
+deployTestnetCrossChainExternal:
+	@echo "Deploying contracts on remote chain (Arbitrum Sepolia)"
+	@forge clean
+	@forge script script/DeployTestnetCrossChain.s.sol:DeployTestnetCrossChain $(ARB_SEPOLIA_TESTNET_ARGS) -vvvvvv
+
 deployLocalTestnet: 
 	@echo "Deploying local testnet"
 	@forge clean
