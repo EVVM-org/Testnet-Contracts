@@ -84,17 +84,17 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Access control modifier restricting function calls to the current admin
      * @dev Validates that msg.sender matches the current admin address before function execution
-     * 
+     *
      * Access Control:
      * - Only the current admin can call functions with this modifier
      * - Uses the admin.current address from the storage structure
      * - Reverts with no specific error message for unauthorized calls
-     * 
+     *
      * Usage:
      * - Applied to critical administrative functions
      * - Protects system configuration changes
      * - Prevents unauthorized upgrades and parameter modifications
-     * 
+     *
      * Security:
      * - Simple but effective access control mechanism
      * - Used for proxy upgrades, admin transfers, and system configuration
@@ -110,7 +110,7 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Initializes the EVVM contract with essential configuration and token distributions
      * @dev Sets up the core system parameters, admin roles, and initial Principal Token allocations
-     * 
+     *
      * Critical Initial Setup:
      * - Configures admin address with full administrative privileges
      * - Sets staking contract address for reward distribution and status management
@@ -118,26 +118,26 @@ contract Evvm is EvvmStorage {
      * - Distributes initial MATE tokens to staking contract (2x reward amount)
      * - Registers staking contract as privileged staker with full benefits
      * - Activates breaker flag for one-time NameService and Treasury setup
-     * 
+     *
      * Token Distribution:
      * - Staking contract receives 2x current reward amount in MATE tokens
      * - Enables immediate reward distribution capabilities
      * - Provides operational liquidity for staking rewards
-     * 
+     *
      * Security Initialization:
      * - Sets admin.current for immediate administrative access
      * - Prepares system for NameService and Treasury integration
      * - Establishes staking privileges for the staking contract
-     * 
+     *
      * Post-Deployment Requirements:
      * - Must call `_setupNameServiceAndTreasuryAddress()` to complete integration
      * - NameService and Treasury addresses must be configured before full operation
      * - Implementation contract should be set for proxy functionality
-     * 
+     *
      * @param _initialOwner Address that will have administrative privileges over the contract
      * @param _stakingContractAddress Address of the staking contract for reward distribution and staker management
      * @param _evvmMetadata Metadata structure containing principal token address, reward amounts, and system parameters
-     * 
+     *
      * @custom:deployment Must be followed by NameService and Treasury setup
      * @custom:security Admin address has full control over system configuration
      */
@@ -164,27 +164,27 @@ contract Evvm is EvvmStorage {
     /**
      * @notice One-time setup function to configure NameService and Treasury contract addresses
      * @dev Can only be called once due to breaker flag mechanism for security
-     * 
+     *
      * Critical Setup Process:
      * - Validates the breaker flag is active (prevents multiple calls)
      * - Sets the NameService contract address for identity resolution in payments
      * - Configures the Treasury contract address for privileged balance operations
      * - Provides initial Principal Token balance (10,000 MATE) to NameService for operations
      * - Registers NameService as a privileged staker for enhanced functionality and rewards
-     * 
+     *
      * Security Features:
      * - Single-use function protected by breaker flag
      * - Prevents unauthorized reconfiguration of critical system addresses
      * - Must be called during initial system deployment phase
-     * 
+     *
      * Initial Token Distribution:
      * - NameService receives 10,000 MATE tokens for operational expenses
      * - NameService gains staker privileges for transaction processing
      * - Enables identity-based payment resolution throughout the ecosystem
-     * 
+     *
      * @param _nameServiceAddress Address of the deployed NameService contract for identity resolution
      * @param _treasuryAddress Address of the Treasury contract for balance management operations
-     * 
+     *
      * @custom:security Single-use function - can only be called once
      * @custom:access-control No explicit access control - relies on deployment sequence
      * @custom:integration Critical for NameService and Treasury functionality
@@ -208,32 +208,32 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Fallback function implementing proxy pattern with delegatecall to implementation
      * @dev Routes all unrecognized function calls to the current implementation contract
-     * 
+     *
      * Proxy Mechanism:
      * - Forwards all calls not handled by this contract to the implementation
      * - Uses delegatecall to preserve storage context and msg.sender
      * - Allows for contract upgrades without changing the main contract address
      * - Maintains all state variables in the proxy contract storage
-     * 
+     *
      * Implementation Process:
      * 1. Validates that an implementation contract is set
      * 2. Copies all calldata to memory for forwarding
      * 3. Executes delegatecall to implementation with full gas allowance
      * 4. Copies the return data back from the implementation
      * 5. Returns the result or reverts based on implementation response
-     * 
+     *
      * Security Features:
      * - Reverts if no implementation is set (prevents undefined behavior)
      * - Preserves all gas for the implementation call
      * - Maintains exact return data and revert behavior from implementation
      * - Uses storage slot reading for gas efficiency
-     * 
+     *
      * Upgrade Compatibility:
      * - Enables seamless contract upgrades through implementation changes
      * - Preserves all existing state and user balances
      * - Allows new functionality addition without user migration
      * - Supports time-delayed upgrade governance for security
-     * 
+     *
      * @custom:security Requires valid implementation address
      * @custom:proxy Transparent proxy pattern implementation
      * @custom:upgrade-safe Preserves storage layout between upgrades
@@ -277,7 +277,6 @@ contract Evvm is EvvmStorage {
         }
     }
 
-
     /**
      * @notice Faucet function to add balance to a user's account for testing purposes
      * @dev This function is intended for testnet use only to provide tokens for testing
@@ -308,13 +307,13 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Processes synchronous payments for non-staking users
      * @dev Uses automatic nonce increment for sequential transaction ordering
-     * 
+     *
      * Payment Flow:
      * - Validates signature authorization for the payment
      * - Checks executor permission if specified
      * - Resolves recipient address (identity or direct address)
      * - Updates balances and increments nonce
-     * 
+     *
      * @param from Address of the payment sender
      * @param to_address Direct recipient address (used if to_identity is empty)
      * @param to_identity Username/identity of recipient (resolved via NameService)
@@ -336,6 +335,7 @@ contract Evvm is EvvmStorage {
     ) external {
         if (
             !SignatureUtils.verifyMessageSignedForPay(
+                evvmMetadata.EvvmID,
                 from,
                 to_address,
                 to_identity,
@@ -369,14 +369,14 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Processes asynchronous payments for non-staking users
      * @dev Uses custom nonces for flexible transaction ordering and replay protection
-     * 
+     *
      * Payment Flow:
      * - Validates signature with custom nonce
      * - Checks executor permission if specified
      * - Ensures nonce hasn't been used before
      * - Resolves recipient address and processes payment
      * - Marks nonce as used to prevent replay attacks
-     * 
+     *
      * @param from Address of the payment sender
      * @param to_address Direct recipient address (used if to_identity is empty)
      * @param to_identity Username/identity of recipient (resolved via NameService)
@@ -400,6 +400,7 @@ contract Evvm is EvvmStorage {
     ) external {
         if (
             !SignatureUtils.verifyMessageSignedForPay(
+                evvmMetadata.EvvmID,
                 from,
                 to_address,
                 to_identity,
@@ -435,18 +436,18 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Processes synchronous payments for Principal Token stakers with rewards
      * @dev Enhanced payment function that provides staker benefits and executor rewards
-     * 
+     *
      * Staker Benefits:
      * - Stakers receive priority fee as reward for processing transactions
      * - Executors (msg.sender) get rewarded if they are also stakers
      * - Supports both direct addresses and identity-based payments
-     * 
+     *
      * Payment Flow:
      * - Validates signature and executor permissions
      * - Processes the main payment transfer
      * - Distributes priority fee reward to stakers
      * - Increments synchronous nonce automatically
-     * 
+     *
      * @param from Address of the payment sender (must be a staker)
      * @param to_address Direct recipient address (used if to_identity is empty)
      * @param to_identity Username/identity of recipient (resolved via NameService)
@@ -468,6 +469,7 @@ contract Evvm is EvvmStorage {
     ) external {
         if (
             !SignatureUtils.verifyMessageSignedForPay(
+                evvmMetadata.EvvmID,
                 from,
                 to_address,
                 to_identity,
@@ -509,19 +511,19 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Processes asynchronous payments for Principal Token stakers with rewards
      * @dev Enhanced async payment function with staker benefits and custom nonce management
-     * 
+     *
      * Staker Benefits:
      * - Priority fee rewards for transaction processing
      * - Principal Token rewards for stakers (1x reward amount)
      * - Custom nonce support for flexible transaction ordering
-     * 
+     *
      * Payment Flow:
      * - Validates signature with custom nonce for replay protection
      * - Verifies executor is a registered staker
      * - Processes main payment and priority fee distribution
      * - Rewards executor with MATE tokens
      * - Marks nonce as used to prevent replay attacks
-     * 
+     *
      * @param from Address of the payment sender
      * @param to_address Direct recipient address (used if to_identity is empty)
      * @param to_identity Username/identity of recipient (resolved via NameService)
@@ -545,6 +547,7 @@ contract Evvm is EvvmStorage {
     ) external {
         if (
             !SignatureUtils.verifyMessageSignedForPay(
+                evvmMetadata.EvvmID,
                 from,
                 to_address,
                 to_identity,
@@ -581,8 +584,7 @@ contract Evvm is EvvmStorage {
                 revert ErrorsLib.UpdateBalanceFailed();
         }
 
-        if (!_giveReward(msg.sender, 1))
-            revert ErrorsLib.UpdateBalanceFailed();
+        if (!_giveReward(msg.sender, 1)) revert ErrorsLib.UpdateBalanceFailed();
 
         asyncUsedNonce[from][nonce] = true;
     }
@@ -590,25 +592,25 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Processes multiple payments in a single transaction batch
      * @dev Executes an array of payment operations with individual success/failure tracking
-     * 
+     *
      * Batch Processing Features:
      * - Processes each payment independently (partial success allowed)
      * - Returns detailed results for each transaction
      * - Supports both staker and non-staker payment types
      * - Handles both sync and async nonce types per payment
      * - Provides comprehensive transaction statistics
-     * 
+     *
      * Payment Validation:
      * - Each payment signature is verified independently
      * - Nonce management handled per payment type (sync/async)
      * - Identity resolution performed for each recipient
      * - Balance updates executed atomically per payment
-     * 
+     *
      * Return Values:
      * - successfulTransactions: Count of completed payments
-     * - failedTransactions: Count of failed payments  
+     * - failedTransactions: Count of failed payments
      * - results: Boolean array indicating success/failure for each payment
-     * 
+     *
      * @param payData Array of PayData structures containing payment details
      * @return successfulTransactions Number of payments that completed successfully
      * @return failedTransactions Number of payments that failed
@@ -629,6 +631,7 @@ contract Evvm is EvvmStorage {
         for (uint256 iteration = 0; iteration < payData.length; iteration++) {
             if (
                 !SignatureUtils.verifyMessageSignedForPay(
+                    evvmMetadata.EvvmID,
                     payData[iteration].from,
                     payData[iteration].to_address,
                     payData[iteration].to_identity,
@@ -742,24 +745,24 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Distributes tokens from a single sender to multiple recipients
      * @dev Efficient single-source multi-recipient payment distribution with signature verification
-     * 
+     *
      * Distribution Features:
      * - Single signature authorizes distribution to multiple recipients
      * - Supports both direct addresses and identity-based recipients
      * - Proportional amount distribution based on recipient configurations
      * - Integrated priority fee and staker reward system
      * - Supports both sync and async nonce management
-     * 
+     *
      * Verification Process:
      * - Validates single signature for entire distribution
      * - Checks total amount and priority fee against sender balance
      * - Ensures executor permissions and nonce validity
      * - Processes each recipient distribution atomically
-     * 
+     *
      * Staker Benefits:
      * - Executor receives priority fee (if staker)
      * - MATE reward based on number of successful distributions
-     * 
+     *
      * @param from Address of the payment sender
      * @param toData Array of recipient data with addresses/identities and amounts
      * @param token Address of the token contract to distribute
@@ -783,6 +786,7 @@ contract Evvm is EvvmStorage {
     ) external {
         if (
             !SignatureUtils.verifyMessageSignedForDispersePay(
+                evvmMetadata.EvvmID,
                 from,
                 sha256(abi.encode(toData)),
                 token,
@@ -851,24 +855,24 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Contract-to-address payment function for authorized smart contracts
      * @dev Allows registered contracts to distribute tokens without signature verification
-     * 
+     *
      * Authorization Model:
      * - Only smart contracts (non-EOA addresses) can call this function
      * - Calling contract must have sufficient token balance
      * - No signature verification required (contract-level authorization)
      * - Used primarily for automated distributions and rewards
-     * 
+     *
      * Use Cases:
      * - Staking contract reward distributions
      * - NameService fee distributions
      * - Automated system payouts
      * - Cross-contract token transfers
-     * 
+     *
      * Security Features:
      * - Validates caller is a contract (has bytecode)
      * - Checks sufficient balance before transfer
      * - Direct balance manipulation for efficiency
-     * 
+     *
      * @param to Address of the token recipient
      * @param token Address of the token contract to transfer
      * @param amount Amount of tokens to transfer from calling contract
@@ -895,24 +899,24 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Contract-to-multiple-addresses payment distribution function
      * @dev Allows authorized contracts to distribute tokens to multiple recipients efficiently
-     * 
+     *
      * Batch Distribution Features:
      * - Single call distributes to multiple recipients
      * - Supports both direct addresses and identity resolution
      * - Validates total amount matches sum of individual distributions
      * - Optimized for contract-based automated distributions
-     * 
+     *
      * Authorization Model:
      * - Only smart contracts can call this function
      * - No signature verification required (contract authorization)
      * - Calling contract must have sufficient balance for total distribution
-     * 
+     *
      * Use Cases:
      * - Bulk reward distributions from staking contracts
      * - Multi-recipient fee distributions
      * - Batch payroll or dividend distributions
      * - Cross-contract multi-party settlements
-     * 
+     *
      * @param toData Array of recipient data containing addresses/identities and amounts
      * @param token Address of the token contract to distribute
      * @param amount Total amount to distribute (must equal sum of individual amounts)
@@ -959,28 +963,28 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Adds tokens to a user's balance in the EVVM system
      * @dev Restricted function that can only be called by the authorized treasury contract
-     * 
+     *
      * Treasury Operations:
      * - Allows treasury to mint or credit tokens to user accounts
      * - Used for reward distributions, airdrops, or token bridging
      * - Direct balance manipulation bypasses normal transfer restrictions
      * - No signature verification required (treasury authorization)
-     * 
+     *
      * Access Control:
      * - Only the registered treasury contract can call this function
      * - Reverts with SenderIsNotTreasury error for unauthorized callers
      * - Provides centralized token distribution mechanism
-     * 
+     *
      * Use Cases:
      * - Cross-chain bridge token minting
      * - Administrative reward distributions
      * - System-level token allocations
      * - Emergency balance corrections
-     * 
+     *
      * @param user Address of the user to receive tokens
      * @param token Address of the token contract to add balance for
      * @param amount Amount of tokens to add to the user's balance
-     * 
+     *
      * @custom:access-control Only treasury contract
      * @custom:security No overflow protection needed due to controlled access
      */
@@ -998,33 +1002,33 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Removes tokens from a user's balance in the EVVM system
      * @dev Restricted function that can only be called by the authorized treasury contract
-     * 
+     *
      * Treasury Operations:
      * - Allows treasury to burn or debit tokens from user accounts
      * - Used for cross-chain bridging, penalties, or system corrections
      * - Direct balance manipulation bypasses normal transfer protections
      * - Can potentially create negative balances if not carefully managed
-     * 
+     *
      * Access Control:
      * - Only the registered treasury contract can call this function
      * - Reverts with SenderIsNotTreasury error for unauthorized callers
      * - Provides centralized token withdrawal mechanism
-     * 
+     *
      * Use Cases:
      * - Cross-chain bridge token burning
      * - Administrative penalty applications
      * - System-level token reclamations
      * - Emergency balance corrections
-     * 
+     *
      * Security Considerations:
      * - No underflow protection: treasury must ensure sufficient balance
      * - Can result in unexpected negative balances if misused
      * - Treasury contract should implement additional validation
-     * 
+     *
      * @param user Address of the user to remove tokens from
      * @param token Address of the token contract to remove balance for
      * @param amount Amount of tokens to remove from the user's balance
-     * 
+     *
      * @custom:access-control Only treasury contract
      * @custom:security No underflow protection - treasury responsibility
      */
@@ -1046,17 +1050,17 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Internal function to safely transfer tokens between addresses
      * @dev Performs balance validation and atomic transfer with overflow protection
-     * 
+     *
      * Transfer Process:
      * - Validates sender has sufficient balance
      * - Performs atomic balance updates using unchecked arithmetic
      * - Returns success/failure status for error handling
-     * 
+     *
      * Security Features:
      * - Balance validation prevents overdrafts
      * - Unchecked arithmetic for gas optimization (overflow impossible)
      * - Returns boolean for caller error handling
-     * 
+     *
      * @param from Address to transfer tokens from
      * @param to Address to transfer tokens to
      * @param token Address of the token contract
@@ -1084,25 +1088,22 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Internal function to distribute Principal Token rewards to stakers
      * @dev Provides incentive distribution for transaction processing and staking participation
-     * 
+     *
      * Reward System:
      * - Calculates reward based on system reward rate and transaction count
      * - Directly increases principal token balance for gas efficiency
      * - Returns success status for error handling in calling functions
-     * 
+     *
      * Reward Calculation:
      * - Base reward per transaction: evvmMetadata.reward
      * - Total reward: base_reward × transaction_amount
      * - Added directly to user's Principal Token balance
-     * 
+     *
      * @param user Address of the staker to receive principal tokenrewards
      * @param amount Number of transactions or reward multiplier
      * @return success True if reward distribution completed successfully
      */
-    function _giveReward(
-        address user,
-        uint256 amount
-    ) internal returns (bool) {
+    function _giveReward(address user, uint256 amount) internal returns (bool) {
         uint256 principalReward = evvmMetadata.reward * amount;
         uint256 userBalance = balances[user][
             evvmMetadata.principalTokenAddress
@@ -1123,13 +1124,13 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Proposes a new implementation contract for the proxy with time delay
      * @dev Part of the time-delayed governance system for critical upgrades
-     * 
+     *
      * Upgrade Security:
      * - 30-day time delay for implementation changes
      * - Only admin can propose upgrades
      * - Allows time for community review and validation
      * - Can be rejected before acceptance deadline
-     * 
+     *
      * @param _newImpl Address of the new implementation contract
      */
     function proposeImplementation(address _newImpl) external onlyAdmin {
@@ -1218,19 +1219,19 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Triggers a reward recalculation and era transition in the token economy
      * @dev Implements deflationary tokenomics with halving mechanism and random rewards
-     * 
+     *
      * Era Transition Mechanism:
      * - Activates when total supply exceeds current era token threshold
-     * - Moves half of remaining tokens to next era threshold  
+     * - Moves half of remaining tokens to next era threshold
      * - Halves the base reward amount for future transactions
      * - Provides random Principal Token bonus to caller (1-5083x reward)
-     * 
+     *
      * Economic Impact:
      * - Gradually reduces inflation through reward halving
      * - Creates scarcity as era thresholds become harder to reach
      * - Incentivizes early participation with higher rewards
      * - Provides lottery-style bonus for triggering era transitions
-     * 
+     *
      * Requirements:
      * - Total supply must exceed current era token threshold
      * - Can be called by anyone when conditions are met
@@ -1251,12 +1252,12 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Generates a pseudo-random number within a specified range
      * @dev Uses block timestamp and prevrandao for randomness (suitable for non-critical randomness)
-     * 
+     *
      * Randomness Source:
      * - Combines block.timestamp and block.prevrandao
      * - Suitable for reward bonuses and non-security-critical randomness
      * - Not suitable for high-stakes randomness requiring true unpredictability
-     * 
+     *
      * @param min Minimum value (inclusive)
      * @param max Maximum value (inclusive)
      * @return Random number between min and max (inclusive)
@@ -1277,16 +1278,16 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Updates staker status for a user address
      * @dev Can only be called by the authorized staking contract
-     * 
+     *
      * Staker Status Management:
      * - Controls who can earn staking rewards and process transactions
      * - Integrates with external staking contract for validation
      * - Updates affect payment processing privileges and reward eligibility
-     * 
+     *
      * Access Control:
      * - Only the registered staking contract can call this function
      * - Ensures staker status changes are properly authorized
-     * 
+     *
      * @param user Address to update staker status for
      * @param answer Bytes1 flag indicating staker status/type
      */
@@ -1302,19 +1303,29 @@ contract Evvm is EvvmStorage {
     /**
      * @notice Returns the complete EVVM metadata configuration
      * @dev Provides access to system-wide configuration and economic parameters
-     * 
+     *
      * Metadata Contents:
      * - Principal token address (Principal Token)
      * - Current reward amount per transaction
      * - Total supply tracking
      * - Era tokens threshold for reward transitions
      * - System configuration parameters
-     * 
+     *
      * @return Complete EvvmMetadata struct with all system parameters
      */
     function getEvvmMetadata() external view returns (EvvmMetadata memory) {
         return evvmMetadata;
     }
+
+    /**
+     * @notice Gets the unique identifier string for this EVVM instance
+     * @dev Returns the EvvmID used for distinguishing different EVVM deployments
+     * @return Unique EvvmID string
+     */
+    function getEvvmID() external view returns (uint256) {
+        return evvmMetadata.EvvmID;
+    }
+
 
     /**
      * @notice Gets the acceptance deadline for pending token whitelist proposals

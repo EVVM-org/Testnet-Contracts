@@ -15,6 +15,7 @@ library SignatureUtils {
      */
 
     function verifyMessageSignedForStake(
+        uint256 evvmID,
         address user,
         bool isExternalStaking,
         bool _isStaking,
@@ -24,14 +25,9 @@ library SignatureUtils {
     ) internal pure returns (bool) {
         return
             SignatureRecover.signatureVerification(
+                Strings.toString(evvmID),
+                isExternalStaking ? "publicStaking" : "presaleStaking",
                 string.concat(
-                    /**
-                     * @dev if isExternalStaking is true,
-                     * the function selector is for publicStaking
-                     * else is for presaleInternalExecution
-                     */
-                    isExternalStaking ? "c769095c" : "c0f6e7d1",
-                    ",",
                     _isStaking ? "true" : "false",
                     ",",
                     Strings.toString(_amountOfStaking),
@@ -44,6 +40,7 @@ library SignatureUtils {
     }
 
     function verifyMessageSignedForPublicServiceStake(
+        uint256 evvmID,
         address user,
         address serviceAddress,
         bool _isStaking,
@@ -53,9 +50,9 @@ library SignatureUtils {
     ) internal pure returns (bool) {
         return
             SignatureRecover.signatureVerification(
+                Strings.toString(evvmID),
+                "publicServiceStaking",
                 string.concat(
-                    "e2ccd470",
-                    ",",
                     AdvancedStrings.addressToString(serviceAddress),
                     ",",
                     _isStaking ? "true" : "false",

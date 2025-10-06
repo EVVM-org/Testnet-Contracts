@@ -33,6 +33,7 @@ library SignatureUtils {
      *  @return true if the signature is valid
      */
     function verifyMessageSignedForPay(
+        uint256 evvmID,
         address signer,
         address _receiverAddress,
         string memory _receiverIdentity,
@@ -46,9 +47,9 @@ library SignatureUtils {
     ) internal pure returns (bool) {
         return
             SignatureRecover.signatureVerification(
+                Strings.toString(evvmID),
+                "pay",
                 string.concat(
-                    _priorityFlag ? "f4e1895b" : "4faa1fa2",
-                    ",",
                     _receiverAddress == address(0)
                         ? _receiverIdentity
                         : AdvancedStrings.addressToString(_receiverAddress),
@@ -85,6 +86,7 @@ library SignatureUtils {
      *  @return true if the signature is valid
      */
     function verifyMessageSignedForDispersePay(
+        uint256 evvmID,
         address signer,
         bytes32 hashList,
         address _token,
@@ -97,9 +99,9 @@ library SignatureUtils {
     ) internal pure returns (bool) {
         return
             SignatureRecover.signatureVerification(
+                Strings.toString(evvmID),
+                "dispersePay",
                 string.concat(
-                    "ef83c1d6",
-                    ",",
                     AdvancedStrings.bytes32ToString(hashList),
                     ",",
                     AdvancedStrings.addressToString(_token),
@@ -119,41 +121,4 @@ library SignatureUtils {
             );
     }
 
-    /**
-     *  @notice This function is used to verify the message signed for the fisher bridge
-     *  @param signer user who signed the message
-     *  @param addressToReceive address of the receiver
-     *  @param _nonce nonce of the transaction
-     *  @param tokenAddress address of the token to deposit
-     *  @param _priorityFee priorityFee to send to the white fisher
-     *  @param _amount amount to deposit
-     *  @param signature signature of the user who wants to send the message
-     *  @return true if the signature is valid
-     */
-    function verifyMessageSignedForFisherBridge(
-        address signer,
-        address addressToReceive,
-        uint256 _nonce,
-        address tokenAddress,
-        uint256 _priorityFee,
-        uint256 _amount,
-        bytes memory signature
-    ) internal pure returns (bool) {
-        return
-            SignatureRecover.signatureVerification(
-                string.concat(
-                    AdvancedStrings.addressToString(addressToReceive),
-                    ",",
-                    Strings.toString(_nonce),
-                    ",",
-                    AdvancedStrings.addressToString(tokenAddress),
-                    ",",
-                    Strings.toString(_priorityFee),
-                    ",",
-                    Strings.toString(_amount)
-                ),
-                signature,
-                signer
-            );
-    }
 }

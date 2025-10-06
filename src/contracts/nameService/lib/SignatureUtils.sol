@@ -13,8 +13,9 @@ library SignatureUtils {
      *       verify messages, the next functions are used to verify the messages signed
      *       by the users
      */
-    
+
     function verifyMessageSignedForPreRegistrationUsername(
+        uint256 evvmID,
         address signer,
         bytes32 _hashUsername,
         uint256 _nameServiceNonce,
@@ -22,9 +23,9 @@ library SignatureUtils {
     ) internal pure returns (bool) {
         return
             SignatureRecover.signatureVerification(
+                Strings.toString(evvmID),
+                "preRegistrationUsername",
                 string.concat(
-                    "5d232a55",
-                    ",",
                     AdvancedStrings.bytes32ToString(_hashUsername),
                     ",",
                     Strings.toString(_nameServiceNonce)
@@ -35,6 +36,7 @@ library SignatureUtils {
     }
 
     function verifyMessageSignedForRegistrationUsername(
+        uint256 evvmID,
         address signer,
         string memory _username,
         uint256 _clowNumber,
@@ -43,9 +45,9 @@ library SignatureUtils {
     ) internal pure returns (bool) {
         return
             SignatureRecover.signatureVerification(
+                Strings.toString(evvmID),
+                "registrationUsername",
                 string.concat(
-                    "afabc8db",
-                    ",",
                     _username,
                     ",",
                     Strings.toString(_clowNumber),
@@ -58,6 +60,7 @@ library SignatureUtils {
     }
 
     function verifyMessageSignedForMakeOffer(
+        uint256 evvmID,
         address signer,
         string memory _username,
         uint256 _dateExpire,
@@ -67,9 +70,9 @@ library SignatureUtils {
     ) internal pure returns (bool) {
         return
             SignatureRecover.signatureVerification(
+                Strings.toString(evvmID),
+                "makeOffer",
                 string.concat(
-                    "d82e5d8b",
-                    ",",
                     _username,
                     ",",
                     Strings.toString(_dateExpire),
@@ -84,6 +87,7 @@ library SignatureUtils {
     }
 
     function verifyMessageSignedForWithdrawOffer(
+        uint256 evvmID,
         address signer,
         string memory _username,
         uint256 _offerId,
@@ -92,9 +96,9 @@ library SignatureUtils {
     ) internal pure returns (bool) {
         return
             SignatureRecover.signatureVerification(
+                Strings.toString(evvmID),
+                "withdrawOffer",
                 string.concat(
-                    "5761d8ed",
-                    ",",
                     _username,
                     ",",
                     Strings.toString(_offerId),
@@ -107,6 +111,7 @@ library SignatureUtils {
     }
 
     function verifyMessageSignedForAcceptOffer(
+        uint256 evvmID,
         address signer,
         string memory _username,
         uint256 _offerId,
@@ -115,9 +120,9 @@ library SignatureUtils {
     ) internal pure returns (bool) {
         return
             SignatureRecover.signatureVerification(
+                Strings.toString(evvmID),
+                "acceptOffer",
                 string.concat(
-                    "8e3bde43",
-                    ",",
                     _username,
                     ",",
                     Strings.toString(_offerId),
@@ -130,6 +135,7 @@ library SignatureUtils {
     }
 
     function verifyMessageSignedForRenewUsername(
+        uint256 evvmID,
         address signer,
         string memory _username,
         uint256 _nameServiceNonce,
@@ -137,9 +143,9 @@ library SignatureUtils {
     ) internal pure returns (bool) {
         return
             SignatureRecover.signatureVerification(
+                Strings.toString(evvmID),
+                "renewUsername",
                 string.concat(
-                    "35723e23",
-                    ",",
                     _username,
                     ",",
                     Strings.toString(_nameServiceNonce)
@@ -150,6 +156,7 @@ library SignatureUtils {
     }
 
     function verifyMessageSignedForAddCustomMetadata(
+        uint256 evvmID,
         address signer,
         string memory _identity,
         string memory _value,
@@ -158,9 +165,9 @@ library SignatureUtils {
     ) internal pure returns (bool) {
         return
             SignatureRecover.signatureVerification(
+                Strings.toString(evvmID),
+                "addCustomMetadata",
                 string.concat(
-                    "4cfe021f",
-                    ",",
                     _identity,
                     ",",
                     _value,
@@ -173,6 +180,7 @@ library SignatureUtils {
     }
 
     function verifyMessageSignedForRemoveCustomMetadata(
+        uint256 evvmID,
         address signer,
         string memory _username,
         uint256 _key,
@@ -181,9 +189,9 @@ library SignatureUtils {
     ) internal pure returns (bool) {
         return
             SignatureRecover.signatureVerification(
+                Strings.toString(evvmID),
+                "removeCustomMetadata",
                 string.concat(
-                    "8adf3927",
-                    ",",
                     _username,
                     ",",
                     Strings.toString(_key),
@@ -196,6 +204,7 @@ library SignatureUtils {
     }
 
     function verifyMessageSignedForFlushCustomMetadata(
+        uint256 evvmID,
         address signer,
         string memory _identity,
         uint256 _nonce,
@@ -203,19 +212,16 @@ library SignatureUtils {
     ) internal pure returns (bool) {
         return
             SignatureRecover.signatureVerification(
-                string.concat(
-                    "3ca44e54",
-                    ",",
-                    _identity,
-                    ",",
-                    Strings.toString(_nonce)
-                ),
+                Strings.toString(evvmID),
+                "flushCustomMetadata",
+                string.concat(_identity, ",", Strings.toString(_nonce)),
                 signature,
                 signer
             );
     }
 
     function verifyMessageSignedForFlushUsername(
+        uint256 evvmID,
         address signer,
         string memory _username,
         uint256 _nonce,
@@ -223,13 +229,9 @@ library SignatureUtils {
     ) internal pure returns (bool) {
         return
             SignatureRecover.signatureVerification(
-                string.concat(
-                    "044695cb",
-                    ",",
-                    _username,
-                    ",",
-                    Strings.toString(_nonce)
-                ),
+                Strings.toString(evvmID),
+                "flushUsername",
+                string.concat(_username, ",", Strings.toString(_nonce)),
                 signature,
                 signer
             );

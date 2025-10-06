@@ -47,9 +47,7 @@ import {Estimator} from "@EVVM/testnet/contracts/staking/Estimator.sol";
 import {ErrorsLib} from "@EVVM/testnet/contracts/staking/lib/ErrorsLib.sol";
 import {SignatureUtils} from "@EVVM/testnet/contracts/staking/lib/SignatureUtils.sol";
 
-
 contract Staking {
-
     /**
      * @dev Metadata for presale stakers
      * @param isAllow Whether the address is allowed to participate in presale staking
@@ -247,6 +245,7 @@ contract Staking {
     ) external {
         if (
             !SignatureUtils.verifyMessageSignedForStake(
+                Evvm(EVVM_ADDRESS).getEvvmID(),
                 user,
                 false,
                 isStaking,
@@ -339,6 +338,7 @@ contract Staking {
 
         if (
             !SignatureUtils.verifyMessageSignedForStake(
+                Evvm(EVVM_ADDRESS).getEvvmID(),
                 user,
                 true,
                 isStaking,
@@ -404,6 +404,7 @@ contract Staking {
         if (isStaking) {
             if (
                 !SignatureUtils.verifyMessageSignedForPublicServiceStake(
+                    Evvm(EVVM_ADDRESS).getEvvmID(),
                     user,
                     service,
                     isStaking,

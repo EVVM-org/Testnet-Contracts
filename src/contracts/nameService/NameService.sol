@@ -214,6 +214,7 @@ contract NameService {
     ) public verifyIfNonceIsAvailable(user, nonce) {
         if (
             !SignatureUtils.verifyMessageSignedForPreRegistrationUsername(
+                Evvm(evvmAddress.current).getEvvmID(),
                 user,
                 hashPreRegisteredUsername,
                 nonce,
@@ -287,6 +288,7 @@ contract NameService {
 
         if (
             !SignatureUtils.verifyMessageSignedForRegistrationUsername(
+                Evvm(evvmAddress.current).getEvvmID(),
                 user,
                 username,
                 clowNumber,
@@ -371,6 +373,7 @@ contract NameService {
 
         if (
             !SignatureUtils.verifyMessageSignedForMakeOffer(
+                Evvm(evvmAddress.current).getEvvmID(),
                 user,
                 username,
                 expireDate,
@@ -447,6 +450,7 @@ contract NameService {
 
         if (
             !SignatureUtils.verifyMessageSignedForWithdrawOffer(
+                Evvm(evvmAddress.current).getEvvmID(),
                 user,
                 username,
                 offerID,
@@ -519,6 +523,7 @@ contract NameService {
 
         if (
             !SignatureUtils.verifyMessageSignedForAcceptOffer(
+                Evvm(evvmAddress.current).getEvvmID(),
                 user,
                 username,
                 offerID,
@@ -602,6 +607,7 @@ contract NameService {
 
         if (
             !SignatureUtils.verifyMessageSignedForRenewUsername(
+                Evvm(evvmAddress.current).getEvvmID(),
                 user,
                 username,
                 nonce,
@@ -679,6 +685,7 @@ contract NameService {
 
         if (
             !SignatureUtils.verifyMessageSignedForAddCustomMetadata(
+                Evvm(evvmAddress.current).getEvvmID(),
                 user,
                 identity,
                 value,
@@ -743,6 +750,7 @@ contract NameService {
     {
         if (
             !SignatureUtils.verifyMessageSignedForRemoveCustomMetadata(
+                Evvm(evvmAddress.current).getEvvmID(),
                 user,
                 identity,
                 key,
@@ -818,6 +826,7 @@ contract NameService {
     {
         if (
             !SignatureUtils.verifyMessageSignedForFlushCustomMetadata(
+                Evvm(evvmAddress.current).getEvvmID(),
                 user,
                 identity,
                 nonce,
@@ -891,6 +900,7 @@ contract NameService {
 
         if (
             !SignatureUtils.verifyMessageSignedForFlushUsername(
+                Evvm(evvmAddress.current).getEvvmID(),
                 user,
                 username,
                 nonce,
@@ -981,9 +991,7 @@ contract NameService {
      * @dev Amount must be available after reserving funds for operations and locked offers
      * @param _amount Amount of Principal Tokens to withdraw
      */
-    function proposeWithdrawPrincipalTokens(
-        uint256 _amount
-    ) public onlyAdmin {
+    function proposeWithdrawPrincipalTokens(uint256 _amount) public onlyAdmin {
         if (
             Evvm(evvmAddress.current).getBalance(
                 address(this),

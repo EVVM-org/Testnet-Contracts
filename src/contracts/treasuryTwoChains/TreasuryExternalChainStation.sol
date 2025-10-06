@@ -39,6 +39,8 @@ contract TreasuryExternalChainStation is
 
     AxelarConfig axelar;
 
+    uint256 immutable EVVM_ID;
+
     mapping(address => uint256) nextFisherExecutionNonce;
 
     bytes _options =
@@ -73,7 +75,8 @@ contract TreasuryExternalChainStation is
 
     constructor(
         address _admin,
-        CrosschainConfig memory _crosschainConfig
+        CrosschainConfig memory _crosschainConfig,
+        uint256 _evvmId
     )
         OApp(_crosschainConfig.endpointAddress, _admin)
         Ownable(_admin)
@@ -102,6 +105,7 @@ contract TreasuryExternalChainStation is
             gasServiceAddress: _crosschainConfig.gasServiceAddress,
             gatewayAddress: _crosschainConfig.gatewayAddress
         });
+        EVVM_ID = _evvmId;
     }
 
     function setHostChainAddress(
@@ -237,6 +241,7 @@ contract TreasuryExternalChainStation is
     ) external onlyFisherExecutor {
         if (
             !SignatureUtils.verifyMessageSignedForFisherBridge(
+                EVVM_ID,
                 from,
                 addressToReceive,
                 nextFisherExecutionNonce[from],
@@ -260,6 +265,7 @@ contract TreasuryExternalChainStation is
     ) external onlyFisherExecutor {
         if (
             !SignatureUtils.verifyMessageSignedForFisherBridge(
+                EVVM_ID,
                 from,
                 addressToReceive,
                 nextFisherExecutionNonce[from],
@@ -293,6 +299,7 @@ contract TreasuryExternalChainStation is
     ) external payable onlyFisherExecutor {
         if (
             !SignatureUtils.verifyMessageSignedForFisherBridge(
+                EVVM_ID,
                 from,
                 addressToReceive,
                 nextFisherExecutionNonce[from],
