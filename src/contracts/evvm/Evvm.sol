@@ -305,13 +305,18 @@ contract Evvm is EvvmStorage {
     //░▒▓█ Payment Functions ████████████████████████████████████████████████████████▓▒░
 
     /**
-     * @notice Processes synchronous payments for non-staking users
-     * @dev Uses automatic nonce increment for sequential transaction ordering
+     * @notice Processes single payments
      *
      * Payment Flow:
-     * - Validates signature authorization for the payment
+     * - Validates signature authorization for the payment 
+     *   (if synchronous nonce, uses nextSyncUsedNonce inside
+     *    the signature verification to verify the correct nonce)
      * - Checks executor permission if specified
+     * - Validates synchronous nonce matches expected value
      * - Resolves recipient address (identity or direct address)
+     * - If the fisher (msg.sender) is a staker:
+     *  - Transfers priority fee to the fisher
+     *  - Rewards the fisher with Principal tokens
      * - Updates balances and increments nonce
      *
      * @param from Address of the payment sender
@@ -320,74 +325,12 @@ contract Evvm is EvvmStorage {
      * @param token Address of the token contract to transfer
      * @param amount Amount of tokens to transfer
      * @param priorityFee Additional fee for transaction priority (not used in non-staker payments)
+     * @param nonce Transaction nonce 
+     * @param priorityFlag Execution type flag (false = sync nonce, true = async nonce)
      * @param executor Address authorized to execute this transaction (zero address = sender only)
      * @param signature Cryptographic signature authorizing this payment
      */
-    function payNoStaker_sync(
-        address from,
-        address to_address,
-        string memory to_identity,
-        address token,
-        uint256 amount,
-        uint256 priorityFee,
-        address executor,
-        bytes memory signature
-    ) external {
-        if (
-            !SignatureUtils.verifyMessageSignedForPay(
-                evvmMetadata.EvvmID,
-                from,
-                to_address,
-                to_identity,
-                token,
-                amount,
-                priorityFee,
-                nextSyncUsedNonce[from],
-                false,
-                executor,
-                signature
-            )
-        ) revert ErrorsLib.InvalidSignature();
-
-        if (executor != address(0)) {
-            if (msg.sender != executor)
-                revert ErrorsLib.SenderIsNotTheExecutor();
-        }
-
-        address to = !Strings.equal(to_identity, "")
-            ? NameService(nameServiceAddress).verifyStrictAndGetOwnerOfIdentity(
-                to_identity
-            )
-            : to_address;
-
-        if (!_updateBalance(from, to, token, amount))
-            revert ErrorsLib.UpdateBalanceFailed();
-
-        nextSyncUsedNonce[from]++;
-    }
-
-    /**
-     * @notice Processes asynchronous payments for non-staking users
-     * @dev Uses custom nonces for flexible transaction ordering and replay protection
-     *
-     * Payment Flow:
-     * - Validates signature with custom nonce
-     * - Checks executor permission if specified
-     * - Ensures nonce hasn't been used before
-     * - Resolves recipient address and processes payment
-     * - Marks nonce as used to prevent replay attacks
-     *
-     * @param from Address of the payment sender
-     * @param to_address Direct recipient address (used if to_identity is empty)
-     * @param to_identity Username/identity of recipient (resolved via NameService)
-     * @param token Address of the token contract to transfer
-     * @param amount Amount of tokens to transfer
-     * @param priorityFee Additional fee for transaction priority (not used in non-staker payments)
-     * @param nonce Custom nonce for transaction ordering and replay protection
-     * @param executor Address authorized to execute this transaction (zero address = sender only)
-     * @param signature Cryptographic signature authorizing this payment
-     */
-    function payNoStaker_async(
+    function pay(
         address from,
         address to_address,
         string memory to_identity,
@@ -395,6 +338,7 @@ contract Evvm is EvvmStorage {
         uint256 amount,
         uint256 priorityFee,
         uint256 nonce,
+        bool priorityFlag,
         address executor,
         bytes memory signature
     ) external {
@@ -407,8 +351,8 @@ contract Evvm is EvvmStorage {
                 token,
                 amount,
                 priorityFee,
-                nonce,
-                true,
+                priorityFlag ? nonce : nextSyncUsedNonce[from],
+                priorityFlag,
                 executor,
                 signature
             )
@@ -419,7 +363,8 @@ contract Evvm is EvvmStorage {
                 revert ErrorsLib.SenderIsNotTheExecutor();
         }
 
-        if (asyncUsedNonce[from][nonce]) revert ErrorsLib.InvalidAsyncNonce();
+        if (priorityFlag && asyncUsedNonce[from][nonce])
+            revert ErrorsLib.InvalidAsyncNonce();
 
         address to = !Strings.equal(to_identity, "")
             ? NameService(nameServiceAddress).verifyStrictAndGetOwnerOfIdentity(
@@ -430,163 +375,19 @@ contract Evvm is EvvmStorage {
         if (!_updateBalance(from, to, token, amount))
             revert ErrorsLib.UpdateBalanceFailed();
 
-        asyncUsedNonce[from][nonce] = true;
-    }
-
-    /**
-     * @notice Processes synchronous payments for Principal Token stakers with rewards
-     * @dev Enhanced payment function that provides staker benefits and executor rewards
-     *
-     * Staker Benefits:
-     * - Stakers receive priority fee as reward for processing transactions
-     * - Executors (msg.sender) get rewarded if they are also stakers
-     * - Supports both direct addresses and identity-based payments
-     *
-     * Payment Flow:
-     * - Validates signature and executor permissions
-     * - Processes the main payment transfer
-     * - Distributes priority fee reward to stakers
-     * - Increments synchronous nonce automatically
-     *
-     * @param from Address of the payment sender (must be a staker)
-     * @param to_address Direct recipient address (used if to_identity is empty)
-     * @param to_identity Username/identity of recipient (resolved via NameService)
-     * @param token Address of the token contract to transfer
-     * @param amount Amount of tokens to transfer
-     * @param priorityFee Fee amount distributed to stakers as reward
-     * @param executor Address authorized to execute this transaction
-     * @param signature Cryptographic signature authorizing this payment
-     */
-    function payStaker_sync(
-        address from,
-        address to_address,
-        string memory to_identity,
-        address token,
-        uint256 amount,
-        uint256 priorityFee,
-        address executor,
-        bytes memory signature
-    ) external {
-        if (
-            !SignatureUtils.verifyMessageSignedForPay(
-                evvmMetadata.EvvmID,
-                from,
-                to_address,
-                to_identity,
-                token,
-                amount,
-                priorityFee,
-                nextSyncUsedNonce[from],
-                false,
-                executor,
-                signature
-            )
-        ) revert ErrorsLib.InvalidSignature();
-
-        if (executor != address(0)) {
-            if (msg.sender != executor)
-                revert ErrorsLib.SenderIsNotTheExecutor();
+        if (isAddressStaker(msg.sender)) {
+            if (priorityFee > 0) {
+                if (!_updateBalance(from, msg.sender, token, priorityFee))
+                    revert ErrorsLib.UpdateBalanceFailed();
+            }
+            _giveReward(msg.sender, 1);
         }
 
-        if (!isAddressStaker(msg.sender)) revert ErrorsLib.NotAnStaker();
-
-        address to = !Strings.equal(to_identity, "")
-            ? NameService(nameServiceAddress).verifyStrictAndGetOwnerOfIdentity(
-                to_identity
-            )
-            : to_address;
-
-        if (!_updateBalance(from, to, token, amount))
-            revert ErrorsLib.UpdateBalanceFailed();
-
-        if (priorityFee > 0) {
-            if (!_updateBalance(from, msg.sender, token, priorityFee))
-                revert ErrorsLib.UpdateBalanceFailed();
+        if (priorityFlag) {
+            asyncUsedNonce[from][nonce] = true;
+        } else {
+            nextSyncUsedNonce[from]++;
         }
-        _giveReward(msg.sender, 1);
-
-        nextSyncUsedNonce[from]++;
-    }
-
-    /**
-     * @notice Processes asynchronous payments for Principal Token stakers with rewards
-     * @dev Enhanced async payment function with staker benefits and custom nonce management
-     *
-     * Staker Benefits:
-     * - Priority fee rewards for transaction processing
-     * - Principal Token rewards for stakers (1x reward amount)
-     * - Custom nonce support for flexible transaction ordering
-     *
-     * Payment Flow:
-     * - Validates signature with custom nonce for replay protection
-     * - Verifies executor is a registered staker
-     * - Processes main payment and priority fee distribution
-     * - Rewards executor with MATE tokens
-     * - Marks nonce as used to prevent replay attacks
-     *
-     * @param from Address of the payment sender
-     * @param to_address Direct recipient address (used if to_identity is empty)
-     * @param to_identity Username/identity of recipient (resolved via NameService)
-     * @param token Address of the token contract to transfer
-     * @param amount Amount of tokens to transfer
-     * @param priorityFee Fee amount distributed to stakers as reward
-     * @param nonce Custom nonce for transaction ordering and replay protection
-     * @param executor Address authorized to execute this transaction (must be a staker)
-     * @param signature Cryptographic signature authorizing this payment
-     */
-    function payStaker_async(
-        address from,
-        address to_address,
-        string memory to_identity,
-        address token,
-        uint256 amount,
-        uint256 priorityFee,
-        uint256 nonce,
-        address executor,
-        bytes memory signature
-    ) external {
-        if (
-            !SignatureUtils.verifyMessageSignedForPay(
-                evvmMetadata.EvvmID,
-                from,
-                to_address,
-                to_identity,
-                token,
-                amount,
-                priorityFee,
-                nonce,
-                true,
-                executor,
-                signature
-            )
-        ) revert ErrorsLib.InvalidSignature();
-
-        if (executor != address(0)) {
-            if (msg.sender != executor)
-                revert ErrorsLib.SenderIsNotTheExecutor();
-        }
-
-        if (!isAddressStaker(msg.sender)) revert ErrorsLib.NotAnStaker();
-
-        if (asyncUsedNonce[from][nonce]) revert ErrorsLib.InvalidAsyncNonce();
-
-        address to = !Strings.equal(to_identity, "")
-            ? NameService(nameServiceAddress).verifyStrictAndGetOwnerOfIdentity(
-                to_identity
-            )
-            : to_address;
-
-        if (!_updateBalance(from, to, token, amount))
-            revert ErrorsLib.UpdateBalanceFailed();
-
-        if (priorityFee > 0) {
-            if (!_updateBalance(from, msg.sender, token, priorityFee))
-                revert ErrorsLib.UpdateBalanceFailed();
-        }
-
-        if (!_giveReward(msg.sender, 1)) revert ErrorsLib.UpdateBalanceFailed();
-
-        asyncUsedNonce[from][nonce] = true;
     }
 
     /**
