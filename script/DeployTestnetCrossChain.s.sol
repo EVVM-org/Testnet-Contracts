@@ -73,19 +73,19 @@ contract DeployTestnetCrossChain is Script {
     function setUp() public {}
 
     function run() public {
-        if (block.chainid == 11155111) {
-            EvvmStructs.EvvmMetadata memory inputMetadata = EvvmStructs
-                .EvvmMetadata({
-                    EvvmName: "EVVM Testnet",
-                    EvvmID: 1,
-                    principalTokenName: "Mate Test Token",
-                    principalTokenSymbol: "Mate",
-                    principalTokenAddress: 0x0000000000000000000000000000000000000001,
-                    totalSupply: 2033333333000000000000000000,
-                    eraTokens: 1016666666500000000000000000,
-                    reward: 5000000000000000000
-                });
+        EvvmStructs.EvvmMetadata memory inputMetadata = EvvmStructs
+            .EvvmMetadata({
+                EvvmName: "EVVM Testnet",
+                EvvmID: 1,
+                principalTokenName: "Mate Test Token",
+                principalTokenSymbol: "Mate",
+                principalTokenAddress: 0x0000000000000000000000000000000000000001,
+                totalSupply: 2033333333000000000000000000,
+                eraTokens: 1016666666500000000000000000,
+                reward: 5000000000000000000
+            });
 
+        if (block.chainid == 11155111) {
             vm.startBroadcast();
 
             sMate = new Staking(ADMIN, ADMIN);
@@ -111,13 +111,13 @@ contract DeployTestnetCrossChain is Script {
             );
 
             vm.stopBroadcast();
-
         } else if (block.chainid == 421614) {
             vm.startBroadcast();
 
             treasuryExternal = new TreasuryExternalChainStation(
                 ADMIN,
-                _crosschainConfigExternal
+                _crosschainConfigExternal,
+                inputMetadata.EvvmID
             );
 
             vm.stopBroadcast();
