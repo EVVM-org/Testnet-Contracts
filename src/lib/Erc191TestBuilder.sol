@@ -19,6 +19,7 @@ library Erc191TestBuilder {
     // EVVM
     //-----------------------------------------------------------------------------------
     function buildMessageSignedForPay(
+        uint256 evvmID,
         address _receiverAddress,
         string memory _receiverIdentity,
         address _token,
@@ -28,45 +29,32 @@ library Erc191TestBuilder {
         bool _priority_boolean,
         address _executor
     ) internal pure returns (bytes32 messageHash) {
-        string memory messageToSign = _receiverAddress == address(0)
-            ? string.concat(
-                _priority_boolean ? "f4e1895b" : "4faa1fa2",
-                ",",
-                _receiverIdentity,
-                ",",
-                AdvancedStrings.addressToString(_token),
-                ",",
-                Strings.toString(_amount),
-                ",",
-                Strings.toString(_priorityFee),
-                ",",
-                Strings.toString(_nonce),
-                ",",
-                _priority_boolean ? "true" : "false",
-                ",",
-                AdvancedStrings.addressToString(_executor)
-            )
-            : string.concat(
-                _priority_boolean ? "f4e1895b" : "4faa1fa2",
-                ",",
-                AdvancedStrings.addressToString(_receiverAddress),
-                ",",
-                AdvancedStrings.addressToString(_token),
-                ",",
-                Strings.toString(_amount),
-                ",",
-                Strings.toString(_priorityFee),
-                ",",
-                Strings.toString(_nonce),
-                ",",
-                _priority_boolean ? "true" : "false",
-                ",",
-                AdvancedStrings.addressToString(_executor)
-            );
+        string memory messageToSign = string.concat(
+            Strings.toString(evvmID),
+            ",",
+            "pay",
+            ",",
+            _receiverAddress == address(0)
+                ? _receiverIdentity
+                : AdvancedStrings.addressToString(_receiverAddress),
+            ",",
+            AdvancedStrings.addressToString(_token),
+            ",",
+            Strings.toString(_amount),
+            ",",
+            Strings.toString(_priorityFee),
+            ",",
+            Strings.toString(_nonce),
+            ",",
+            _priority_boolean ? "true" : "false",
+            ",",
+            AdvancedStrings.addressToString(_executor)
+        );
         messageHash = buildHashForSign(messageToSign);
     }
 
     function buildMessageSignedForDispersePay(
+        uint256 evvmID,
         bytes32 hashList,
         address _token,
         uint256 _amount,
@@ -78,7 +66,9 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    "ef83c1d6",
+                    Strings.toString(evvmID),
+                    ",",
+                    "dispersePay",
                     ",",
                     AdvancedStrings.bytes32ToString(hashList),
                     ",",
@@ -102,13 +92,16 @@ library Erc191TestBuilder {
     //-----------------------------------------------------------------------------------
 
     function buildMessageSignedForPreRegistrationUsername(
+        uint256 evvmID,
         bytes32 _hashUsername,
         uint256 _nameServiceNonce
     ) internal pure returns (bytes32 messageHash) {
         return
             buildHashForSign(
                 string.concat(
-                    "5d232a55",
+                    Strings.toString(evvmID),
+                    ",",
+                    "preRegistrationUsername",
                     ",",
                     AdvancedStrings.bytes32ToString(_hashUsername),
                     ",",
@@ -118,6 +111,7 @@ library Erc191TestBuilder {
     }
 
     function buildMessageSignedForRegistrationUsername(
+        uint256 evvmID,
         string memory _username,
         uint256 _clowNumber,
         uint256 _nameServiceNonce
@@ -125,7 +119,9 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    "afabc8db",
+                    Strings.toString(evvmID),
+                    ",",
+                    "registrationUsername",
                     ",",
                     _username,
                     ",",
@@ -137,6 +133,7 @@ library Erc191TestBuilder {
     }
 
     function buildMessageSignedForMakeOffer(
+        uint256 evvmID,
         string memory _username,
         uint256 _dateExpire,
         uint256 _amount,
@@ -145,7 +142,9 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    "d82e5d8b",
+                    Strings.toString(evvmID),
+                    ",",
+                    "makeOffer",
                     ",",
                     _username,
                     ",",
@@ -159,6 +158,7 @@ library Erc191TestBuilder {
     }
 
     function buildMessageSignedForWithdrawOffer(
+        uint256 evvmID,
         string memory _username,
         uint256 _offerId,
         uint256 _nameServiceNonce
@@ -166,7 +166,9 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    "5761d8ed",
+                    Strings.toString(evvmID),
+                    ",",
+                    "withdrawOffer",
                     ",",
                     _username,
                     ",",
@@ -178,6 +180,7 @@ library Erc191TestBuilder {
     }
 
     function buildMessageSignedForAcceptOffer(
+        uint256 evvmID,
         string memory _username,
         uint256 _offerId,
         uint256 _nameServiceNonce
@@ -185,7 +188,9 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    "8e3bde43", //methodIdentifier
+                    Strings.toString(evvmID),
+                    ",",
+                    "acceptOffer", 
                     ",",
                     _username,
                     ",",
@@ -197,13 +202,16 @@ library Erc191TestBuilder {
     }
 
     function buildMessageSignedForRenewUsername(
+        uint256 evvmID,
         string memory _username,
         uint256 _nameServiceNonce
     ) internal pure returns (bytes32 messageHash) {
         return
             buildHashForSign(
                 string.concat(
-                    "35723e23",
+                    Strings.toString(evvmID),
+                    ",",
+                    "renewUsername",
                     ",",
                     _username,
                     ",",
@@ -213,6 +221,7 @@ library Erc191TestBuilder {
     }
 
     function buildMessageSignedForAddCustomMetadata(
+        uint256 evvmID,
         string memory _username,
         string memory _value,
         uint256 _nameServiceNonce
@@ -220,7 +229,9 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    "4cfe021f",
+                    Strings.toString(evvmID),
+                    ",",
+                    "addCustomMetadata",
                     ",",
                     _username,
                     ",",
@@ -232,6 +243,7 @@ library Erc191TestBuilder {
     }
 
     function buildMessageSignedForRemoveCustomMetadata(
+        uint256 evvmID,
         string memory _username,
         uint256 _key,
         uint256 _nonce
@@ -239,7 +251,9 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    "8adf3927",
+                    Strings.toString(evvmID),
+                    ",",
+                    "removeCustomMetadata",
                     ",",
                     _username,
                     ",",
@@ -251,13 +265,16 @@ library Erc191TestBuilder {
     }
 
     function buildMessageSignedForFlushCustomMetadata(
+        uint256 evvmID,
         string memory _username,
         uint256 _nonce
     ) internal pure returns (bytes32 messageHash) {
         return
             buildHashForSign(
                 string.concat(
-                    "3ca44e54",
+                    Strings.toString(evvmID),
+                    ",",
+                    "flushCustomMetadata",
                     ",",
                     _username,
                     ",",
@@ -267,13 +284,16 @@ library Erc191TestBuilder {
     }
 
     function buildMessageSignedForFlushUsername(
+        uint256 evvmID,
         string memory _username,
         uint256 _nonce
     ) internal pure returns (bytes32 messageHash) {
         return
             buildHashForSign(
                 string.concat(
-                    "044695cb",
+                    Strings.toString(evvmID),
+                    ",",
+                    "flushUsername",
                     ",",
                     _username,
                     ",",
@@ -287,6 +307,7 @@ library Erc191TestBuilder {
     //-----------------------------------------------------------------------------------
 
     function buildMessageSignedForPublicServiceStake(
+        uint256 evvmID,
         address _serviceAddress,
         bool _isStaking,
         uint256 _amountOfStaking,
@@ -295,7 +316,9 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    "e2ccd470",
+                    Strings.toString(evvmID),
+                    ",",
+                    "publicServiceStaking",
                     ",",
                     AdvancedStrings.addressToString(_serviceAddress),
                     ",",
@@ -309,6 +332,7 @@ library Erc191TestBuilder {
     }
 
     function buildMessageSignedForPublicStaking(
+        uint256 evvmID,
         bool _isStaking,
         uint256 _amountOfStaking,
         uint256 _nonce
@@ -316,7 +340,9 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    "c769095c",
+                    Strings.toString(evvmID),
+                    ",",
+                    "publicStaking",
                     ",",
                     _isStaking ? "true" : "false",
                     ",",
@@ -328,6 +354,7 @@ library Erc191TestBuilder {
     }
 
     function buildMessageSignedForPresaleStaking(
+        uint256 evvmID,
         bool _isStaking,
         uint256 _amountOfStaking,
         uint256 _nonce
@@ -335,7 +362,9 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    "c0f6e7d1",
+                    Strings.toString(evvmID),
+                    ",",
+                    "presaleStaking",
                     ",",
                     _isStaking ? "true" : "false",
                     ",",
