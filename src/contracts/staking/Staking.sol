@@ -674,30 +674,18 @@ contract Staking {
         uint256 nonce,
         bytes memory signature
     ) internal {
-        if (priorityFlag) {
-            Evvm(EVVM_ADDRESS).payStaker_async(
-                user,
-                address(this),
-                "",
-                PRINCIPAL_TOKEN_ADDRESS,
-                amount,
-                priorityFee,
-                nonce,
-                address(this),
-                signature
-            );
-        } else {
-            Evvm(EVVM_ADDRESS).payStaker_sync(
-                user,
-                address(this),
-                "",
-                PRINCIPAL_TOKEN_ADDRESS,
-                amount,
-                priorityFee,
-                address(this),
-                signature
-            );
-        }
+        Evvm(EVVM_ADDRESS).pay(
+            user,
+            address(this),
+            "",
+            PRINCIPAL_TOKEN_ADDRESS,
+            amount,
+            priorityFee,
+            nonce,
+            priorityFlag,
+            address(this),
+            signature
+        );
     }
 
     /**
