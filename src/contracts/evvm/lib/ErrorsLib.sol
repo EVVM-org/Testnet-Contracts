@@ -13,4 +13,5 @@ library ErrorsLib {
     error InvalidAmount(uint256, uint256);
     error NotAnCA();
     error SenderIsNotTreasury();
+    error WindowToChangeEvvmIDExpired();
 }
