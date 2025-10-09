@@ -190,7 +190,7 @@ library Erc191TestBuilder {
                 string.concat(
                     Strings.toString(evvmID),
                     ",",
-                    "acceptOffer", 
+                    "acceptOffer",
                     ",",
                     _username,
                     ",",
