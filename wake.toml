@@ -2,24 +2,28 @@
 exclude_paths = ["node_modules", "venv", ".venv", "lib", "script", "test"]
 include_paths = ["node_modules"]
 remappings = [
+    "@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/",
     "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
-    "@axelar-network/axelar-gmp-sdk-solidity/=node_modules/@axelar-network/axelar-gmp-sdk-solidity/",
-    "@layerzerolabs/=node_modules/@layerzerolabs/",
+    "@EVVM/testnet/=src/",
+    "@solady/=lib/solady/src/",
+    "solidity-bytes-utils/=lib/solidity-bytes-utils/",
     "@hyperlane-xyz/core/=node_modules/@hyperlane-xyz/core/",
-    "@chainlink/contracts-ccip/=node_modules/@chainlink/contracts-ccip/",
-    "solidity-bytes-utils/=node_modules/solidity-bytes-utils/",
-    "@uniswap/v3-periphery/contracts/=lib/v3-periphery/contracts/",
-    "@uniswap/v3-core/contracts/=lib/v3-core/contracts/",
-    "@EVVM/interfaces/=src/interfaces/",
-    "@EVVM/core/=src/production/core/",
-    "@EVVM/EVVM-solidity-library/==lib/EVVM-solidity-library/src/",
-    "@EVVM/testnet/=src/mock/",
+    "@layerzerolabs/oapp-evm/=lib/devtools/packages/oapp-evm/",
+    "@layerzerolabs/lz-evm-protocol-v2/contracts/=lib/LayerZero-v2/packages/layerzero-v2/evm/protocol/contracts/",
+    "@layerzerolabs/lz-evm-messagelib-v2/contracts/=lib/LayerZero-v2/packages/layerzero-v2/evm/messagelib/contracts/",
+    "@axelar-network/axelar-gmp-sdk-solidity/contracts/=lib/axelar-gmp-sdk-solidity/contracts/",
+    "LayerZero-v2/=lib/LayerZero-v2/",
+    "axelar-gmp-sdk-solidity/=lib/axelar-gmp-sdk-solidity/contracts/",
+    "devtools/=lib/devtools/packages/toolbox-foundry/src/",
     "ds-test/=lib/forge-std/lib/ds-test/src/",
-    "erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
+    "erc4626-tests/=lib/openzeppelin-contracts-upgradeable/lib/erc4626-tests/",
     "forge-std/=lib/forge-std/src/",
+    "halmos-cheatcodes/=lib/openzeppelin-contracts-upgradeable/lib/halmos-cheatcodes/src/",
+    "openzeppelin-contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/",
     "openzeppelin-contracts/=lib/openzeppelin-contracts/",
+    "solady/=lib/solady/src/",
     "v3-core/=lib/v3-core/contracts/",
-    "v3-periphery/=lib/v3-periphery/contracts/"
+    "v3-periphery/=lib/v3-periphery/contracts/",
 ]
 via_IR = true
 
