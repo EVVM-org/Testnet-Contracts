@@ -117,7 +117,7 @@ contract DeployTestnetCrossChain is Script {
             treasuryExternal = new TreasuryExternalChainStation(
                 ADMIN,
                 _crosschainConfigExternal,
-                inputMetadata.EvvmID
+                0
             );
 
             vm.stopBroadcast();

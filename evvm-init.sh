@@ -83,17 +83,6 @@ echo -e "${GREEN}=== EVVM Metadata Configuration ===${NC}"
 read -p "$(echo -e "EVVM Name ${GRAY}[EVVM]${NC}: ")" evvmName
 evvmName=${evvmName:-"EVVM"}
 
-while true; do
-    read -p "EVVM ID (number - required): " evvmID
-    if [[ -z "$evvmID" ]]; then
-        echo -e "${RED}Error: EVVM ID is required. Please enter a valid number.${NC}"
-    elif validate_number "$evvmID"; then
-        break
-    else
-        echo -e "${RED}Error: Must be a valid number${NC}"
-    fi
-done
-
 read -p "$(echo -e "Principal Token Name ${GRAY}[Mate token]${NC}: ")" principalTokenName
 principalTokenName=${principalTokenName:-"Mate token"}
 
@@ -148,7 +137,6 @@ echo -e "Admin: ${GREEN}$admin${NC}"
 echo -e "Golden Fisher: ${GREEN}$goldenFisher${NC}"
 echo -e "Activator: ${GREEN}$activator${NC}"
 echo -e "EVVM Name: ${GREEN}$evvmName${NC}"
-echo -e "EVVM ID: ${GREEN}$evvmID${NC}"
 echo -e "Principal Token Name: ${GREEN}$principalTokenName${NC}"
 echo -e "Principal Token Symbol: ${GREEN}$principalTokenSymbol${NC}"
 echo -e "Total Supply: ${GREEN}$totalSupply${NC}"
@@ -177,7 +165,6 @@ EOF
 cat > input/evvmBasicMetadata.json << EOF
 {
   "EvvmName": "$evvmName",
-  "EvvmID": $evvmID,
   "principalTokenName": "$principalTokenName",
   "principalTokenSymbol": "$principalTokenSymbol"
 }

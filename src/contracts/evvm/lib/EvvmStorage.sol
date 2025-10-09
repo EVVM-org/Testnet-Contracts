@@ -31,12 +31,6 @@ abstract contract EvvmStorage is EvvmStructs {
     address whitelistTokenToBeAdded_pool;
     uint256 whitelistTokenToBeAdded_dateToSet;
 
-    bytes1 breakerSetupNameServiceAddress;
-
-    EvvmMetadata evvmMetadata;
-
-    AddressTypeProposal admin;
-
     /**
      * @dev The address of the implementation contract is stored
      *      separately because of the way the proxy pattern works,
@@ -45,6 +39,14 @@ abstract contract EvvmStorage is EvvmStructs {
     address currentImplementation;
     address proposalImplementation;
     uint256 timeToAcceptImplementation;
+
+    uint256 windowTimeToChangeEvvmID;
+
+    EvvmMetadata evvmMetadata;
+
+    AddressTypeProposal admin;
+
+    bytes1 breakerSetupNameServiceAddress;
 
     mapping(address => bytes1) stakerList;
 
@@ -55,5 +57,4 @@ abstract contract EvvmStorage is EvvmStructs {
     mapping(address user => mapping(uint256 nonce => bool isUsed)) asyncUsedNonce;
 
     mapping(address user => uint256 nonce) nextFisherDepositNonce;
-
 }

@@ -159,6 +159,8 @@ contract Evvm is EvvmStorage {
         breakerSetupNameServiceAddress = FLAG_IS_STAKER;
 
         evvmMetadata = _evvmMetadata;
+
+        windowTimeToChangeEvvmID = block.timestamp + 1 days;
     }
 
     /**
@@ -203,6 +205,19 @@ contract Evvm is EvvmStorage {
         stakerList[nameServiceAddress] = FLAG_IS_STAKER;
 
         treasuryAddress = _treasuryAddress;
+    }
+
+    /**
+     * @notice Updates the EVVM ID with a new value, restricted to admin and time-limited
+     * @dev Allows the admin to change the EVVM ID within a 1-day window after deployment
+     */
+    function setEvvmID(uint256 newEvvmID) external onlyAdmin {
+        if (block.timestamp > windowTimeToChangeEvvmID)
+            revert ErrorsLib.WindowToChangeEvvmIDExpired();
+
+        evvmMetadata.EvvmID = newEvvmID;
+
+        windowTimeToChangeEvvmID = block.timestamp + 1 days;
     }
 
     /**
@@ -308,7 +323,7 @@ contract Evvm is EvvmStorage {
      * @notice Processes single payments
      *
      * Payment Flow:
-     * - Validates signature authorization for the payment 
+     * - Validates signature authorization for the payment
      *   (if synchronous nonce, uses nextSyncUsedNonce inside
      *    the signature verification to verify the correct nonce)
      * - Checks executor permission if specified
@@ -325,7 +340,7 @@ contract Evvm is EvvmStorage {
      * @param token Address of the token contract to transfer
      * @param amount Amount of tokens to transfer
      * @param priorityFee Additional fee for transaction priority (not used in non-staker payments)
-     * @param nonce Transaction nonce 
+     * @param nonce Transaction nonce
      * @param priorityFlag Execution type flag (false = sync nonce, true = async nonce)
      * @param executor Address authorized to execute this transaction (zero address = sender only)
      * @param signature Cryptographic signature authorizing this payment
@@ -1126,7 +1141,6 @@ contract Evvm is EvvmStorage {
     function getEvvmID() external view returns (uint256) {
         return evvmMetadata.EvvmID;
     }
-
 
     /**
      * @notice Gets the acceptance deadline for pending token whitelist proposals
