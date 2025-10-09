@@ -3,12 +3,29 @@
 
 pragma solidity ^0.8.0;
 
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 /**
+    ____             _      __            
+   / __ \___  ____ _(______/ /________  __
+  / /_/ / _ \/ __ `/ / ___/ __/ ___/ / / /
+ / _, _/  __/ /_/ / (__  / /_/ /  / /_/ / 
+/_/ |_|\___/\__, /_/____/\__/_/   \__, /  
+           /____/                /____/   
+    ______                                
+   / _____   ___   ______ ___             
+  / __/ | | / | | / / __ `__ \            
+ / /___ | |/ /| |/ / / / / / /            
+/_____/ |___/ |___/_/ /_/ /_/             
+                                          
+████████╗███████╗███████╗████████╗███╗   ██╗███████╗████████╗
+╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝████╗  ██║██╔════╝╚══██╔══╝
+   ██║   █████╗  ███████╗   ██║   ██╔██╗ ██║█████╗     ██║   
+   ██║   ██╔══╝  ╚════██║   ██║   ██║╚██╗██║██╔══╝     ██║   
+   ██║   ███████╗███████║   ██║   ██║ ╚████║███████╗   ██║   
+   ╚═╝   ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚══════╝   ╚═╝   
+                                                             
  * @title RegistryEvvm
+ * @author jistro.eth ariutokintumi.eth
  * @notice Registry contract for EVVM deployments on testnets
  * @dev Upgradeable contract that manages EVVM registration with 7-day time-delayed governance
  * 
@@ -18,6 +35,11 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
  * - Chain ID whitelisting to restrict registration to approved testnets
  * - Time-delayed governance for superUser changes and contract upgrades
  */
+
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+
 contract RegistryEvvm is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     error InvalidUser();
     error InvalidInput();
