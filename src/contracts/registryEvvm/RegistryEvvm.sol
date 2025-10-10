@@ -41,12 +41,15 @@ import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Ini
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 contract RegistryEvvm is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+
+    // 🬮🬼🬬🬎🬞🬸🬥🬵🬍🬝🬭🬶🬿🬹🬗🬗🬖🬗🬟🬿 Errors 🬎🬞🬝🬏🬘🬯🬉🬹🬭🬅🬤🬣🬤🬋🬲🬯🬀🬂🬀🬆 //
     error InvalidUser();
     error InvalidInput();
     error AlreadyRegistered();
     error ChainIdNotRegistered();
     error EvvmIdAlreadyRegistered();
     
+    // 🬽🬴🬴🬲🬞🬤🬦🬳🬋🬄🬇🬖🬦🬧🬓🬉🬤🬏🬑🬮 Structures 🬶🬸🬙🬀🬐🬣🬢🬮🬘🬴🬂🬬🬼🬅🬒🬲🬁🬣🬉🬀 //
     /**
      * @notice Metadata structure for EVVM registration
      * @param chainId The chain ID where the EVVM is deployed
@@ -69,6 +72,8 @@ contract RegistryEvvm is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         uint256 timeToAccept;
     }
 
+    // 🬂🬒🬆🬣🬐🬑🬞🬮🬌🬚🬅🬍🬟🬿🬠🬉🬾🬁🬛🬸 State Variables 🬕🬅🬿🬈🬿🬋🬥🬂🬹🬦🬿🬋🬳🬏🬟🬇🬐🬹🬱🬻 //
+
     AddressTypeProposal superUser;
     AddressTypeProposal upgradeProposal;
 
@@ -84,6 +89,8 @@ contract RegistryEvvm is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
         _;
     }
+
+    // 🬥🬗🬈🬊🬞🬝🬮🬁🬢🬇🬥🬾🬠🬭🬩🬎🬛🬃🬥🬿 Initialization Functions 🬗🬩🬢🬘🬜🬆🬫🬒🬼🬋🬐🬨🬞🬉🬹🬆🬳🬣🬜🬯 //
 
     /**
      * @notice Constructor that disables initializers for the implementation contract
@@ -104,6 +111,8 @@ contract RegistryEvvm is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         __Ownable_init(initialSuperUser);
         __UUPSUpgradeable_init();
     }
+
+    // 🬬🬱🬳🬌🬐🬍🬾🬊🬽🬃🬣🬔🬇🬻🬥🬨🬑🬹🬐🬱 Registration Functions 🬢🬒🬢🬹🬵🬣🬙🬙🬤🬎🬰🬠🬓🬘🬐🬆🬅🬺🬇🬳 //
 
     /**
      * @notice Public registration function for EVVM instances
@@ -182,6 +191,8 @@ contract RegistryEvvm is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
         return evvmID;
     }
+
+    // 🬥🬭🬔🬑🬹🬬🬨🬟🬧🬛🬄🬐🬥🬯🬄🬥🬞🬚🬎🬼 SuperUser Functions 🬥🬛🬞🬊🬴🬹🬥🬀🬐🬬🬰🬈🬎🬚🬼🬆🬻🬜🬌🬳 //
 
     /**
      * @notice Registers multiple chain IDs to the whitelist
@@ -302,6 +313,8 @@ contract RegistryEvvm is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     ) external view returns (Metadata memory) {
         return registry[evvmID];
     }
+
+    // 🬡🬯🬓🬶🬾🬧🬝🬘🬘🬔🬗🬼🬙🬺🬔🬠🬺🬛🬖🬣 Getters 🬝🬡🬦🬋🬂🬺🬿🬳🬈🬘🬍🬁🬗🬸🬉🬷🬞🬢🬩🬑 //
 
     /**
      * @notice Retrieves all active whitelisted EVVM IDs (1-999)
