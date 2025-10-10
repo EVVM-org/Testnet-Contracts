@@ -67,6 +67,11 @@ deployLocalTestnet:
 	@forge script script/DeployLocalTestnet.s.sol:DeployLocalTestnet $(ANVIL_ARGS) -vvvv
 
 
+deployRegistryEvvm: 
+	@echo "Deploying RegistryEvvm contract on Ethereum Sepolia"
+	@forge clean
+	@forge script script/DeployRegistryEvvm.s.sol:DeployRegistryEvvm $(ETH_SEPOLIA_TESTNET_ARGS) -vvvvvv
+
 # Help command
 help:
 	@echo "-------------------------------------=Usage=-------------------------------------"
@@ -82,5 +87,9 @@ help:
 	@echo "-----------------------=Deployers for test networks=----------------------"
 	@echo ""
 	@echo "  make deployTestnet ---------------- Deploy testnet contracts"
+	@echo ""
+	@echo "-----------------------=Deployer for RegistryEvvm=----------------------"
+	@echo ""
+	@echo "  make deployRegistryEvvm ----------- Deploy RegistryEvvm contract on Ethereum Sepolia"
 	@echo ""
 	@echo "---------------------------------------------------------------------------------"
