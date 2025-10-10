@@ -10,7 +10,8 @@ contract DeployRegistryEvvm is Script {
     RegistryEvvm registryEvvm;
     ERC1967Proxy proxyRegistryEvvm;
 
-    address constant SUPERUSER = 0x63c3774531EF83631111Fe2Cf01520Fb3F5A68F7; // replace with actual address
+    // first superuser address is dev.jistro.eth
+    address constant SUPERUSER = 0x5cBf2D4Bbf834912Ad0bD59980355b57695e8309;
 
     function setUp() public {}
 
