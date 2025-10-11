@@ -38,7 +38,7 @@ seeSizes:
 
 anvil:
 	@echo "Starting Anvil, remember to use another terminal to run tests"
-	@anvil -m 'test test test test test test test test test test test junk' --steps-tracing
+	@anvil -m 'test test test test test test test test test test test junk' --block-time 10
 
 deployTestnet: 
 	@echo "Deploying testnet on $(NETWORK)"
@@ -61,11 +61,10 @@ deployTestnetCrossChainExternal:
 	@forge clean
 	@forge script script/DeployTestnetCrossChain.s.sol:DeployTestnetCrossChain $(ARB_SEPOLIA_TESTNET_ARGS) -vvvvvv
 
-deployLocalTestnet: 
+deployTestnetAnvil: 
 	@echo "Deploying local testnet"
 	@forge clean
-	@forge script script/DeployLocalTestnet.s.sol:DeployLocalTestnet $(ANVIL_ARGS) -vvvv
-
+	@forge script script/DeployTestnetOnAnvil.s.sol:DeployTestnetOnAnvil $(ANVIL_ARGS) -vvvv
 
 deployRegistryEvvm: 
 	@echo "Deploying RegistryEvvm contract on Ethereum Sepolia"
