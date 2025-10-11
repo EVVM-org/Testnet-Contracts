@@ -80,7 +80,7 @@ contract DeployTestnet is Script {
         EvvmStructs.EvvmMetadata memory inputMetadata = EvvmStructs
             .EvvmMetadata({
                 EvvmName: basicMetadata.EvvmName,
-                EvvmID: 0,
+                EvvmID: 0, ///@dev dont change the EvvmID unless you know what you are doing
                 principalTokenName: basicMetadata.principalTokenName,
                 principalTokenSymbol: basicMetadata.principalTokenSymbol,
                 principalTokenAddress: 0x0000000000000000000000000000000000000001,
