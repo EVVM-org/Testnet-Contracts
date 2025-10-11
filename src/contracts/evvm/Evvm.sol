@@ -212,7 +212,7 @@ contract Evvm is EvvmStorage {
      * @dev Allows the admin to change the EVVM ID within a 1-day window after deployment
      */
     function setEvvmID(uint256 newEvvmID) external onlyAdmin {
-        if (block.timestamp > windowTimeToChangeEvvmID)
+        if (newEvvmID != 0 && block.timestamp > windowTimeToChangeEvvmID)
             revert ErrorsLib.WindowToChangeEvvmIDExpired();
 
         evvmMetadata.EvvmID = newEvvmID;
