@@ -42,14 +42,14 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 
 contract RegistryEvvm is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
-    // 🬮🬼🬬🬎🬞🬸🬥🬵🬍🬝🬭🬶🬿🬹🬗🬗🬖🬗🬟🬿 Errors 🬎🬞🬝🬏🬘🬯🬉🬹🬭🬅🬤🬣🬤🬋🬲🬯🬀🬂🬀🬆 //
+    // 🬮 Errors 🬼🬬🬎🬞🬸🬥🬵🬍🬝🬭🬶🬿🬹🬗🬗🬖🬗🬟🬿🬎🬞🬝🬏🬘🬯🬉🬹🬭🬅🬤🬣🬤🬋🬲🬯🬀🬂🬀🬆 //
     error InvalidUser();
     error InvalidInput();
     error AlreadyRegistered();
     error ChainIdNotRegistered();
     error EvvmIdAlreadyRegistered();
     
-    // 🬽🬴🬴🬲🬞🬤🬦🬳🬋🬄🬇🬖🬦🬧🬓🬉🬤🬏🬑🬮 Structures 🬶🬸🬙🬀🬐🬣🬢🬮🬘🬴🬂🬬🬼🬅🬒🬲🬁🬣🬉🬀 //
+    // 🬽 Structures 🬴🬴🬲🬞🬤🬦🬳🬋🬄🬇🬖🬦🬧🬓🬉🬤🬏🬑🬮🬶🬸🬙🬀🬐🬣🬢🬮🬘🬴🬂🬬🬼🬅🬒🬲🬁🬣🬉🬀 //
     /**
      * @notice Metadata structure for EVVM registration
      * @param chainId The chain ID where the EVVM is deployed
@@ -72,7 +72,7 @@ contract RegistryEvvm is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         uint256 timeToAccept;
     }
 
-    // 🬂🬒🬆🬣🬐🬑🬞🬮🬌🬚🬅🬍🬟🬿🬠🬉🬾🬁🬛🬸 State Variables 🬕🬅🬿🬈🬿🬋🬥🬂🬹🬦🬿🬋🬳🬏🬟🬇🬐🬹🬱🬻 //
+    // 🬂 State Variables 🬒🬆🬣🬐🬑🬞🬮🬌🬚🬅🬍🬟🬿🬠🬉🬾🬁🬛🬸🬕🬅🬿🬈🬿🬋🬥🬂🬹🬦🬿🬋🬳🬏🬟🬇🬐🬹🬱🬻 //
 
     AddressTypeProposal superUser;
     AddressTypeProposal upgradeProposal;
@@ -89,7 +89,7 @@ contract RegistryEvvm is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         _;
     }
 
-    // 🬥🬗🬈🬊🬞🬝🬮🬁🬢🬇🬥🬾🬠🬭🬩🬎🬛🬃🬥🬿 Initialization Functions 🬗🬩🬢🬘🬜🬆🬫🬒🬼🬋🬐🬨🬞🬉🬹🬆🬳🬣🬜🬯 //
+    // 🬥 Initialization Functions 🬗🬈🬊🬞🬝🬮🬁🬢🬇🬥🬾🬠🬭🬩🬎🬛🬃🬥🬿🬗🬩🬢🬘🬜🬆🬫🬒🬼🬋🬐🬨🬞🬉🬹🬆🬳🬣🬜🬯 //
 
     /**
      * @notice Constructor that disables initializers for the implementation contract
@@ -111,7 +111,7 @@ contract RegistryEvvm is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         __UUPSUpgradeable_init();
     }
 
-    // 🬬🬱🬳🬌🬐🬍🬾🬊🬽🬃🬣🬔🬇🬻🬥🬨🬑🬹🬐🬱 Registration Functions 🬢🬒🬢🬹🬵🬣🬙🬙🬤🬎🬰🬠🬓🬘🬐🬆🬅🬺🬇🬳 //
+    // 🬬 Registration Functions 🬱🬳🬌🬐🬍🬾🬊🬽🬃🬣🬔🬇🬻🬥🬨🬑🬹🬐🬱🬢🬒🬢🬹🬵🬣🬙🬙🬤🬎🬰🬠🬓🬘🬐🬆🬅🬺🬇🬳 //
 
     /**
      * @notice Public registration function for EVVM instances
@@ -191,7 +191,7 @@ contract RegistryEvvm is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         return evvmID;
     }
 
-    // 🬥🬭🬔🬑🬹🬬🬨🬟🬧🬛🬄🬐🬥🬯🬄🬥🬞🬚🬎🬼 SuperUser Functions 🬥🬛🬞🬊🬴🬹🬥🬀🬐🬬🬰🬈🬎🬚🬼🬆🬻🬜🬌🬳 //
+    // 🬥 SuperUser Functions 🬭🬔🬑🬹🬬🬨🬟🬧🬛🬄🬐🬥🬯🬄🬥🬞🬚🬎🬥🬛🬞🬊🬴🬹🬥🬀🬐🬬🬰🬈🬎🬚🬼🬆🬻🬜🬌🬳 //
 
     /**
      * @notice Registers multiple chain IDs to the whitelist
@@ -299,7 +299,7 @@ contract RegistryEvvm is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         upgradeToAndCall(newImplementation, "");
     }
 
-    // 🬡🬯🬓🬶🬾🬧🬝🬘🬘🬔🬗🬼🬙🬺🬔🬠🬺🬛🬖🬣 Getters 🬝🬡🬦🬋🬂🬺🬿🬳🬈🬘🬍🬁🬗🬸🬉🬷🬞🬢🬩🬑 //
+    // 🬡 Getters 🬯🬓🬶🬾🬧🬝🬘🬘🬔🬗🬼🬙🬺🬔🬠🬺🬛🬖🬣🬝🬡🬦🬋🬂🬺🬿🬳🬈🬘🬍🬁🬗🬸🬉🬷🬞🬢🬩🬑 //
 
     /**
      * @notice Retrieves metadata for a specific EVVM ID
