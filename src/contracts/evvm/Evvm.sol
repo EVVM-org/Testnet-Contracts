@@ -159,8 +159,6 @@ contract Evvm is EvvmStorage {
         breakerSetupNameServiceAddress = FLAG_IS_STAKER;
 
         evvmMetadata = _evvmMetadata;
-
-        windowTimeToChangeEvvmID = block.timestamp + 1 days;
     }
 
     /**
@@ -212,8 +210,10 @@ contract Evvm is EvvmStorage {
      * @dev Allows the admin to change the EVVM ID within a 1-day window after deployment
      */
     function setEvvmID(uint256 newEvvmID) external onlyAdmin {
-        if (newEvvmID != 0 && block.timestamp > windowTimeToChangeEvvmID)
-            revert ErrorsLib.WindowToChangeEvvmIDExpired();
+        if (newEvvmID == 0) {
+            if (block.timestamp > windowTimeToChangeEvvmID)
+                revert ErrorsLib.WindowToChangeEvvmIDExpired();
+        }
 
         evvmMetadata.EvvmID = newEvvmID;
 
