@@ -194,6 +194,7 @@ The EVVM ecosystem consists of five main contracts:
 - **Staking.sol**: Token staking and rewards mechanism
 - **Estimator.sol**: Staking rewards estimation and calculation
 - **Treasury.sol**: Manages deposits and withdrawals of ETH and ERC20 tokens
+- **Treasury.sol**: Manages deposits and withdrawals of ETH and ERC20 tokens
 
 ## Configuration Files
 Key files for EVVM deployment:
