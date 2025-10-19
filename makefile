@@ -69,12 +69,6 @@ deployTestnetAnvil:
 	@echo "Deploying local testnet"
 	@forge clean
 	@forge script script/DeployTestnetOnAnvil.s.sol:DeployTestnetOnAnvil $(ANVIL_ARGS) -vvvv
-
-deployRegistryEvvm: 
-	@echo "Deploying RegistryEvvm contract on Ethereum Sepolia"
-	@forge clean
-	@forge script script/DeployRegistryEvvm.s.sol:DeployRegistryEvvm $(ETH_SEPOLIA_TESTNET_ARGS) -vvvvvv
-
 # Help command
 help:
 	@echo "================================================================================="
