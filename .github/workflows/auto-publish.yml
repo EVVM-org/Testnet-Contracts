@@ -32,8 +32,8 @@ jobs:
 
     - name: Configure Git
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+        git config --global user.email "noreply@github.com"
+        git config --global user.name "EVVM Bot"
 
     - name: Get current version
       id: current_version
