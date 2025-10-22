@@ -2,12 +2,12 @@
 pragma solidity ^0.8.13;
 
 import {Script, console2} from "forge-std/Script.sol";
-import {Evvm} from "@EVVM/testnet/contracts/evvm/Evvm.sol";
-import {Staking} from "@EVVM/testnet/contracts/staking/Staking.sol";
-import {Estimator} from "@EVVM/testnet/contracts/staking/Estimator.sol";
-import {NameService} from "@EVVM/testnet/contracts/nameService/NameService.sol";
-import {EvvmStructs} from "@EVVM/testnet/contracts/evvm/lib/EvvmStructs.sol";
-import {Treasury} from "@EVVM/testnet/contracts/treasury/Treasury.sol";
+import {Evvm} from "@EVVM/testnet-contracts/contracts/evvm/Evvm.sol";
+import {Staking} from "@EVVM/testnet-contracts/contracts/staking/Staking.sol";
+import {Estimator} from "@EVVM/testnet-contracts/contracts/staking/Estimator.sol";
+import {NameService} from "@EVVM/testnet-contracts/contracts/nameService/NameService.sol";
+import {EvvmStructs} from "@EVVM/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
+import {Treasury} from "@EVVM/testnet-contracts/contracts/treasury/Treasury.sol";
 
 contract DeployTestnet is Script {
     Staking sMate;

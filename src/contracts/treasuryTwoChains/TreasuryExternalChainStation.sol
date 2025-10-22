@@ -4,12 +4,12 @@
 pragma solidity ^0.8.0;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ErrorsLib} from "@EVVM/testnet/contracts/treasuryTwoChains/lib/ErrorsLib.sol";
-import {ExternalChainStationStructs} from "@EVVM/testnet/contracts/treasuryTwoChains/lib/ExternalChainStationStructs.sol";
+import {ErrorsLib} from "@EVVM/testnet-contracts/contracts/treasuryTwoChains/lib/ErrorsLib.sol";
+import {ExternalChainStationStructs} from "@EVVM/testnet-contracts/contracts/treasuryTwoChains/lib/ExternalChainStationStructs.sol";
 
 import {SafeTransferLib} from "@solady/utils/SafeTransferLib.sol";
 
-import {SignatureUtils} from "@EVVM/testnet/contracts/treasuryTwoChains/lib/SignatureUtils.sol";
+import {SignatureUtils} from "@EVVM/testnet-contracts/contracts/treasuryTwoChains/lib/SignatureUtils.sol";
 
 import {IMailbox} from "@hyperlane-xyz/core/contracts/interfaces/IMailbox.sol";
 

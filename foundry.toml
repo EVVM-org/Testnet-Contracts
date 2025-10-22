@@ -5,7 +5,7 @@ libs = ["lib"]
 remappings = [
     '@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/',
     '@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts',
-    '@EVVM/testnet/=src/',
+    '@EVVM/testnet-contracts/=src/',
     '@solady/=lib/solady/src/',
     'solidity-bytes-utils/=lib/solidity-bytes-utils/',
     # Cross-chain remappings

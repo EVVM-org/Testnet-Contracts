@@ -29,8 +29,8 @@ pragma solidity ^0.8.0;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeTransferLib} from "@solady/utils/SafeTransferLib.sol";
-import {Evvm} from "@EVVM/testnet/contracts/evvm/Evvm.sol";
-import {ErrorsLib} from "@EVVM/testnet/contracts/treasury/lib/ErrorsLib.sol";
+import {Evvm} from "@EVVM/testnet-contracts/contracts/evvm/Evvm.sol";
+import {ErrorsLib} from "@EVVM/testnet-contracts/contracts/treasury/lib/ErrorsLib.sol";
 
 contract Treasury {
     /// @notice Address of the EVVM core contract

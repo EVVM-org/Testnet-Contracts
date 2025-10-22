@@ -41,11 +41,11 @@ pragma solidity ^0.8.0;
  * - Estimator integration for yield calculations
  */
 
-import {Evvm} from "@EVVM/testnet/contracts/evvm/Evvm.sol";
-import {NameService} from "@EVVM/testnet/contracts/nameService/NameService.sol";
-import {Estimator} from "@EVVM/testnet/contracts/staking/Estimator.sol";
-import {ErrorsLib} from "@EVVM/testnet/contracts/staking/lib/ErrorsLib.sol";
-import {SignatureUtils} from "@EVVM/testnet/contracts/staking/lib/SignatureUtils.sol";
+import {Evvm} from "@EVVM/testnet-contracts/contracts/evvm/Evvm.sol";
+import {NameService} from "@EVVM/testnet-contracts/contracts/nameService/NameService.sol";
+import {Estimator} from "@EVVM/testnet-contracts/contracts/staking/Estimator.sol";
+import {ErrorsLib} from "@EVVM/testnet-contracts/contracts/staking/lib/ErrorsLib.sol";
+import {SignatureUtils} from "@EVVM/testnet-contracts/contracts/staking/lib/SignatureUtils.sol";
 
 contract Staking {
     /**
