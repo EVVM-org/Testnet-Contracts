@@ -1,5 +1,51 @@
 {
+  "name": "@evvm/testnet-contracts",
+  "version": "1.0.0",
+  "description": "EVVM Testnet Contracts - Smart contracts and tools for scalable, modular, and cross-chain EVM virtualization",
+  "files": [
+    "src/**/*.sol",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "evvm",
+    "ethereum",
+    "virtual-machine",
+    "solidity",
+    "smart-contracts",
+    "cross-chain",
+    "testnet",
+    "evm",
+    "blockchain",
+    "defi"
+  ],
+  "author": "EVVM Organization",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EVVM-org/Testnet-Contracts.git"
+  },
+  "homepage": "https://github.com/EVVM-org/Testnet-Contracts#readme",
+  "bugs": {
+    "url": "https://github.com/EVVM-org/Testnet-Contracts/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "compile": "forge build",
+    "test": "forge test",
+    "deploy:anvil": "make deployLocalTestnet",
+    "deploy:sepolia": "make deployTestnet NETWORK=eth",
+    "deploy:arbitrum": "make deployTestnet NETWORK=arb"
+  },
+  "peerDependencies": {
+    "@openzeppelin/contracts": "^5.0.0"
+  },
   "dependencies": {
     "@hyperlane-xyz/core": "^3.6.1"
+  },
+  "devDependencies": {
+    "forge-std": "^1.0.0"
   }
 }

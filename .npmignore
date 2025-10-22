@@ -1,0 +1,47 @@
+# Build and cache directories
+out/
+cache/
+broadcast/
+node_modules/
+
+# Development files
+.env
+.env.example
+*.log
+.DS_Store
+
+# Foundry artifacts
+foundry.toml
+remappings.txt
+
+# Scripts and makefiles (not needed for library usage)
+script/
+makefile
+evvm-init.sh
+
+# Git and CI
+.git/
+.github/
+.gitignore
+.gitmodules
+
+# Test files
+test/
+tests/
+
+# Documentation that's not README
+docs/
+*.md
+!README.md
+
+# Library dependencies (users should install these separately)
+lib/
+
+# Input configuration files
+input/
+
+# Wake configuration
+wake.toml
+
+# TypeScript example
+package-ts.json.example
