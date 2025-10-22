@@ -36,7 +36,7 @@
   },
   "scripts": {
     "build": "npm run copy-files",
-    "copy-files": "cp -r src/contracts . && cp -r src/interfaces . && cp -r src/lib library",
+    "copy-files": "cp -r src/contracts . && cp -r src/interfaces . && cp -r src/library .",
     "clean": "rm -rf contracts interfaces library",
     "prepare-publish": "npm run copy-files && npm pack",
     "publish-package": "npm run copy-files && npm publish && npm run clean",
