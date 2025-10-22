@@ -4,7 +4,7 @@
   "description": "EVVM Testnet Contracts - Smart contracts and tools for scalable, modular, and cross-chain EVM virtualization",
   "files": [
     "contracts",
-    "interfaces",
+    "interfaces", 
     "lib",
     "README.md",
     "LICENSE"
@@ -35,13 +35,13 @@
     "access": "public"
   },
   "scripts": {
-    "prepublishOnly": "cp -r src/* . && echo 'Copied src contents to root for publishing'",
-    "postpublish": "rm -rf contracts interfaces lib && echo 'Cleaned up copied files'",
     "compile": "forge build",
     "test": "forge test",
     "deploy:anvil": "make deployLocalTestnet",
     "deploy:sepolia": "make deployTestnet NETWORK=eth",
-    "deploy:arbitrum": "make deployTestnet NETWORK=arb"
+    "deploy:arbitrum": "make deployTestnet NETWORK=arb",
+    "prepublishOnly": "cp -r src/* . && echo 'Copied src contents to root for publishing'",
+    "postpublish": "rm -rf contracts interfaces lib && echo 'Cleaned up copied files'"
   },
   "peerDependencies": {
     "@openzeppelin/contracts": "^5.0.0"
