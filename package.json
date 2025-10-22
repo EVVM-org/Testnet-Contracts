@@ -22,7 +22,7 @@
     "defi"
   ],
   "author": "EVVM Organization",
-  "license": "MIT",
+  "license": "EVVM-NONCOMMERCIAL-1.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/EVVM-org/Testnet-Contracts.git"
