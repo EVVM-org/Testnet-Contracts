@@ -2,14 +2,209 @@
 
 ![](https://github.com/user-attachments/assets/08d995ee-7512-42e4-a26c-0d62d2e8e0bf)
 
-The Ethereum Virtual Virtual Machine (EVVM) ⚙️
+EVVM is an innovative blockchain virtualization system that allows you to create and deploy your own virtual blockchains on top of existing Ethereum networks where you can:
 
-**This repository is the next step after successful playground testing. It is dedicated to advanced integration, deployment, and validation on public testnets, before mainnet implementation.**
+- **Create your own virtual blockchain** with custom tokens and governance
+- **Deploy on testnets** like Ethereum Sepolia or Arbitrum Sepolia for testing
+- **Use proven, audited contracts** for staking, treasury management, and domain services
+- **Scale to mainnet** when ready for production
 
-EVVM provides a comprehensive set of smart contracts and tools for scalable, modular, and cross-chain EVM virtualization. This repo is intended for developers who want to:
-- Test and validate contracts on public testnets (Ethereum Sepolia, Arbitrum Sepolia)
-- Prepare for mainnet deployment after testnet validation
-- Contribute to the evolution of the EVVM protocol
+## What's included?
+
+EVVM provides a complete ecosystem of smart contracts:
+- **Core EVVM**: Your virtual blockchain's main engine
+- **NameService**: Domain name system for your blockchain (like ENS)
+- **Staking**: Token staking and rewards system
+- **Treasury**: Secure fund management inside the host chain or across chains 
+- **Estimator**: Reward calculation and optimization
+
+## Use Cases
+
+This repository serves two main purposes:
+
+### Deploy Your Own EVVM Instance
+Create and deploy a complete virtual blockchain with all EVVM contracts on testnets for experimentation and testing.
+
+### Build Services Using Existing EVVM
+Use EVVM contracts as a library to build services that interact with already deployed EVVM instances.
+
+---
+
+## Quick Start Options
+
+Choose your path based on what you want to achieve:
+
+### Option A: Building Services on Existing EVVM 
+
+**Perfect if you want to create smart contracts that interact with already deployed EVVM instances.**
+
+Simply install the library and start building:
+
+```bash
+# Install via NPM
+npm install @evvm/testnet-contracts
+
+# OR install via Forge  
+forge install EVVM-org/Testnet-Contracts
+```
+
+**What you get**: Access to all EVVM interfaces and contracts to build services that interact with live EVVM instances on testnets.
+
+**Next steps**: Jump to [Library Usage](#library-usage) section below.
+
+### Option B: Deploy Your Own Complete EVVM Instance
+
+**Perfect if you want to create your own virtual blockchain with custom tokens and governance.**
+
+Follow the complete deployment process:
+
+**What you get**: Your own virtual blockchain with custom tokens, domain system, staking rewards, and treasury management - all deployed and verified on public testnets.
+
+**Next steps**: Jump to [Deploy Your Own EVVM](#deploy-your-own-evvm) section below.
+
+---
+
+## Library Usage
+
+> **For Building Services**: This section is for developers who want to build smart contracts that interact with existing EVVM instances. If you want to deploy your own complete EVVM instance, skip to [Deploy Your Own EVVM](#deploy-your-own-evvm).
+
+This repository can be used as a library in your Solidity projects through multiple installation methods:
+
+### Installation Options
+
+#### Option 1: NPM
+```bash
+npm install @evvm/testnet-contracts
+```
+
+#### Option 2: Forge
+```bash
+forge install EVVM-org/Testnet-Contracts
+```
+
+### Configuration
+
+#### If using NPM installation
+Add to your `foundry.toml`:
+```toml
+remappings = [
+    "@evvm/testnet-contracts/=node_modules/@evvm/testnet-contracts/src/",
+]
+```
+
+#### If using Forge installation
+Add to your `foundry.toml`:
+```toml
+remappings = [
+    "@evvm/testnet-contracts/=lib/Testnet-Contracts/src/",
+]
+```
+
+### Package Structure
+
+```
+@evvm/testnet-contracts/
+├── src/
+│   ├── contracts/
+│   │   ├── evvm/Evvm.sol           # Core EVVM implementation
+│   │   ├── nameService/NameService.sol  # Domain name resolution
+│   │   ├── staking/Staking.sol     # Staking mechanism
+│   │   ├── staking/Estimator.sol   # Rewards estimation
+│   │   ├── treasury/Treasury.sol   # Treasury management
+│   │   └── treasuryTwoChains/      # Cross-chain treasury contracts
+│   ├── interfaces/                 # All contract interfaces
+│   └── lib/                       # Utility libraries
+```
+
+### Quick Integration Example
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+import "@evvm/testnet-contracts/interfaces/IEvvm.sol";
+import "@evvm/testnet-contracts/interfaces/ITreasury.sol";
+
+contract MyDApp {
+    IEvvm public immutable evvm;
+    ITreasury public immutable treasury;
+    
+    constructor(address _evvm, address _treasury) {
+        evvm = IEvvm(_evvm);
+        treasury = ITreasury(_treasury);
+    }
+    
+    function getEvvmInfo() external view returns (string memory name, uint256 id) {
+        name = evvm.getEvvmName();
+        id = evvm.getEvvmID();
+    }
+}
+```
+
+### Available Contracts
+
+#### Core Contracts
+- `contracts/evvm/Evvm.sol` - Main EVVM virtual machine implementation
+- `contracts/nameService/NameService.sol` - Domain name resolution system
+- `contracts/staking/Staking.sol` - Token staking and rewards mechanism
+- `contracts/staking/Estimator.sol` - Staking rewards estimation and calculation
+- `contracts/treasury/Treasury.sol` - Manages deposits and withdrawals
+
+#### Cross-chain Treasury
+- `contracts/treasuryTwoChains/TreasuryHostChainStation.sol` - Host chain treasury management
+- `contracts/treasuryTwoChains/TreasuryExternalChainStation.sol` - External chain treasury management
+
+#### Interfaces
+All contracts have corresponding interfaces in the `interfaces/` directory:
+- `interfaces/IEvvm.sol`
+- `interfaces/INameService.sol`
+- `interfaces/IStaking.sol`
+- `interfaces/IEstimator.sol`
+- `interfaces/ITreasury.sol`
+- `interfaces/ITreasuryHostChainStation.sol`
+- `interfaces/ITreasuryExternalChainStation.sol`
+
+#### Utility Libraries
+- `lib/AdvancedStrings.sol` - Advanced string manipulation utilities
+- `lib/SignatureRecover.sol` - Signature recovery utilities
+- `lib/Erc191TestBuilder.sol` - ERC-191 signature testing utilities
+
+### Import Patterns
+
+#### Individual Contract Imports
+```solidity
+import "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
+import "@evvm/testnet-contracts/interfaces/IEvvm.sol";
+import "@evvm/testnet-contracts/lib/AdvancedStrings.sol";
+```
+
+#### Interface-Only Imports (Recommended for DApps)
+```solidity
+import "@evvm/testnet-contracts/interfaces/IEvvm.sol";
+import "@evvm/testnet-contracts/interfaces/IStaking.sol";
+```
+
+### Dependencies
+
+#### If using NPM installation
+Dependencies are automatically handled when you install the package. However, you need to ensure you have the peer dependencies:
+
+```bash
+npm install @openzeppelin/contracts
+```
+
+For cross-chain functionality, you might also need:
+```bash
+npm install @hyperlane-xyz/core
+```
+
+#### If using Forge installation
+You need to manually install all dependencies:
+
+```bash
+forge install OpenZeppelin/openzeppelin-contracts
+forge install hyperlane-xyz/hyperlane-monorepo  # For cross-chain functionality
+```
 
 ## Repository Structure
 - `src/contracts/evvm/` — Core EVVM contracts and storage
@@ -24,30 +219,9 @@ EVVM provides a comprehensive set of smart contracts and tools for scalable, mod
 - `input/` — Configuration files for deployment (generated by `evvm-init.sh`)
 - `evvm-init.sh` — Interactive setup and deployment script
 
-## Public EVVM Contract Address
-
-### Ethereum Sepolia Testnet
-- **EVVM**: [0x2029bb5e15E22c19Bc8bde3426fab29dD4db8A98](https://sepolia.etherscan.io/address/0x2029bb5e15E22c19Bc8bde3426fab29dD4db8A98#code)
-- **NameService**: [0xD904f38B8c9968AbAb63f47c21aB120FCe59F013](https://sepolia.etherscan.io/address/0xD904f38B8c9968AbAb63f47c21aB120FCe59F013#code)
-- **Staking**: [0xA68D4a0cFFDc6145D35Ae27521d01b166Fe4AE46](https://sepolia.etherscan.io/address/0xA68D4a0cFFDc6145D35Ae27521d01b166Fe4AE46#code)
-- **Estimator**: [0x2aBEAD7519c9AFc14eEc2582dDD9FF04f0da0F42](https://sepolia.etherscan.io/address/0x2aBEAD7519c9AFc14eEc2582dDD9FF04f0da0F42#code)
-- **Treasury**: [0x98465F828b82d0b676937e159547F35BBDBdfe91](https://sepolia.etherscan.io/address/0x98465F828b82d0b676937e159547F35BBDBdfe91#code)
-
-### Arbitrum Sepolia Testnet
-- **EVVM**: [0xC688C12541Ff85EF3E63755F6889317f312d03A3](https://sepolia.arbiscan.io/address/0xC688C12541Ff85EF3E63755F6889317f312d03A3#code)
-- **NameService**: [0x82Fbac7857E8407cE6578E02B0be0d3Cd15Fb790](https://sepolia.arbiscan.io/address/0x82Fbac7857E8407cE6578E02B0be0d3Cd15Fb790#code)
-- **Staking**: [0xaC3C70604a5633807Ae0149B6E6766452355635C](https://sepolia.arbiscan.io/address/0xaC3C70604a5633807Ae0149B6E6766452355635C#code)
-- **Estimator**: [0xC4FF60fBAEf050FC476f4Ab10CA75378A2Cc79A3](https://sepolia.arbiscan.io/address/0xC4FF60fBAEf050FC476f4Ab10CA75378A2Cc79A3#code)
-- **Treasury**: [0x7d4F9D95e84f6903c7247527e6BF1FA864F7c764](https://sepolia.arbiscan.io/address/0x7d4F9D95e84f6903c7247527e6BF1FA864F7c764#code)
-
-## Development Flow
-1. **Playground**: Prototype and experiment with new features in the playground repo.
-2. **Testnet (this repo)**: Integrate, test, and validate on public testnets.
-3. **Mainnet**: After successful testnet validation, proceed to mainnet deployment.
-
 ## Prerequisites
 - [Foundry](https://getfoundry.sh/) (Solidity development toolkit)
-- Node.js (for dependency management)
+- Node.js (if using npm installation method)
 - Bash shell (for running `evvm-init.sh`)
 - Environment variables set up (`.env` file with API keys and RPC URLs)
 
@@ -73,9 +247,11 @@ This command will prompt you to enter your private key securely. The key will be
 ## Key Dependencies
 - [OpenZeppelin Contracts](https://github.com/OpenZeppelin/openzeppelin-contracts)
 
-## Quick Start
+## Deploy Your Own EVVM
 
-Deploy your EVVM virtual blockchain on testnet in 4 simple steps:
+Want to create your own virtual blockchain? Follow these steps to deploy a complete EVVM instance on testnets:
+
+> **What you'll get**: Your own virtual blockchain with custom tokens, domain system, staking rewards, and treasury management - all deployed and verified on public testnets.
 
 ### 1. Clone and Install
 ```bash
@@ -142,18 +318,15 @@ If you prefer manual control over configuration, create these files in `input/`:
 }
 ```
 
-## Local Development
-Start a local Anvil chain:
+## Local Development & Manual Deployment
+
+### Start Local Development
 ```bash
-make anvil
+make anvil                # Start local blockchain
+make deployLocalTestnet   # Deploy to local chain
 ```
 
-Deploy contracts to local testnet:
-```bash
-make deployLocalTestnet
-```
-
-## Manual Deployment
+### Manual Deployment to Testnets
 
 If you prefer to deploy manually after configuration:
 
@@ -173,12 +346,6 @@ forge script script/DeployTestnet.s.sol:DeployTestnet \
     --etherscan-api-key $ETHERSCAN_API
 ```
 
-## Local Development
-```bash
-make anvil                # Start local blockchain
-make deployLocalTestnet   # Deploy to local chain
-```
-
 ## Development Commands
 ```bash
 make install     # Install dependencies and compile
@@ -194,7 +361,6 @@ The EVVM ecosystem consists of five main contracts:
 - **Staking.sol**: Token staking and rewards mechanism
 - **Estimator.sol**: Staking rewards estimation and calculation
 - **Treasury.sol**: Manages deposits and withdrawals of ETH and ERC20 tokens
-- **Treasury.sol**: Manages deposits and withdrawals of ETH and ERC20 tokens
 
 ## Configuration Files
 Key files for EVVM deployment:
@@ -204,6 +370,15 @@ Key files for EVVM deployment:
 - `makefile` — Build and deployment automation
 
 ## Contributing
+
+**Development Flow Context**: This repository is the next step after successful playground testing. It is dedicated to advanced integration, deployment, and validation on public testnets, before mainnet implementation.
+
+### Development Flow
+1. **Playground**: Prototype and experiment with new features in the playground repo.
+2. **Testnet (this repo)**: Integrate, test, and validate on public testnets.
+3. **Mainnet**: After successful testnet validation, proceed to mainnet deployment.
+
+### How to Contribute
 1. Fork the repository
 2. Create a feature branch and make changes
 3. Add tests for new features
