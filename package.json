@@ -1,17 +1,14 @@
 {
   "name": "@evvm/testnet-contracts",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "EVVM Testnet Contracts - Smart contracts and tools for scalable, modular, and cross-chain EVM virtualization",
   "files": [
-    "src/**/*.sol",
+    "contracts/**/*.sol",
+    "interfaces/**/*.sol", 
+    "lib/**/*.sol",
     "README.md",
     "LICENSE"
   ],
-  "exports": {
-    "./contracts/*": "./src/contracts/*",
-    "./interfaces/*": "./src/interfaces/*",
-    "./lib/*": "./src/lib/*"
-  },
   "keywords": [
     "evvm",
     "ethereum",
@@ -38,6 +35,8 @@
     "access": "public"
   },
   "scripts": {
+    "prepublishOnly": "cp -r src/* .",
+    "postpublish": "rm -rf contracts interfaces lib",
     "compile": "forge build",
     "test": "forge test",
     "deploy:anvil": "make deployLocalTestnet",
