@@ -58,7 +58,7 @@ pragma solidity ^0.8.0;
 
 import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {AdvancedStrings} from "@evvm/testnet-contracts/lib/AdvancedStrings.sol";
+import {AdvancedStrings} from "@evvm/testnet-contracts/library/AdvancedStrings.sol";
 import {ErrorsLib} from "@evvm/testnet-contracts/contracts/nameService/lib/ErrorsLib.sol";
 import {SignatureUtils} from "@evvm/testnet-contracts/contracts/nameService/lib/SignatureUtils.sol";
 

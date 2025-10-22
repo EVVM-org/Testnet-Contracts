@@ -35,7 +35,15 @@ docs/
 !README.md
 
 # Library dependencies (users should install these separately)
-lib/
+lib/forge-std/
+lib/devtools/
+lib/axelar-gmp-sdk-solidity/
+lib/LayerZero-v2/
+lib/openzeppelin-contracts/
+lib/solady/
+lib/solidity-bytes-utils/
+lib/v3-core/
+lib/v3-periphery/
 
 # Input configuration files
 input/
@@ -45,3 +53,6 @@ wake.toml
 
 # TypeScript example
 package-ts.json.example
+
+# Source directory (since we copy from src/ to root during packaging)
+src/

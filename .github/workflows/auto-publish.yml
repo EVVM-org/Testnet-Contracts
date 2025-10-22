@@ -1,0 +1,83 @@
+name: Auto Publish NPM Package
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - '.github/**'
+      - 'docs/**'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip-publish]')"
+    
+    permissions:
+      contents: write
+      packages: write
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+    - name: Get current version
+      id: current_version
+      run: |
+        CURRENT_VERSION=$(node -p "require('./package.json').version")
+        echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Increment patch version
+      id: increment_version
+      run: |
+        npm version patch --no-git-tag-version
+        NEW_VERSION=$(node -p "require('./package.json').version")
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Copy source files for publishing
+      run: |
+        npm run copy-files
+
+    - name: Publish to NPM
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: Clean up copied files
+      run: |
+        npm run clean
+
+    - name: Commit version bump
+      run: |
+        git add package.json
+        git commit -m "chore: bump version to ${{ steps.increment_version.outputs.new_version }} [skip-publish]"
+        git push
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.increment_version.outputs.new_version }}
+        release_name: Release v${{ steps.increment_version.outputs.new_version }}
+        body: |
+          Auto-generated release for version ${{ steps.increment_version.outputs.new_version }}
+          
+          **Changes:**
+          - ${{ github.event.head_commit.message }}
+        draft: false
+        prerelease: false
