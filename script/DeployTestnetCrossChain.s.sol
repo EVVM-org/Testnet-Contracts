@@ -2,15 +2,15 @@
 pragma solidity ^0.8.13;
 
 import {Script, console2} from "forge-std/Script.sol";
-import {Evvm} from "@EVVM/testnet-contracts/contracts/evvm/Evvm.sol";
-import {Staking} from "@EVVM/testnet-contracts/contracts/staking/Staking.sol";
-import {Estimator} from "@EVVM/testnet-contracts/contracts/staking/Estimator.sol";
-import {NameService} from "@EVVM/testnet-contracts/contracts/nameService/NameService.sol";
-import {EvvmStructs} from "@EVVM/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
-import {TreasuryExternalChainStation} from "@EVVM/testnet-contracts/contracts/treasuryTwoChains/TreasuryExternalChainStation.sol";
-import {TreasuryHostChainStation} from "@EVVM/testnet-contracts/contracts/treasuryTwoChains/TreasuryHostChainStation.sol";
-import {HostChainStationStructs} from "@EVVM/testnet-contracts/contracts/treasuryTwoChains/lib/HostChainStationStructs.sol";
-import {ExternalChainStationStructs} from "@EVVM/testnet-contracts/contracts/treasuryTwoChains/lib/ExternalChainStationStructs.sol";
+import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
+import {Staking} from "@evvm/testnet-contracts/contracts/staking/Staking.sol";
+import {Estimator} from "@evvm/testnet-contracts/contracts/staking/Estimator.sol";
+import {NameService} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
+import {EvvmStructs} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
+import {TreasuryExternalChainStation} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/TreasuryExternalChainStation.sol";
+import {TreasuryHostChainStation} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/TreasuryHostChainStation.sol";
+import {HostChainStationStructs} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/HostChainStationStructs.sol";
+import {ExternalChainStationStructs} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/ExternalChainStationStructs.sol";
 
 contract DeployTestnetCrossChain is Script {
     Staking sMate;

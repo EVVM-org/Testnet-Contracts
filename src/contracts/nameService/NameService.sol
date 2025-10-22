@@ -56,11 +56,11 @@ pragma solidity ^0.8.0;
  * - Marketplace takes 0.5% fee on username sales
  */
 
-import {Evvm} from "@EVVM/testnet-contracts/contracts/evvm/Evvm.sol";
+import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {AdvancedStrings} from "@EVVM/testnet-contracts/lib/AdvancedStrings.sol";
-import {ErrorsLib} from "@EVVM/testnet-contracts/contracts/nameService/lib/ErrorsLib.sol";
-import {SignatureUtils} from "@EVVM/testnet-contracts/contracts/nameService/lib/SignatureUtils.sol";
+import {AdvancedStrings} from "@evvm/testnet-contracts/lib/AdvancedStrings.sol";
+import {ErrorsLib} from "@evvm/testnet-contracts/contracts/nameService/lib/ErrorsLib.sol";
+import {SignatureUtils} from "@evvm/testnet-contracts/contracts/nameService/lib/SignatureUtils.sol";
 
 contract NameService {
     /**

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: EVVM-NONCOMMERCIAL-1.0
 // Full license terms available at: https://www.evvm.info/docs/EVVMNoncommercialLicense
 
-import {SignatureRecover} from "@EVVM/testnet-contracts/lib/SignatureRecover.sol";
-import {AdvancedStrings} from "@EVVM/testnet-contracts/lib/AdvancedStrings.sol";
+import {SignatureRecover} from "@evvm/testnet-contracts/lib/SignatureRecover.sol";
+import {AdvancedStrings} from "@evvm/testnet-contracts/lib/AdvancedStrings.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 pragma solidity ^0.8.0;

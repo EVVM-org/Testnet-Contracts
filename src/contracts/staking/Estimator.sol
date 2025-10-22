@@ -15,8 +15,8 @@ MMMMMMMMMMMM
  * @author jistro.eth ariutokintumi.eth
  */
 
-import {Staking} from "@EVVM/testnet-contracts/contracts/staking/Staking.sol";
-import {Evvm} from "@EVVM/testnet-contracts/contracts/evvm/Evvm.sol";
+import {Staking} from "@evvm/testnet-contracts/contracts/staking/Staking.sol";
+import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
 
 contract Estimator {
     struct AddressTypeProposal {

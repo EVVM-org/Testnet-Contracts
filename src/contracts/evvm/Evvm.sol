@@ -74,10 +74,10 @@ pragma solidity ^0.8.0;
  * @custom:upgrade-pattern Transparent proxy with admin-controlled implementation
  */
 
-import {NameService} from "@EVVM/testnet-contracts/contracts/nameService/NameService.sol";
-import {EvvmStorage} from "@EVVM/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
-import {ErrorsLib} from "@EVVM/testnet-contracts/contracts/evvm/lib/ErrorsLib.sol";
-import {SignatureUtils} from "@EVVM/testnet-contracts/contracts/evvm/lib/SignatureUtils.sol";
+import {NameService} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
+import {EvvmStorage} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
+import {ErrorsLib} from "@evvm/testnet-contracts/contracts/evvm/lib/ErrorsLib.sol";
+import {SignatureUtils} from "@evvm/testnet-contracts/contracts/evvm/lib/SignatureUtils.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 contract Evvm is EvvmStorage {
