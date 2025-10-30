@@ -40,10 +40,26 @@ jobs:
         CURRENT_VERSION=$(node -p "require('./package.json').version")
         echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
-    - name: Increment patch version
+    - name: Determine version increment type
+      id: version_type
+      run: |
+        COMMIT_MSG="${{ github.event.head_commit.message }}"
+        if [[ "$COMMIT_MSG" =~ ^MAJOR: ]]; then
+          echo "increment=major" >> $GITHUB_OUTPUT
+          echo "type=MAJOR" >> $GITHUB_OUTPUT
+        elif [[ "$COMMIT_MSG" =~ ^MINOR: ]]; then
+          echo "increment=minor" >> $GITHUB_OUTPUT
+          echo "type=MINOR" >> $GITHUB_OUTPUT
+        else
+          echo "increment=patch" >> $GITHUB_OUTPUT
+          echo "type=PATCH" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Increment version
       id: increment_version
       run: |
-        npm version patch --no-git-tag-version
+        INCREMENT_TYPE="${{ steps.version_type.outputs.increment }}"
+        npm version $INCREMENT_TYPE --no-git-tag-version
         NEW_VERSION=$(node -p "require('./package.json').version")
         echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
@@ -63,7 +79,7 @@ jobs:
     - name: Commit version bump
       run: |
         git add package.json
-        git commit -m "chore: bump version to ${{ steps.increment_version.outputs.new_version }} [skip-publish]"
+        git commit -m "chore: bump ${{ steps.version_type.outputs.type }} version to ${{ steps.increment_version.outputs.new_version }} [skip-publish]"
         git push
 
     - name: Create GitHub Release
@@ -74,9 +90,11 @@ jobs:
         tag_name: v${{ steps.increment_version.outputs.new_version }}
         release_name: Release v${{ steps.increment_version.outputs.new_version }}
         body: |
-          Auto-generated release for version ${{ steps.increment_version.outputs.new_version }}
+          Auto-generated ${{ steps.version_type.outputs.type }} release for version ${{ steps.increment_version.outputs.new_version }}
           
           **Changes:**
           - ${{ github.event.head_commit.message }}
+          
+          **Version Type:** ${{ steps.version_type.outputs.type }}
         draft: false
         prerelease: false
