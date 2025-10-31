@@ -12,7 +12,7 @@ MM        .M `88888P'   dP   dP dP  dP  dP `88888P8   dP   `88888P' dP
 MMMMMMMMMMMM                                                                 
                                                                             
  * @title Staking Mate contract for Roll A Mate Protocol 
- * @author jistro.eth ariutokintumi.eth
+ * @author Mate labs
  */
 
 import {Staking} from "@evvm/testnet-contracts/contracts/staking/Staking.sol";

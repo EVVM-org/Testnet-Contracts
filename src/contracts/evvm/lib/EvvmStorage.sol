@@ -7,7 +7,7 @@ import {EvvmStructs} from "./EvvmStructs.sol";
 
 /**
  * @title EvvmStorage
- * @author jistro.eth
+ * @author Mate labs
  * @dev Storage layout contract for EVVM proxy pattern implementation.
  *      This contract inherits all structures from EvvmStructs and
  *      defines the storage layout that will be used by the proxy pattern.

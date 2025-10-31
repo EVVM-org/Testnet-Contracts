@@ -27,7 +27,7 @@ pragma solidity ^0.8.0;
    ╚═╝   ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚══════╝   ╚═╝   
  *
  * @title EVVM Name Service Contract
- * @author jistro.eth ariutokintumi.eth
+ * @author Mate labs
  * @notice This contract manages username registration and domain name services for the EVVM ecosystem
  * @dev Provides a comprehensive domain name system with features including:
  *

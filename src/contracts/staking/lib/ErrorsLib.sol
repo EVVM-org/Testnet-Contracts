@@ -14,6 +14,10 @@ library ErrorsLib {
     error PublicStakingDisabled();
     error AddressIsNotAService();
     error UserAndServiceMismatch();
-    error UserMustWaitToStakeAgain();
-    error UserMustWaitToFullUnstake();
+    error AddressMustWaitToStakeAgain();
+    error AddressMustWaitToFullUnstake();
+    error ServiceDoesNotFulfillCorrectStakingAmount(uint256 requiredAmount);
+    error ServiceDoesNotStakeInSameTx();
+    error AddressMismatch();
 }
+

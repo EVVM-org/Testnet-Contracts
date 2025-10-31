@@ -61,7 +61,7 @@ pragma solidity ^0.8.0;
    ╚═╝   ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚══════╝   ╚═╝   
                                                              
  * @title EVVM (Ethereum Virtual Machine Virtualization) Core Contract
- * @author jistro.eth ariutokintumi.eth
+ * @author Mate labs
  * @notice Core payment processing and token management system for the EVVM ecosystem
  * @dev This contract serves as the central hub for:
  *      - Multi-token payment processing with signature verification

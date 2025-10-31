@@ -4,7 +4,7 @@
 pragma solidity ^0.8.0;
 /**
  * @title Erc191TestBuilder
- * @author jistro.eth
+ * @author Mate labs
  * @notice this library is used to build ERC191 messages for foundry test scripts
  *         more info in
  *         https://book.getfoundry.sh/cheatcodes/create-wallet

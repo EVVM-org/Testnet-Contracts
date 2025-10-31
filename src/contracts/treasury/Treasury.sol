@@ -22,7 +22,7 @@ pragma solidity ^0.8.0;
    ╚═╝   ╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚══════╝   ╚═╝   
             
  * @title Treasury Contract
- * @author jistro.eth
+ * @author Mate labs
  * @notice Treasury for managing deposits and withdrawals in the EVVM ecosystem
  * @dev Secure vault for ETH and ERC20 tokens with EVVM integration and input validation
  */
