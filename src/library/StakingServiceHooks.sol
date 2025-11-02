@@ -59,7 +59,7 @@ abstract contract StakingServiceHooks {
      * @dev CRITICAL: This function ensures atomicity - if any step fails, the entire transaction reverts
      *      preventing the loss of Principal Tokens that could occur with manual step-by-step execution
      */
-    function makeStakeService(uint256 amountToStake) internal {
+    function _makeStakeService(uint256 amountToStake) internal {
         Staking(stakingHookAddress).prepareServiceStaking(amountToStake);
         Evvm(evvmHookAddress).caPay(
             address(stakingHookAddress),
@@ -84,7 +84,7 @@ abstract contract StakingServiceHooks {
      * 
      * @dev Unstaking is subject to the same time locks as regular user unstaking
      */
-    function makeUnstakeService(uint256 amountToUnstake) internal {
+    function _makeUnstakeService(uint256 amountToUnstake) internal {
         Staking(stakingHookAddress).serviceUnstaking(amountToUnstake);
     }
 
@@ -110,7 +110,7 @@ abstract contract StakingServiceHooks {
      *      is upgraded but the staking contract remains the same. In most cases, prefer
      *      using _changeStakingHookAddress which updates both addresses automatically.
      */
-    function changeEvvmHookAddress(address newEvvmAddress) internal {
+    function _changeEvvmHookAddress(address newEvvmAddress) internal {
         evvmHookAddress = newEvvmAddress;
     }
 }
