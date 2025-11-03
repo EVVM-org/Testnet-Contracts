@@ -299,7 +299,7 @@ contract NameService {
 
         makePay(
             user,
-            getPricePerRegistration(),
+            getPriceOfRegistration(username),
             priorityFee_EVVM,
             nonce_EVVM,
             priorityFlag_EVVM,
@@ -1659,12 +1659,20 @@ contract NameService {
     }
 
     /**
-     * @notice Gets the current price for registering a new username
-     * @dev Price is dynamic and based on current EVVM reward amount (100x reward)
+     * @notice Gets price to register an username
+     * @dev Price is fully dynamic based on existing offers and timing
+     *      - If dosnt have offers, price is 100x current EVVM reward amount
+     *      - If has offers, price is calculated via seePriceToRenew function
+     * @param username The username to get registration price for
      * @return The current registration price in Principal Tokens
      */
-    function getPricePerRegistration() public view returns (uint256) {
-        return Evvm(evvmAddress.current).getRewardAmount() * 100;
+    function getPriceOfRegistration(
+        string memory username
+    ) public view returns (uint256) {
+        return
+            identityDetails[username].offerMaxSlots > 0
+                ? seePriceToRenew(username)
+                : Evvm(evvmAddress.current).getRewardAmount() * 100;
     }
 
     //█ Administrative Getters ███████████████████████████████████████████████████████████████████████
