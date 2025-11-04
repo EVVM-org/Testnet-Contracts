@@ -11,14 +11,16 @@ import {TreasuryExternalChainStation} from "@evvm/testnet-contracts/contracts/tr
 import {TreasuryHostChainStation} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/TreasuryHostChainStation.sol";
 import {HostChainStationStructs} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/HostChainStationStructs.sol";
 import {ExternalChainStationStructs} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/ExternalChainStationStructs.sol";
+import {P2PSwap} from "@evvm/testnet-contracts/contracts/p2pSwap/P2PSwap.sol";
 
 contract DeployTestnetCrossChain is Script {
-    Staking sMate;
+    Staking staking;
     Evvm evvm;
     Estimator estimator;
     NameService nameService;
     TreasuryExternalChainStation treasuryExternal;
     TreasuryHostChainStation treasuryHost;
+    P2PSwap p2pSwap;
     /*
     
     struct CrosschainConfig {
@@ -88,12 +90,12 @@ contract DeployTestnetCrossChain is Script {
         if (block.chainid == 11155111) {
             vm.startBroadcast();
 
-            sMate = new Staking(ADMIN, ADMIN);
-            evvm = new Evvm(ADMIN, address(sMate), inputMetadata);
+            staking = new Staking(ADMIN, ADMIN);
+            evvm = new Evvm(ADMIN, address(staking), inputMetadata);
             estimator = new Estimator(
                 ADMIN,
                 address(evvm),
-                address(sMate),
+                address(staking),
                 ADMIN
             );
             nameService = new NameService(address(evvm), ADMIN);
@@ -104,11 +106,13 @@ contract DeployTestnetCrossChain is Script {
                 _crosschainConfigHost
             );
 
-            sMate._setupEstimatorAndEvvm(address(estimator), address(evvm));
+            staking._setupEstimatorAndEvvm(address(estimator), address(evvm));
             evvm._setupNameServiceAndTreasuryAddress(
                 address(nameService),
                 address(treasuryHost)
             );
+
+            p2pSwap = new P2PSwap(address(evvm), address(staking), ADMIN);
 
             vm.stopBroadcast();
         } else if (block.chainid == 421614) {

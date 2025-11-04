@@ -11,7 +11,7 @@ MM  MMMMMMMM       88   88   88 88  88  88 88.  .88   88   88.  .88 88
 MM        .M `88888P'   dP   dP dP  dP  dP `88888P8   dP   `88888P' dP       
 MMMMMMMMMMMM                                                                 
                                                                             
- * @title Staking Mate contract for Roll A Mate Protocol 
+ * @title Staking Estimator Contract
  * @author Mate labs
  */
 

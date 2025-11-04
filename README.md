@@ -17,6 +17,7 @@ EVVM provides a complete ecosystem of smart contracts:
 - **Staking**: Token staking and rewards system
 - **Treasury**: Secure fund management inside the host chain or across chains 
 - **Estimator**: Reward calculation and optimization
+- **P2PSwap**: Peer-to-peer token exchange service with automated market making
 
 ## Use Cases
 
@@ -111,7 +112,8 @@ remappings = [
 │   │   ├── staking/Staking.sol     # Staking mechanism
 │   │   ├── staking/Estimator.sol   # Rewards estimation
 │   │   ├── treasury/Treasury.sol   # Treasury management
-│   │   └── treasuryTwoChains/      # Cross-chain treasury contracts
+│   │   ├── treasuryTwoChains/      # Cross-chain treasury contracts
+│   │   └── p2pSwap/P2PSwap.sol     # Peer-to-peer token exchange
 │   ├── interfaces/                 # All contract interfaces
 │   └── lib/                       # Utility libraries
 ```
@@ -149,6 +151,7 @@ contract MyDApp {
 - `contracts/staking/Staking.sol` - Token staking and rewards mechanism
 - `contracts/staking/Estimator.sol` - Staking rewards estimation and calculation
 - `contracts/treasury/Treasury.sol` - Manages deposits and withdrawals
+- `contracts/p2pSwap/P2PSwap.sol` - Peer-to-peer decentralized token exchange service
 
 #### Cross-chain Treasury
 - `contracts/treasuryTwoChains/TreasuryHostChainStation.sol` - Host chain treasury management
@@ -163,11 +166,13 @@ All contracts have corresponding interfaces in the `interfaces/` directory:
 - `interfaces/ITreasury.sol`
 - `interfaces/ITreasuryHostChainStation.sol`
 - `interfaces/ITreasuryExternalChainStation.sol`
+- `interfaces/IP2PSwap.sol`
 
 #### Utility Libraries
 - `lib/AdvancedStrings.sol` - Advanced string manipulation utilities
 - `lib/SignatureRecover.sol` - Signature recovery utilities
 - `lib/Erc191TestBuilder.sol` - ERC-191 signature testing utilities
+- `lib/StakingServiceHooks.sol` - Simplified staking integration for service contracts
 
 ### Import Patterns
 
@@ -211,6 +216,7 @@ forge install hyperlane-xyz/hyperlane-monorepo  # For cross-chain functionality
 - `src/contracts/nameService/` — NameService contracts for domain management
 - `src/contracts/staking/` — Staking and Estimator contracts
 - `src/contracts/treasury/` — Treasury contract for managing deposits and withdrawals
+- `src/contracts/p2pSwap/` — P2P token exchange service contracts
 - `src/lib/` — Shared Solidity libraries (AdvancedStrings, SignatureRecover, etc.)
 - `script/` — Deployment and automation scripts (e.g., `DeployTestnet.s.sol`)
 - `lib/` — External dependencies (OpenZeppelin, Uniswap v3, forge-std)
@@ -355,12 +361,14 @@ make help        # Show all available commands
 ```
 
 ## Contract Architecture
-The EVVM ecosystem consists of five main contracts:
+The EVVM ecosystem consists of six main contracts:
 - **Evvm.sol**: Core virtual machine implementation
 - **NameService.sol**: Domain name resolution system  
 - **Staking.sol**: Token staking and rewards mechanism
 - **Estimator.sol**: Staking rewards estimation and calculation
 - **Treasury.sol**: Manages deposits and withdrawals of ETH and ERC20 tokens
+- **P2PSwap.sol**: Peer-to-peer decentralized exchange for token trading
+
 
 ## Configuration Files
 Key files for EVVM deployment:

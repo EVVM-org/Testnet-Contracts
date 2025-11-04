@@ -8,13 +8,15 @@ import {Estimator} from "@evvm/testnet-contracts/contracts/staking/Estimator.sol
 import {NameService} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
 import {EvvmStructs} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
 import {Treasury} from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
+import {P2PSwap} from "@evvm/testnet-contracts/contracts/p2pSwap/P2PSwap.sol";
 
 contract DeployTestnetOnAnvil is Script {
-    Staking sMate;
+    Staking staking;
     Evvm evvm;
     Estimator estimator;
     NameService nameService;
     Treasury treasury;
+    P2PSwap p2pSwap;
 
     struct AddressData {
         address activator;
@@ -91,25 +93,29 @@ contract DeployTestnetOnAnvil is Script {
 
         vm.startBroadcast();
 
-        sMate = new Staking(addressData.admin, addressData.goldenFisher);
-        evvm = new Evvm(addressData.admin, address(sMate), inputMetadata);
+        staking = new Staking(addressData.admin, addressData.goldenFisher);
+        evvm = new Evvm(addressData.admin, address(staking), inputMetadata);
         estimator = new Estimator(
             addressData.activator,
             address(evvm),
-            address(sMate),
+            address(staking),
             addressData.admin
         );
         nameService = new NameService(address(evvm), addressData.admin);
 
         treasury = new Treasury(address(evvm));
 
-        sMate._setupEstimatorAndEvvm(address(estimator), address(evvm));
+        staking._setupEstimatorAndEvvm(address(estimator), address(evvm));
         evvm._setupNameServiceAndTreasuryAddress(address(nameService), address(treasury));
+        p2pSwap = new P2PSwap(address(evvm), address(staking), addressData.admin);
 
         vm.stopBroadcast();
 
-        console2.log("SMate deployed at:", address(sMate));
+        console2.log("Staking deployed at:", address(staking));
         console2.log("Evvm deployed at:", address(evvm));
         console2.log("Estimator deployed at:", address(estimator));
+        console2.log("NameService deployed at:", address(nameService));
+        console2.log("Treasury deployed at:", address(treasury));
+        console2.log("P2PSwap deployed at:", address(p2pSwap));
     }
 }
