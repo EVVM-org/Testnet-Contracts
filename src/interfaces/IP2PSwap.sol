@@ -79,7 +79,7 @@ interface P2PSwap {
         uint256 _nonce_Evvm,
         bool _priority_Evvm,
         bytes memory _signature_Evvm,
-        uint256 _amountOut
+        uint256 maxFillFixedFee
     ) external;
     function dispatchOrder_fillPropotionalFee(
         address user,

@@ -559,7 +559,7 @@ contract P2PSwap is StakingServiceHooks {
      * @param _nonce_Evvm Nonce for EVVM payment transaction
      * @param _priority_Evvm Whether to use priority (async) processing
      * @param _signature_Evvm Signature for EVVM payment authorization
-     * @param _amountOut Maximum output amount for fee calculation (testing parameter)
+     * @param maxFillFixedFee Maximum output amount for fee calculation (testing parameter)
      */
     function dispatchOrder_fillFixedFee(
         address user,
@@ -568,7 +568,7 @@ contract P2PSwap is StakingServiceHooks {
         uint256 _nonce_Evvm,
         bool _priority_Evvm,
         bytes memory _signature_Evvm,
-        uint256 _amountOut ///@dev for testing purposes
+        uint256 maxFillFixedFee
     ) external {
         if (
             !SignatureUtils.verifyMessageSignedForDispatchOrder(
@@ -598,9 +598,8 @@ contract P2PSwap is StakingServiceHooks {
         }
 
         (uint256 fee, uint256 fee10) = calculateFillFixedFee(
-            metadata.tokenB,
             ordersInsideMarket[market][metadata.orderId].amountB,
-            _amountOut
+            maxFillFixedFee
         );
 
         if (
@@ -704,19 +703,17 @@ contract P2PSwap is StakingServiceHooks {
     /**
      * @notice Calculates fixed trading fee with maximum limit constraints
      * @dev Compares proportional fee with maximum output, applies 10% reduction if needed
-     * @param token Token address for fee calculation (currently unused)
      * @param amount Order amount for proportional fee calculation
-     * @param _amountOut Maximum output amount for fee limiting (testing parameter)
+     * @param maxFillFixedFee Maximum output amount for fee limiting
      * @return fee The final calculated fee amount
      * @return fee10 10% of the fee amount for specific calculations
      */
     function calculateFillFixedFee(
-        address token,
         uint256 amount,
-        uint256 _amountOut
+        uint256 maxFillFixedFee
     ) internal view returns (uint256 fee, uint256 fee10) {
-        if (calculateFillPropotionalFee(amount) > _amountOut) {
-            fee = _amountOut;
+        if (calculateFillPropotionalFee(amount) > maxFillFixedFee) {
+            fee = maxFillFixedFee;
             fee10 = (fee * 1000) / 10_000;
         } else {
             fee = calculateFillPropotionalFee(amount);
