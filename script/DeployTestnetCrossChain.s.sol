@@ -87,7 +87,7 @@ contract DeployTestnetCrossChain is Script {
                 reward: 5000000000000000000
             });
 
-        if (block.chainid == 11155111) {
+        if (block.chainid == 11155111) { //Sepolia ETH
             vm.startBroadcast();
 
             staking = new Staking(ADMIN, ADMIN);
@@ -115,7 +115,7 @@ contract DeployTestnetCrossChain is Script {
             p2pSwap = new P2PSwap(address(evvm), address(staking), ADMIN);
 
             vm.stopBroadcast();
-        } else if (block.chainid == 421614) {
+        } else if (block.chainid == 421614) { //Arb Sepolia
             vm.startBroadcast();
 
             treasuryExternal = new TreasuryExternalChainStation(
