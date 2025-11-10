@@ -11,10 +11,12 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '[skip-publish]')"
+    environment: npm-publish  # Opcional: usar environment para mayor seguridad
     
     permissions:
       contents: write
       packages: write
+      id-token: write  # Required for npm trusted publishing (OIDC)
       
     steps:
     - name: Checkout code
@@ -68,9 +70,7 @@ jobs:
         npm run copy-files
 
     - name: Publish to NPM
-      run: npm publish
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: npm publish --provenance --access public
 
     - name: Clean up copied files
       run: |
@@ -83,12 +83,10 @@ jobs:
         git push
 
     - name: Create GitHub Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: v${{ steps.increment_version.outputs.new_version }}
-        release_name: Release v${{ steps.increment_version.outputs.new_version }}
+        name: Release v${{ steps.increment_version.outputs.new_version }}
         body: |
           Auto-generated ${{ steps.version_type.outputs.type }} release for version ${{ steps.increment_version.outputs.new_version }}
           
