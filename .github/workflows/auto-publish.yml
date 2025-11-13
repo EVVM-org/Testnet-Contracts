@@ -69,6 +69,32 @@ jobs:
       run: |
         npm run copy-files
 
+    - name: Check if package exists
+      id: check_package
+      run: |
+        if npm view @evvm/testnet-contracts > /dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "Package exists in registry"
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "Package does not exist - first time publishing"
+        fi
+      continue-on-error: true
+
+    - name: Verify Trusted Publishing Setup
+      if: steps.check_package.outputs.exists == 'false'
+      run: |
+        echo "⚠️  FIRST TIME PUBLISHING DETECTED"
+        echo "📋 Make sure you have configured trusted publishing on npmjs.com:"
+        echo "   1. Go to https://npmjs.com and login"
+        echo "   2. Go to 'Publishing access' or 'Trusted publishers'"
+        echo "   3. Add GitHub Actions as trusted publisher:"
+        echo "      - Provider: GitHub Actions"
+        echo "      - Repository owner: EVVM-org"
+        echo "      - Repository name: Testnet-Contracts"
+        echo "      - Workflow filename: auto-publish.yml"
+        echo "🚀 If configured correctly, publishing will proceed..."
+
     - name: Publish to NPM
       run: npm publish --provenance --access public
 
