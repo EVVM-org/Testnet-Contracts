@@ -44,11 +44,7 @@
     "test": "forge test",
     "deploy:anvil": "make deployLocalTestnet",
     "deploy:sepolia": "make deployTestnet NETWORK=eth",
-    "deploy:arbitrum": "make deployTestnet NETWORK=arb",
-    "deploy": "node -r ts-node/register evvm-init.ts",
-    "deploy:bash": "./evvm-init.sh",
-    "build:ts": "tsc",
-    "dev": "ts-node evvm-init.ts"
+    "deploy:arbitrum": "make deployTestnet NETWORK=arb"
   },
   "peerDependencies": {
     "@openzeppelin/contracts": "^5.0.0"
@@ -57,10 +53,6 @@
     "@hyperlane-xyz/core": "^3.6.1"
   },
   "devDependencies": {
-    "forge-std": "^1.0.0",
-    "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "ts-node": "^10.9.0",
-    "dotenv": "^16.0.0"
+    "forge-std": "^1.0.0"
   }
 }
