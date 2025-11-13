@@ -1,7 +1,5 @@
 # EVVM Testnet Contracts
 
-![](https://github.com/user-attachments/assets/08d995ee-7512-42e4-a26c-0d62d2e8e0bf)
-
 EVVM is an innovative blockchain virtualization system that allows you to create and deploy your own virtual blockchains on top of existing Ethereum networks where you can:
 
 - **Create your own virtual blockchain** with custom tokens and governance
