@@ -57,18 +57,6 @@ jobs:
           echo "type=PATCH" >> $GITHUB_OUTPUT
         fi
 
-    - name: Increment version
-      id: increment_version
-      run: |
-        INCREMENT_TYPE="${{ steps.version_type.outputs.increment }}"
-        npm version $INCREMENT_TYPE --no-git-tag-version
-        NEW_VERSION=$(node -p "require('./package.json').version")
-        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-
-    - name: Copy source files for publishing
-      run: |
-        npm run copy-files
-
     - name: Check if package exists
       id: check_package
       run: |
@@ -81,20 +69,36 @@ jobs:
         fi
       continue-on-error: true
 
-    - name: Reset version for first publish
+    - name: Set version for first publish
       if: steps.check_package.outputs.exists == 'false'
+      id: first_version
       run: |
-        echo "🔄 Resetting version to 1.0.0 for first publish"
-        npm version 1.0.0 --no-git-tag-version
+        echo "🔄 Setting version to 1.0.0 for first publish"
+        npm version 1.0.0 --no-git-tag-version --allow-same-version
         NEW_VERSION=$(node -p "require('./package.json').version")
         echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-      id: reset_version
 
-    - name: Update version output for first publish
-      if: steps.check_package.outputs.exists == 'false'
+    - name: Increment version for update
+      if: steps.check_package.outputs.exists == 'true'
+      id: increment_version
       run: |
-        echo "new_version=${{ steps.reset_version.outputs.new_version }}" >> $GITHUB_OUTPUT
-      id: update_version
+        INCREMENT_TYPE="${{ steps.version_type.outputs.increment }}"
+        npm version $INCREMENT_TYPE --no-git-tag-version
+        NEW_VERSION=$(node -p "require('./package.json').version")
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Set final version
+      id: final_version
+      run: |
+        if [[ "${{ steps.check_package.outputs.exists }}" == "false" ]]; then
+          echo "version=${{ steps.first_version.outputs.new_version }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${{ steps.increment_version.outputs.new_version }}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Copy source files for publishing
+      run: |
+        npm run copy-files
 
     - name: Verify Trusted Publishing Setup
       if: steps.check_package.outputs.exists == 'false'
@@ -135,26 +139,26 @@ jobs:
 
     - name: Commit version bump
       run: |
+        FINAL_VERSION="${{ steps.final_version.outputs.version }}"
         if [[ "${{ steps.check_package.outputs.exists }}" == "false" ]]; then
-          FINAL_VERSION=$(node -p "require('./package.json').version")
           git add package.json
           git commit -m "chore: initial npm publish v${FINAL_VERSION} [skip-publish]"
           git push
         else
           git add package.json
-          git commit -m "chore: bump ${{ steps.version_type.outputs.type }} version to ${{ steps.increment_version.outputs.new_version }} [skip-publish]"
+          git commit -m "chore: bump ${{ steps.version_type.outputs.type }} version to ${FINAL_VERSION} [skip-publish]"
           git push
         fi
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: v${{ steps.check_package.outputs.exists == 'false' && steps.reset_version.outputs.new_version || steps.increment_version.outputs.new_version }}
-        name: Release v${{ steps.check_package.outputs.exists == 'false' && steps.reset_version.outputs.new_version || steps.increment_version.outputs.new_version }}
+        tag_name: v${{ steps.final_version.outputs.version }}
+        name: Release v${{ steps.final_version.outputs.version }}
         body: |
           ${{ steps.check_package.outputs.exists == 'false' && 'Initial npm package publication' || format('Auto-generated {0} release', steps.version_type.outputs.type) }}
           
-          **Version:** ${{ steps.check_package.outputs.exists == 'false' && steps.reset_version.outputs.new_version || steps.increment_version.outputs.new_version }}
+          **Version:** ${{ steps.final_version.outputs.version }}
           
           **Changes:**
           - ${{ github.event.head_commit.message }}
