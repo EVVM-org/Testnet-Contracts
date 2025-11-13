@@ -1,168 +1,108 @@
-name: Auto Publish NPM Package
+name: Auto Publish to NPM
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
     paths-ignore:
-      - '.github/**'
+      - 'README.md'
       - 'docs/**'
+      - '.github/**'
+
+# Required permissions for OIDC trusted publishing
+permissions:
+  contents: write
+  packages: write
+  id-token: write
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    # Skip if commit message contains [skip-publish]
     if: "!contains(github.event.head_commit.message, '[skip-publish]')"
-    environment: npm-publish  # Opcional: usar environment para mayor seguridad
+    runs-on: ubuntu-latest
+    environment: npm-publish
     
-    permissions:
-      contents: write
-      packages: write
-      id-token: write  # Required for npm trusted publishing (OIDC)
-      
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        registry-url: 'https://registry.npmjs.org'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
 
-    - name: Configure Git
-      run: |
-        git config --global user.email "noreply@github.com"
-        git config --global user.name "EVVM Bot"
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-    - name: Get current version
-      id: current_version
-      run: |
-        CURRENT_VERSION=$(node -p "require('./package.json').version")
-        echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+      - name: Determine version type
+        id: version-type
+        run: |
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          if [[ "$COMMIT_MSG" == MAJOR:* ]]; then
+            echo "type=major" >> $GITHUB_OUTPUT
+            echo "Version type: MAJOR"
+          elif [[ "$COMMIT_MSG" == MINOR:* ]]; then
+            echo "type=minor" >> $GITHUB_OUTPUT
+            echo "Version type: MINOR"
+          else
+            echo "type=patch" >> $GITHUB_OUTPUT
+            echo "Version type: PATCH"
+          fi
 
-    - name: Determine version increment type
-      id: version_type
-      run: |
-        COMMIT_MSG='${{ github.event.head_commit.message }}'
-        if [[ "$COMMIT_MSG" =~ ^MAJOR: ]]; then
-          echo "increment=major" >> $GITHUB_OUTPUT
-          echo "type=MAJOR" >> $GITHUB_OUTPUT
-        elif [[ "$COMMIT_MSG" =~ ^MINOR: ]]; then
-          echo "increment=minor" >> $GITHUB_OUTPUT
-          echo "type=MINOR" >> $GITHUB_OUTPUT
-        else
-          echo "increment=patch" >> $GITHUB_OUTPUT
-          echo "type=PATCH" >> $GITHUB_OUTPUT
-        fi
+      - name: Bump version
+        id: version
+        run: |
+          VERSION_TYPE=${{ steps.version-type.outputs.type }}
+          npm version $VERSION_TYPE -m "chore: bump version to %s [skip-publish]"
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "New version: $NEW_VERSION"
 
-    - name: Check if package exists
-      id: check_package
-      run: |
-        if npm view @evvm/testnet-contracts > /dev/null 2>&1; then
-          echo "exists=true" >> $GITHUB_OUTPUT
-          echo "✅ Package exists in registry"
-        else
-          echo "exists=false" >> $GITHUB_OUTPUT
-          echo "📦 Package does not exist - first time publishing"
-        fi
-      continue-on-error: true
+      - name: Copy files for publishing
+        run: |
+          cp -r src/contracts ./contracts
+          cp -r src/interfaces ./interfaces
+          cp -r src/library ./library
+          echo "Files copied from src/ to root for npm publishing"
 
-    - name: Set version for first publish
-      if: steps.check_package.outputs.exists == 'false'
-      id: first_version
-      run: |
-        echo "🔄 Setting version to 1.0.0 for first publish"
-        npm version 1.0.0 --no-git-tag-version --allow-same-version
-        NEW_VERSION=$(node -p "require('./package.json').version")
-        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+      - name: Publish to NPM with provenance
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-    - name: Increment version for update
-      if: steps.check_package.outputs.exists == 'true'
-      id: increment_version
-      run: |
-        INCREMENT_TYPE="${{ steps.version_type.outputs.increment }}"
-        npm version $INCREMENT_TYPE --no-git-tag-version
-        NEW_VERSION=$(node -p "require('./package.json').version")
-        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+      - name: Cleanup copied files
+        run: |
+          rm -rf ./contracts ./interfaces ./library
+          echo "Cleaned up temporary files"
 
-    - name: Set final version
-      id: final_version
-      run: |
-        if [[ "${{ steps.check_package.outputs.exists }}" == "false" ]]; then
-          echo "version=${{ steps.first_version.outputs.new_version }}" >> $GITHUB_OUTPUT
-        else
-          echo "version=${{ steps.increment_version.outputs.new_version }}" >> $GITHUB_OUTPUT
-        fi
+      - name: Push version bump
+        run: |
+          git push origin main --follow-tags
+          echo "Version bump committed and pushed"
 
-    - name: Copy source files for publishing
-      run: |
-        npm run copy-files
-
-    - name: Verify Trusted Publishing Setup
-      if: steps.check_package.outputs.exists == 'false'
-      run: |
-        echo "⚠️  FIRST TIME PUBLISHING DETECTED"
-        echo "📋 CRITICAL: Trusted publishing must be configured on npmjs.com:"
-        echo ""
-        echo "🔧 Configuration steps:"
-        echo "   1. Go to https://www.npmjs.com/settings/[YOUR_USERNAME]/publishing"
-        echo "   2. Click 'Add publisher' under Trusted publishers"
-        echo "   3. Configure EXACTLY as follows:"
-        echo "      Provider: GitHub Actions"
-        echo "      Repository owner: EVVM-org"
-        echo "      Repository name: Testnet-Contracts"  
-        echo "      Workflow filename: auto-publish.yml"
-        echo "      Environment: (leave empty)"
-        echo ""
-        echo "❌ If not configured, this will fail with 404 error"
-        echo "✅ Version reset to 1.0.0 for first publish"
-
-    - name: Publish to NPM (First Time)
-      if: steps.check_package.outputs.exists == 'false'
-      run: |
-        echo "📦 Publishing first version to npm..."
-        echo "Version: $(node -p 'require(\"./package.json\").version')"
-        npm publish --provenance --access public
-
-    - name: Publish to NPM (Update)
-      if: steps.check_package.outputs.exists == 'true'
-      run: |
-        echo "🔄 Publishing update to npm..."
-        echo "Version: $(node -p 'require(\"./package.json\").version')"
-        npm publish --provenance --access public
-
-    - name: Clean up copied files
-      run: |
-        npm run clean
-
-    - name: Commit version bump
-      run: |
-        FINAL_VERSION="${{ steps.final_version.outputs.version }}"
-        if [[ "${{ steps.check_package.outputs.exists }}" == "false" ]]; then
-          git add package.json
-          git commit -m "chore: initial npm publish v${FINAL_VERSION} [skip-publish]"
-          git push
-        else
-          git add package.json
-          git commit -m "chore: bump ${{ steps.version_type.outputs.type }} version to ${FINAL_VERSION} [skip-publish]"
-          git push
-        fi
-
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: v${{ steps.final_version.outputs.version }}
-        name: Release v${{ steps.final_version.outputs.version }}
-        body: |
-          ${{ steps.check_package.outputs.exists == 'false' && 'Initial npm package publication' || format('Auto-generated {0} release', steps.version_type.outputs.type) }}
-          
-          **Version:** ${{ steps.final_version.outputs.version }}
-          
-          **Changes:**
-          - ${{ github.event.head_commit.message }}
-          
-          ${{ steps.check_package.outputs.exists == 'false' && '**Type:** Initial Release' || format('**Version Type:** {0}', steps.version_type.outputs.type) }}
-        draft: false
-        prerelease: false
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.new_version }}
+          release_name: Release v${{ steps.version.outputs.new_version }}
+          body: |
+            ## Release v${{ steps.version.outputs.new_version }}
+            
+            **Version Type**: ${{ steps.version-type.outputs.type }}
+            
+            **Commit**: ${{ github.event.head_commit.message }}
+            
+            Published to NPM: [@evvm/testnet-contracts@${{ steps.version.outputs.new_version }}](https://www.npmjs.com/package/@evvm/testnet-contracts/v/${{ steps.version.outputs.new_version }})
+            
+            ### Published with Trusted Publishing
+            This package includes provenance attestation for enhanced security.
+          draft: false
+          prerelease: false
