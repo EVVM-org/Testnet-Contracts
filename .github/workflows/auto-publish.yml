@@ -45,7 +45,7 @@ jobs:
     - name: Determine version increment type
       id: version_type
       run: |
-        COMMIT_MSG="${{ github.event.head_commit.message }}"
+        COMMIT_MSG='${{ github.event.head_commit.message }}'
         if [[ "$COMMIT_MSG" =~ ^MAJOR: ]]; then
           echo "increment=major" >> $GITHUB_OUTPUT
           echo "type=MAJOR" >> $GITHUB_OUTPUT
