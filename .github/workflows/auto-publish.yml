@@ -71,10 +71,8 @@ jobs:
           cp -r src/library ./library
           echo "Files copied from src/ to root for npm publishing"
 
-      - name: Publish to NPM with provenance
+      - name: Publish to NPM with provenance (Trusted Publishing)
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Cleanup copied files
         run: |
