@@ -39,6 +39,24 @@ const CHAIN_CONFIGS: Record<string, any> = {
   'arb': arbitrumSepolia
 };
 
+// RPC Fallback endpoints for Ethereum Sepolia
+const ETH_SEPOLIA_RPC_FALLBACKS = [
+  'https://0xrpc.io/sep',                              // 0xRPC (currently in .env)
+  'https://ethereum-sepolia.rpc.subquery.network/public', // SubQuery (fastest: 0.165s)
+  'https://ethereum-sepolia.gateway.tatum.io',         // Tatum
+  'https://sepolia.drpc.org',                          // dRPC
+  'https://gateway.tenderly.co/public/sepolia',        // Tenderly
+];
+
+// RPC Fallback endpoints for Arbitrum Sepolia
+const ARB_SEPOLIA_RPC_FALLBACKS = [
+  'https://sepolia-rollup.arbitrum.io/rpc',           // Official Arbitrum (most reliable)
+  'https://arbitrum-sepolia.gateway.tenderly.co',     // Tenderly (fastest)
+  'https://endpoints.omniatech.io/v1/arbitrum/sepolia/public', // Omnia
+  'https://arbitrum-sepolia.drpc.org',                // dRPC
+  'https://arbitrum-sepolia-rpc.publicnode.com',      // PublicNode
+];
+
 // Contract ABIs
 const REGISTRY_ABI = parseAbi([
   'function registerEvvm(uint256 chainId, address evvmAddress) external returns (uint256)'
@@ -579,48 +597,117 @@ const getAvailableWallets = async (): Promise<string[]> => {
   }
 };
 
-// Deploy contracts
+// Deploy contracts with RPC fallback mechanism
 const deployContracts = async (
   network: string,
   wallet: string,
   customRpc?: string
 ): Promise<void> => {
-  try {
-    if (network === 'custom' && customRpc) {
-      console.log(chalk.blue('\n🚀 Starting deployment on custom network...'));
+  // Determine fallback endpoints and retry count based on network
+  const fallbackRpcs = network === 'eth' ? ETH_SEPOLIA_RPC_FALLBACKS
+                     : network === 'arb' ? ARB_SEPOLIA_RPC_FALLBACKS
+                     : [];
+  const maxRetries = fallbackRpcs.length || 1;
+  const hasFailover = fallbackRpcs.length > 0;
+  let lastError: any;
 
-      const etherscanApi = process.env.ETHERSCAN_API || '';
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      if (network === 'custom' && customRpc) {
+        console.log(chalk.blue('\n🚀 Starting deployment on custom network...'));
 
-      await execa(
-        'forge',
-        [
-          'script',
-          'script/DeployTestnet.s.sol:DeployTestnet',
-          '--rpc-url',
-          customRpc,
-          '--account',
-          wallet,
-          '--broadcast',
-          '--verify',
-          '--etherscan-api-key',
-          etherscanApi,
-          '-vvvvvv',
-        ],
-        { stdio: 'inherit' }
-      );
-    } else {
-      console.log(chalk.blue(`\n🚀 Starting deployment on ${network}...`));
+        const etherscanApi = process.env.ETHERSCAN_API || '';
 
-      await execa(
-        'make',
-        ['deployTestnet', `NETWORK=${network}`, `WALLET=${wallet}`],
-        { stdio: 'inherit' }
-      );
+        await execa(
+          'forge',
+          [
+            'script',
+            'script/DeployTestnet.s.sol:DeployTestnet',
+            '--rpc-url',
+            customRpc,
+            '--account',
+            wallet,
+            '--broadcast',
+            '--verify',
+            '--etherscan-api-key',
+            etherscanApi,
+            '-vvvvvv',
+          ],
+          { stdio: 'inherit' }
+        );
+      } else if (hasFailover && attempt > 0) {
+        // Use fallback RPC for supported networks
+        const fallbackRpc = fallbackRpcs[attempt];
+        const networkName = network === 'eth' ? 'Ethereum Sepolia' : 'Arbitrum Sepolia';
+        console.log(chalk.yellow(`\n⚠ Trying fallback RPC (${attempt}/${maxRetries - 1}) for ${networkName}:`));
+        console.log(chalk.gray(`   ${fallbackRpc}`));
+
+        const etherscanApi = process.env.ETHERSCAN_API || '';
+
+        await execa(
+          'forge',
+          [
+            'script',
+            'script/DeployTestnet.s.sol:DeployTestnet',
+            '--rpc-url',
+            fallbackRpc,
+            '--account',
+            wallet,
+            '--broadcast',
+            '--verify',
+            '--etherscan-api-key',
+            etherscanApi,
+            '-vvvvvv',
+          ],
+          { stdio: 'inherit' }
+        );
+      } else {
+        // Use makefile for first attempt
+        if (attempt === 0 && hasFailover) {
+          const networkName = network === 'eth' ? 'Ethereum Sepolia' : 'Arbitrum Sepolia';
+          console.log(chalk.blue(`\n🚀 Starting deployment on ${networkName}...`));
+          console.log(chalk.gray(`   Using primary RPC from .env file`));
+        } else {
+          console.log(chalk.blue(`\n🚀 Starting deployment on ${network}...`));
+        }
+
+        await execa(
+          'make',
+          ['deployTestnet', `NETWORK=${network}`, `WALLET=${wallet}`],
+          { stdio: 'inherit' }
+        );
+      }
+
+      // If we reach here, deployment succeeded
+      return;
+
+    } catch (error) {
+      lastError = error;
+
+      // If we have more fallbacks available, continue to next attempt
+      if (hasFailover && attempt < maxRetries - 1) {
+        console.log(chalk.yellow(`\n⚠ Deployment attempt ${attempt + 1} failed, trying next RPC endpoint...`));
+        continue;
+      }
+
+      // No more retries available
+      break;
     }
-  } catch (error) {
-    console.log(chalk.red('\n✖ Deployment failed'));
-    process.exit(1);
   }
+
+  // All attempts failed
+  console.log(chalk.red('\n✖ Deployment failed after trying all available RPC endpoints'));
+  if (hasFailover) {
+    const networkName = network === 'eth' ? 'Ethereum Sepolia' : 'Arbitrum Sepolia';
+    const envVar = network === 'eth' ? 'RPC_URL_ETH_SEPOLIA' : 'RPC_URL_ARB_SEPOLIA';
+    console.log(chalk.yellow('\n💡 Troubleshooting tips:'));
+    console.log(chalk.gray('   1. Check your internet connection'));
+    console.log(chalk.gray('   2. Verify your wallet has sufficient ETH for gas fees'));
+    console.log(chalk.gray('   3. Try again later - RPC endpoints may be temporarily unavailable'));
+    console.log(chalk.gray(`   4. Update ${envVar} in .env with a custom endpoint`));
+    console.log(chalk.gray(`   5. Visit https://chainlist.org/ for more ${networkName} RPC endpoints`));
+  }
+  process.exit(1);
 };
 
 // Main function
