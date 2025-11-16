@@ -277,15 +277,19 @@ const registerWithRegistry = async (
       transport: http(ethSepoliaRpc)
     });
 
-    // Simulate transaction first
+    // Simulate transaction first to get the return value
     console.log(chalk.gray('   Simulating transaction...'));
-    const { request } = await publicClient.simulateContract({
+    const { request, result } = await publicClient.simulateContract({
       address: REGISTRY_ADDRESS,
       abi: REGISTRY_ABI,
       functionName: 'registerEvvm',
       args: [BigInt(chainId), evvmAddress],
       account
     });
+
+    // The result contains the evvmID that will be returned
+    const evvmId = result as bigint;
+    console.log(chalk.gray(`   Predicted EVVM ID: ${evvmId}`));
 
     // Execute transaction
     console.log(chalk.gray('   Sending transaction...'));
@@ -300,27 +304,10 @@ const registerWithRegistry = async (
       throw new Error('Transaction failed');
     }
 
-    // Decode logs to get evvmID (it's the return value)
-    // The registerEvvm function returns the evvmID
-    // We need to read it from the transaction logs or call the contract again
-    // For now, we'll parse it from logs or estimate based on publicCounter
-
     console.log(chalk.green('   ✓ Registration transaction confirmed!'));
-
-    // Get the evvmID from transaction logs
-    // The return value is emitted in logs, but for simplicity we can also
-    // assume it's the last assigned ID. A better approach is to parse logs.
-
-    // For now, let's use a simple approach: read the receipt logs
-    // Registry typically emits the ID or we can derive it
-
-    // We'll need to add a getter or parse events. For MVP, let's ask user to provide it
-    // Or we can make another call to get the assigned ID
-
-    console.log(chalk.yellow('   Please check the transaction on Etherscan to get your EVVM ID'));
     console.log(chalk.blue(`   https://sepolia.etherscan.io/tx/${hash}`));
 
-    return null; // We'll improve this to actually extract the ID
+    return evvmId;
 
   } catch (error: any) {
     if (error.message?.includes('AlreadyRegistered')) {
