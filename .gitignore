@@ -25,3 +25,6 @@ reportWake.txt
 
 /.vscode/
 *.code-workspace
+
+# Claude Code documentation
+CLAUDE.md
