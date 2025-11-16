@@ -161,14 +161,29 @@ const initializeSubmodules = async (): Promise<void> => {
 // Get private key from Foundry keystore
 const getPrivateKeyFromWallet = async (walletName: string): Promise<`0x${string}`> => {
   try {
+    // Prompt for password
+    const passwordResponse = await prompts({
+      type: 'password',
+      name: 'password',
+      message: `Enter password for wallet "${walletName}":`,
+    });
+
+    if (!passwordResponse.password) {
+      throw new Error('Password is required');
+    }
+
+    // Use cast wallet private-key with password via stdin
     const { stdout } = await execa('cast', [
       'wallet',
       'private-key',
-      walletName
+      walletName,
+      '--password',
+      passwordResponse.password
     ]);
+
     return stdout.trim() as `0x${string}`;
-  } catch (error) {
-    throw new Error(`Failed to retrieve private key from wallet: ${walletName}`);
+  } catch (error: any) {
+    throw new Error(`Failed to retrieve private key from wallet: ${walletName}. ${error.message || error}`);
   }
 };
 
