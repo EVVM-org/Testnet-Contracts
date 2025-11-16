@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
 import { join } from 'path';
 import prompts from 'prompts';
 import chalk from 'chalk';
@@ -12,6 +12,96 @@ config();
 
 // EVVM Brand Color (RGB: 1, 240, 148)
 const evvmGreen = chalk.rgb(1, 240, 148);
+
+// Check if a command exists
+const commandExists = async (command: string): Promise<boolean> => {
+  try {
+    await execa('which', [command]);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+// Check prerequisites
+const checkPrerequisites = async (): Promise<void> => {
+  console.log(chalk.blue('\n🔍 Checking prerequisites...'));
+
+  const checks = [
+    { name: 'Foundry (forge)', command: 'forge', required: true },
+    { name: 'Git', command: 'git', required: true },
+    { name: 'Node.js', command: 'node', required: true },
+  ];
+
+  let allPassed = true;
+
+  for (const check of checks) {
+    const exists = await commandExists(check.command);
+    if (exists) {
+      console.log(chalk.green(`  ✓ ${check.name}`));
+    } else {
+      console.log(chalk.red(`  ✖ ${check.name} not found`));
+      if (check.required) {
+        allPassed = false;
+      }
+    }
+  }
+
+  if (!allPassed) {
+    console.log(chalk.red('\n✖ Missing required dependencies.'));
+    console.log(chalk.yellow('\nPlease install:'));
+    console.log(chalk.yellow('  - Foundry: https://getfoundry.sh/'));
+    console.log(chalk.yellow('  - Git: https://git-scm.com/'));
+    console.log(chalk.yellow('  - Node.js: https://nodejs.org/'));
+    process.exit(1);
+  }
+
+  console.log(chalk.green('✓ All prerequisites met!\n'));
+};
+
+// Check if git submodules are initialized
+const checkSubmodules = async (): Promise<boolean> => {
+  const libPath = join(process.cwd(), 'lib');
+
+  if (!existsSync(libPath)) {
+    return false;
+  }
+
+  // Check if critical submodule directories are populated
+  const criticalSubmodules = ['solady', 'openzeppelin-contracts', 'forge-std'];
+
+  for (const submodule of criticalSubmodules) {
+    const submodulePath = join(libPath, submodule);
+    if (!existsSync(submodulePath)) {
+      return false;
+    }
+
+    // Check if directory is not empty
+    const files = readdirSync(submodulePath);
+    if (files.length <= 1) { // Only .git or empty
+      return false;
+    }
+  }
+
+  return true;
+};
+
+// Initialize git submodules
+const initializeSubmodules = async (): Promise<void> => {
+  console.log(chalk.blue('\n📦 Initializing dependencies (git submodules)...'));
+  console.log(chalk.gray('   This may take a few minutes on first run.\n'));
+
+  try {
+    await execa('git', ['submodule', 'update', '--init', '--recursive'], {
+      stdio: 'inherit',
+    });
+    console.log(chalk.green('\n✓ Dependencies initialized successfully!\n'));
+  } catch (error) {
+    console.log(chalk.red('\n✖ Failed to initialize dependencies'));
+    console.log(chalk.yellow('Please run manually: git submodule update --init --recursive'));
+    process.exit(1);
+  }
+};
 
 // Banner
 const banner = `
@@ -210,6 +300,19 @@ const deployContracts = async (
 // Main function
 const main = async (): Promise<void> => {
   console.log(banner);
+
+  // Check prerequisites
+  await checkPrerequisites();
+
+  // Check and initialize submodules if needed
+  const submodulesInitialized = await checkSubmodules();
+  if (!submodulesInitialized) {
+    console.log(chalk.yellow('⚠ Dependencies not initialized. Initializing now...'));
+    await initializeSubmodules();
+  } else {
+    console.log(chalk.green('✓ Dependencies already initialized\n'));
+  }
+
   console.log(chalk.yellow('Configuring deployment variables...\n'));
 
   // Parse command line arguments
@@ -423,21 +526,46 @@ const main = async (): Promise<void> => {
     }
 
     await deployContracts(networkResponse.network, walletResponse.wallet, customRpc);
+
+    // Post-deployment instructions
+    console.log(chalk.green('\n🎉 Deployment completed!'));
+    console.log(chalk.cyan('\n═══════════════════════════════════════════════════════════'));
+    console.log(chalk.cyan('                    IMPORTANT NEXT STEPS'));
+    console.log(chalk.cyan('═══════════════════════════════════════════════════════════\n'));
+
+    console.log(chalk.yellow('📋 1. Register with Registry EVVM (REQUIRED)'));
+    console.log(chalk.gray('   All EVVM deployments must register on Ethereum Sepolia'));
+    console.log(chalk.gray('   to obtain an official EVVM ID.\n'));
+    console.log(chalk.blue('   Registration contract: Ethereum Sepolia'));
+    console.log(chalk.gray('   You will need ETH Sepolia tokens for gas fees.\n'));
+
+    console.log(chalk.yellow('📋 2. Configure EVVM ID (within 1 hour)'));
+    console.log(chalk.gray('   After registration, update your deployed contracts with'));
+    console.log(chalk.gray('   the assigned EVVM ID within the one-hour window.\n'));
+
+    console.log(chalk.yellow('📋 3. Verify Deployment'));
+    console.log(chalk.gray('   Check the broadcast/ directory for deployment artifacts'));
+    console.log(chalk.gray('   and transaction receipts.\n'));
+
+    console.log(chalk.yellow('📋 4. Explore Documentation'));
+    console.log(chalk.gray('   Learn more at: https://www.evvm.info/docs\n'));
+
+    console.log(chalk.cyan('═══════════════════════════════════════════════════════════\n'));
   } else {
     console.log(chalk.yellow('\n📝 To deploy later, run:'));
     console.log(
       chalk.yellow(
-        '  For predefined networks: make deployTestnet NETWORK=<eth|arb>'
+        '  For predefined networks: make deployTestnet NETWORK=<eth|arb> WALLET=<wallet-name>'
       )
     );
     console.log(
       chalk.yellow(
-        '  For custom RPC: forge script script/DeployTestnet.s.sol:DeployTestnet --rpc-url <YOUR_RPC_URL> --account defaultKey --broadcast --verify --etherscan-api-key $ETHERSCAN_API -vvvvvv'
+        '  For custom RPC: forge script script/DeployTestnet.s.sol:DeployTestnet --rpc-url <YOUR_RPC_URL> --account <WALLET_NAME> --broadcast --verify --etherscan-api-key $ETHERSCAN_API -vvvvvv'
       )
     );
   }
 
-  console.log(chalk.green('\n✅ Configuration completed!'));
+  console.log(chalk.green('\n✅ Configuration wizard completed!'));
 };
 
 // Run main function
