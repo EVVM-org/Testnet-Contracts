@@ -161,6 +161,20 @@ const initializeSubmodules = async (): Promise<void> => {
 // Get private key from Foundry keystore
 const getPrivateKeyFromWallet = async (walletName: string): Promise<`0x${string}`> => {
   try {
+    // Get home directory
+    const homeDir = process.env.HOME || process.env.USERPROFILE;
+    if (!homeDir) {
+      throw new Error('Could not determine home directory');
+    }
+
+    // Construct keystore path
+    const keystorePath = join(homeDir, '.foundry', 'keystores', walletName);
+
+    // Check if keystore exists
+    if (!existsSync(keystorePath)) {
+      throw new Error(`Keystore not found at: ${keystorePath}`);
+    }
+
     // Prompt for password
     const passwordResponse = await prompts({
       type: 'password',
@@ -172,11 +186,12 @@ const getPrivateKeyFromWallet = async (walletName: string): Promise<`0x${string}
       throw new Error('Password is required');
     }
 
-    // Use cast wallet private-key with password via stdin
+    // Use cast wallet private-key with keystore path and password
     const { stdout } = await execa('cast', [
       'wallet',
       'private-key',
-      walletName,
+      '--keystore',
+      keystorePath,
       '--password',
       passwordResponse.password
     ]);
