@@ -64,6 +64,11 @@ interface DeploymentArtifact {
 
 interface ParsedDeployment {
   evvmAddress: Address;
+  stakingAddress: Address;
+  estimatorAddress: Address;
+  nameServiceAddress: Address;
+  treasuryAddress: Address;
+  p2pSwapAddress: Address;
   chainId: number;
   timestamp: number;
 }
@@ -223,18 +228,44 @@ const parseDeploymentArtifacts = (network: string): ParsedDeployment | null => {
     const artifactData = readFileSync(runLatestPath, 'utf-8');
     const artifact: DeploymentArtifact = JSON.parse(artifactData);
 
-    // Find Evvm contract deployment
+    // Find all contract deployments
     const evvmDeployment = artifact.transactions.find(
       (tx) => tx.contractName === 'Evvm'
     );
+    const stakingDeployment = artifact.transactions.find(
+      (tx) => tx.contractName === 'Staking'
+    );
+    const estimatorDeployment = artifact.transactions.find(
+      (tx) => tx.contractName === 'Estimator'
+    );
+    const nameServiceDeployment = artifact.transactions.find(
+      (tx) => tx.contractName === 'NameService'
+    );
+    const treasuryDeployment = artifact.transactions.find(
+      (tx) => tx.contractName === 'Treasury'
+    );
+    const p2pSwapDeployment = artifact.transactions.find(
+      (tx) => tx.contractName === 'P2PSwap'
+    );
 
-    if (!evvmDeployment || !evvmDeployment.contractAddress) {
-      console.log(chalk.yellow('\n⚠ Evvm contract address not found in deployment artifacts'));
+    // Verify all contracts were deployed
+    if (!evvmDeployment?.contractAddress ||
+        !stakingDeployment?.contractAddress ||
+        !estimatorDeployment?.contractAddress ||
+        !nameServiceDeployment?.contractAddress ||
+        !treasuryDeployment?.contractAddress ||
+        !p2pSwapDeployment?.contractAddress) {
+      console.log(chalk.yellow('\n⚠ Some contract addresses not found in deployment artifacts'));
       return null;
     }
 
     return {
       evvmAddress: evvmDeployment.contractAddress,
+      stakingAddress: stakingDeployment.contractAddress,
+      estimatorAddress: estimatorDeployment.contractAddress,
+      nameServiceAddress: nameServiceDeployment.contractAddress,
+      treasuryAddress: treasuryDeployment.contractAddress,
+      p2pSwapAddress: p2pSwapDeployment.contractAddress,
       chainId,
       timestamp: Date.now()
     };
@@ -824,19 +855,51 @@ const main = async (): Promise<void> => {
 
     console.log(chalk.green('\n🎉 Deployment completed!'));
 
-    // Auto-registration flow (only for supported networks)
-    if (networkResponse.network !== 'custom') {
+    // Parse deployment artifacts and display summary
+    const deployment = networkResponse.network !== 'custom'
+      ? parseDeploymentArtifacts(networkResponse.network)
+      : null;
+
+    if (deployment) {
+      // Display deployment summary
       console.log(chalk.cyan('\n═══════════════════════════════════════════════════════════'));
+      console.log(chalk.cyan('                 DEPLOYED CONTRACTS SUMMARY'));
+      console.log(chalk.cyan('═══════════════════════════════════════════════════════════\n'));
+
+      const networkName = networkResponse.network === 'eth' ? 'Ethereum Sepolia' : 'Arbitrum Sepolia';
+      const explorerBase = networkResponse.network === 'eth'
+        ? 'https://sepolia.etherscan.io/address/'
+        : 'https://sepolia.arbiscan.io/address/';
+
+      console.log(chalk.white(`Network: ${chalk.green(networkName)} (Chain ID: ${deployment.chainId})\n`));
+
+      console.log(chalk.yellow('Core Contracts:'));
+      console.log(chalk.white(`  EVVM:        ${chalk.green(deployment.evvmAddress)}`));
+      console.log(chalk.gray(`               ${explorerBase}${deployment.evvmAddress}`));
+      console.log(chalk.white(`  Treasury:    ${chalk.green(deployment.treasuryAddress)}`));
+      console.log(chalk.gray(`               ${explorerBase}${deployment.treasuryAddress}\n`));
+
+      console.log(chalk.yellow('Supporting Contracts:'));
+      console.log(chalk.white(`  Staking:     ${chalk.green(deployment.stakingAddress)}`));
+      console.log(chalk.gray(`               ${explorerBase}${deployment.stakingAddress}`));
+      console.log(chalk.white(`  Estimator:   ${chalk.green(deployment.estimatorAddress)}`));
+      console.log(chalk.gray(`               ${explorerBase}${deployment.estimatorAddress}`));
+      console.log(chalk.white(`  NameService: ${chalk.green(deployment.nameServiceAddress)}`));
+      console.log(chalk.gray(`               ${explorerBase}${deployment.nameServiceAddress}`));
+      console.log(chalk.white(`  P2PSwap:     ${chalk.green(deployment.p2pSwapAddress)}`));
+      console.log(chalk.gray(`               ${explorerBase}${deployment.p2pSwapAddress}`));
+
+      console.log(chalk.cyan('\n═══════════════════════════════════════════════════════════\n'));
+    }
+
+    // Auto-registration flow (only for supported networks)
+    if (networkResponse.network !== 'custom' && deployment) {
+      console.log(chalk.cyan('═══════════════════════════════════════════════════════════'));
       console.log(chalk.cyan('                    REGISTRY EVVM REGISTRATION'));
       console.log(chalk.cyan('═══════════════════════════════════════════════════════════\n'));
 
-      // Parse deployment artifacts
-      const deployment = parseDeploymentArtifacts(networkResponse.network);
-
-      if (deployment) {
-        console.log(chalk.green('✓ Deployment artifacts found'));
-        console.log(chalk.gray(`  EVVM Address: ${deployment.evvmAddress}`));
-        console.log(chalk.gray(`  Chain ID: ${deployment.chainId}\n`));
+      console.log(chalk.gray(`  EVVM Address: ${deployment.evvmAddress}`));
+      console.log(chalk.gray(`  Chain ID: ${deployment.chainId}\n`));
 
         const registerPrompt = await prompts({
           type: 'confirm',
@@ -879,16 +942,15 @@ const main = async (): Promise<void> => {
             // Registration returned null - check Etherscan or already registered
             console.log(chalk.yellow('\n⚠ Please verify registration status manually'));
           }
-        } else {
-          console.log(chalk.yellow('\n⚠ Skipping automatic registration'));
-          console.log(chalk.gray('   You will need to register manually later'));
-        }
       } else {
-        console.log(chalk.yellow('⚠ Could not parse deployment artifacts'));
-        console.log(chalk.gray('   Automatic registration skipped'));
+        console.log(chalk.yellow('\n⚠ Skipping automatic registration'));
+        console.log(chalk.gray('   You will need to register manually later'));
       }
 
       console.log(chalk.cyan('\n═══════════════════════════════════════════════════════════\n'));
+    } else if (networkResponse.network === 'custom') {
+      console.log(chalk.yellow('\n⚠ Deployment artifacts not available for custom networks'));
+      console.log(chalk.gray('   Manual registration required\n'));
     }
 
     // Post-deployment instructions
