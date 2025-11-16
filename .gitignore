@@ -28,3 +28,7 @@ reportWake.txt
 
 # Claude Code documentation
 CLAUDE.md
+
+# TypeScript compilation
+dist/
+tsconfig.tsbuildinfo
