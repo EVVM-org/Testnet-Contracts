@@ -1,6 +1,7 @@
 {
   "name": "@evvm/testnet-contracts",
   "version": "2.1.2",
+  "type": "module",
   "description": "EVVM Testnet Contracts - Smart contracts and tools for scalable, modular, and cross-chain EVM virtualization",
   "files": [
     "contracts/**/*.sol",
@@ -44,15 +45,26 @@
     "test": "forge test",
     "deploy:anvil": "make deployLocalTestnet",
     "deploy:sepolia": "make deployTestnet NETWORK=eth",
-    "deploy:arbitrum": "make deployTestnet NETWORK=arb"
+    "deploy:arbitrum": "make deployTestnet NETWORK=arb",
+    "wizard": "tsx scripts/evvm-init.ts",
+    "wizard:deploy": "tsx scripts/evvm-init.ts --deploy"
   },
   "peerDependencies": {
     "@openzeppelin/contracts": "^5.0.0"
   },
   "dependencies": {
-    "@hyperlane-xyz/core": "^3.6.1"
+    "@hyperlane-xyz/core": "^3.6.1",
+    "chalk": "^5.3.0",
+    "dotenv": "^16.4.5",
+    "execa": "^8.0.1",
+    "prompts": "^2.4.2",
+    "viem": "^2.39.0"
   },
   "devDependencies": {
-    "forge-std": "^1.0.0"
+    "@types/node": "^20.11.0",
+    "@types/prompts": "^2.4.9",
+    "forge-std": "^1.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
   }
 }
