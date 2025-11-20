@@ -216,7 +216,7 @@ contract Evvm is EvvmStorage {
 
         evvmMetadata.EvvmID = newEvvmID;
 
-        windowTimeToChangeEvvmID = block.timestamp + 1 days;
+        windowTimeToChangeEvvmID = block.timestamp + 1 minutes;
     }
 
     /**
@@ -999,7 +999,7 @@ contract Evvm is EvvmStorage {
         }
 
         admin.proposal = _newOwner;
-        admin.timeToAccept = block.timestamp + 1 days;
+        admin.timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**

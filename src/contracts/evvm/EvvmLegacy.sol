@@ -1225,7 +1225,7 @@ contract Evvm is EvvmStorage {
         }
 
         admin.proposal = _newOwner;
-        admin.timeToAccept = block.timestamp + 1 days;
+        admin.timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**

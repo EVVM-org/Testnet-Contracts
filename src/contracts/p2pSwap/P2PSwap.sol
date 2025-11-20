@@ -819,7 +819,7 @@ contract P2PSwap is StakingServiceHooks {
             revert();
         }
         owner_proposal = _owner;
-        owner_timeToAccept = block.timestamp + 1 days;
+        owner_timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**
@@ -868,7 +868,7 @@ contract P2PSwap is StakingServiceHooks {
             revert();
         }
         rewardPercentage_proposal = Percentage(_seller, _service, _mateStaker);
-        rewardPercentage_timeToAcceptNewChange = block.timestamp + 1 days;
+        rewardPercentage_timeToAcceptNewChange = block.timestamp + 1 minutes;
     }
 
     /**
@@ -915,7 +915,7 @@ contract P2PSwap is StakingServiceHooks {
             revert();
         }
         rewardPercentage_proposal = Percentage(_seller, _service, _mateStaker);
-        rewardPercentage_timeToAcceptNewChange = block.timestamp + 1 days;
+        rewardPercentage_timeToAcceptNewChange = block.timestamp + 1 minutes;
     }
 
     /**
@@ -956,7 +956,7 @@ contract P2PSwap is StakingServiceHooks {
             revert();
         }
         percentageFee_proposal = _percentageFee;
-        percentageFee_timeToAccept = block.timestamp + 1 days;
+        percentageFee_timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**
@@ -997,7 +997,7 @@ contract P2PSwap is StakingServiceHooks {
             revert();
         }
         maxLimitFillFixedFee_proposal = _maxLimitFillFixedFee;
-        maxLimitFillFixedFee_timeToAccept = block.timestamp + 1 days;
+        maxLimitFillFixedFee_timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**
@@ -1049,7 +1049,7 @@ contract P2PSwap is StakingServiceHooks {
         tokenToWithdraw = _tokenToWithdraw;
         amountToWithdraw = _amountToWithdraw;
         recipientToWithdraw = _to;
-        timeToWithdrawal = block.timestamp + 1 days;
+        timeToWithdrawal = block.timestamp + 1 minutes;
     }
 
     /**

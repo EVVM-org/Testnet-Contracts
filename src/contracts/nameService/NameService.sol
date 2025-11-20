@@ -955,7 +955,7 @@ contract NameService {
         }
 
         admin.proposal = _adminToPropose;
-        admin.timeToAccept = block.timestamp + 1 days;
+        admin.timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**
@@ -1007,7 +1007,7 @@ contract NameService {
         }
 
         amountToWithdrawTokens.proposal = _amount;
-        amountToWithdrawTokens.timeToAccept = block.timestamp + 1 days;
+        amountToWithdrawTokens.timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**
@@ -1046,7 +1046,7 @@ contract NameService {
             revert();
         }
         evvmAddress.proposal = _newEvvmAddress;
-        evvmAddress.timeToAccept = block.timestamp + 1 days;
+        evvmAddress.timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**

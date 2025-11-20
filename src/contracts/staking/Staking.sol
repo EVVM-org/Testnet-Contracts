@@ -216,7 +216,7 @@ contract Staking {
 
         secondsToUnlockStaking.actual = 0;
 
-        secondsToUnllockFullUnstaking.actual = 21 days;
+        secondsToUnllockFullUnstaking.actual = 30 seconds;
 
         breakerSetupEstimatorAndEvvm = 0x01;
     }
@@ -761,7 +761,7 @@ contract Staking {
      */
     function proposeAdmin(address _newAdmin) external onlyOwner {
         admin.proposal = _newAdmin;
-        admin.timeToAccept = block.timestamp + 1 days;
+        admin.timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**
@@ -795,7 +795,7 @@ contract Staking {
      */
     function proposeGoldenFisher(address _goldenFisher) external onlyOwner {
         goldenFisher.proposal = _goldenFisher;
-        goldenFisher.timeToAccept = block.timestamp + 1 days;
+        goldenFisher.timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**
@@ -829,7 +829,7 @@ contract Staking {
         uint256 _secondsToUnlockStaking
     ) external onlyOwner {
         secondsToUnlockStaking.proposal = _secondsToUnlockStaking;
-        secondsToUnlockStaking.timeToAccept = block.timestamp + 1 days;
+        secondsToUnlockStaking.timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**
@@ -863,7 +863,7 @@ contract Staking {
         uint256 _secondsToUnllockFullUnstaking
     ) external onlyOwner {
         secondsToUnllockFullUnstaking.proposal = _secondsToUnllockFullUnstaking;
-        secondsToUnllockFullUnstaking.timeToAccept = block.timestamp + 1 days;
+        secondsToUnllockFullUnstaking.timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**
@@ -894,7 +894,7 @@ contract Staking {
      * @dev Initiates the time-delayed process to enable/disable public staking
      */
     function prepareChangeAllowPublicStaking() external onlyOwner {
-        allowPublicStaking.timeToAccept = block.timestamp + 1 days;
+        allowPublicStaking.timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**
@@ -924,7 +924,7 @@ contract Staking {
      * @dev Initiates the time-delayed process to enable/disable presale staking
      */
     function prepareChangeAllowPresaleStaking() external onlyOwner {
-        allowPresaleStaking.timeToAccept = block.timestamp + 1 days;
+        allowPresaleStaking.timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**
@@ -956,7 +956,7 @@ contract Staking {
      */
     function proposeEstimator(address _estimator) external onlyOwner {
         estimator.proposal = _estimator;
-        estimator.timeToAccept = block.timestamp + 1 days;
+        estimator.timeToAccept = block.timestamp + 1 minutes;
     }
 
     /**

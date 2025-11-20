@@ -588,7 +588,7 @@ contract TreasuryExternalChainStation is
         if (_newOwner == address(0) || _newOwner == admin.current) revert();
 
         admin.proposal = _newOwner;
-        admin.timeToAccept = block.timestamp + 1 days;
+        admin.timeToAccept = block.timestamp + 1 minutes;
     }
 
     /// @notice Cancels a pending admin change proposal
@@ -625,7 +625,7 @@ contract TreasuryExternalChainStation is
         ) revert();
 
         fisherExecutor.proposal = _newFisherExecutor;
-        fisherExecutor.timeToAccept = block.timestamp + 1 days;
+        fisherExecutor.timeToAccept = block.timestamp + 1 minutes;
     }
 
     /// @notice Cancels a pending Fisher executor change proposal
@@ -661,7 +661,7 @@ contract TreasuryExternalChainStation is
         hostChainAddressChangeProposal = ChangeHostChainAddressParams({
             porposeAddress_AddressType: hostChainStationAddress,
             porposeAddress_StringType: hostChainStationAddressString,
-            timeToAccept: block.timestamp + 1 days
+            timeToAccept: block.timestamp + 1 minutes
         });
     }
 

@@ -180,7 +180,7 @@ contract Estimator {
         address _proposal
     ) external onlyActivator {
         activator.proposal = _proposal;
-        activator.timeToAccept = block.timestamp + 1 days;
+        activator.timeToAccept = block.timestamp + 1 minutes;
     }
 
     function cancelActivatorProposal() external onlyActivator {
@@ -200,7 +200,7 @@ contract Estimator {
         address _proposal
     ) external onlyAdmin {
         evvmAddress.proposal = _proposal;
-        evvmAddress.timeToAccept = block.timestamp + 1 days;
+        evvmAddress.timeToAccept = block.timestamp + 1 minutes;
     }
 
     function cancelEvvmAddressProposal() external onlyAdmin {
@@ -220,7 +220,7 @@ contract Estimator {
         address _proposal
     ) external onlyAdmin {
         addressStaking.proposal = _proposal;
-        addressStaking.timeToAccept = block.timestamp + 1 days;
+        addressStaking.timeToAccept = block.timestamp + 1 minutes;
     }
 
     function cancelAddressStakingProposal() external onlyAdmin {
@@ -240,7 +240,7 @@ contract Estimator {
         address _proposal
     ) external onlyAdmin {
         admin.proposal = _proposal;
-        admin.timeToAccept = block.timestamp + 1 days;
+        admin.timeToAccept = block.timestamp + 1 minutes;
     }
 
     function cancelAdminProposal() external onlyAdmin {
