@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: EVVM-NONCOMMERCIAL-1.0
 // Full license terms available at: https://www.evvm.info/docs/EVVMNoncommercialLicense
 
-import {SignatureRecover} from "@evvm/testnet-contracts/library/SignatureRecover.sol";
-import {AdvancedStrings} from "@evvm/testnet-contracts/library/AdvancedStrings.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {SignatureUtil} from "@evvm/testnet-contracts/library/utils/SignatureUtil.sol";
+import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
 
 pragma solidity ^0.8.0;
 
@@ -22,13 +21,13 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "preRegistrationUsername",
                 string.concat(
                     AdvancedStrings.bytes32ToString(_hashUsername),
                     ",",
-                    Strings.toString(_nameServiceNonce)
+                    AdvancedStrings.uintToString(_nameServiceNonce)
                 ),
                 signature,
                 signer
@@ -44,15 +43,15 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "registrationUsername",
                 string.concat(
                     _username,
                     ",",
-                    Strings.toString(_clowNumber),
+                    AdvancedStrings.uintToString(_clowNumber),
                     ",",
-                    Strings.toString(_nameServiceNonce)
+                    AdvancedStrings.uintToString(_nameServiceNonce)
                 ),
                 signature,
                 signer
@@ -69,17 +68,17 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "makeOffer",
                 string.concat(
                     _username,
                     ",",
-                    Strings.toString(_dateExpire),
+                    AdvancedStrings.uintToString(_dateExpire),
                     ",",
-                    Strings.toString(_amount),
+                    AdvancedStrings.uintToString(_amount),
                     ",",
-                    Strings.toString(_nameServiceNonce)
+                    AdvancedStrings.uintToString(_nameServiceNonce)
                 ),
                 signature,
                 signer
@@ -95,15 +94,15 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "withdrawOffer",
                 string.concat(
                     _username,
                     ",",
-                    Strings.toString(_offerId),
+                    AdvancedStrings.uintToString(_offerId),
                     ",",
-                    Strings.toString(_nameServiceNonce)
+                    AdvancedStrings.uintToString(_nameServiceNonce)
                 ),
                 signature,
                 signer
@@ -119,15 +118,15 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "acceptOffer",
                 string.concat(
                     _username,
                     ",",
-                    Strings.toString(_offerId),
+                    AdvancedStrings.uintToString(_offerId),
                     ",",
-                    Strings.toString(_nameServiceNonce)
+                    AdvancedStrings.uintToString(_nameServiceNonce)
                 ),
                 signature,
                 signer
@@ -142,13 +141,13 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "renewUsername",
                 string.concat(
                     _username,
                     ",",
-                    Strings.toString(_nameServiceNonce)
+                    AdvancedStrings.uintToString(_nameServiceNonce)
                 ),
                 signature,
                 signer
@@ -164,15 +163,15 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "addCustomMetadata",
                 string.concat(
                     _identity,
                     ",",
                     _value,
                     ",",
-                    Strings.toString(_nameServiceNonce)
+                    AdvancedStrings.uintToString(_nameServiceNonce)
                 ),
                 signature,
                 signer
@@ -188,15 +187,15 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "removeCustomMetadata",
                 string.concat(
                     _username,
                     ",",
-                    Strings.toString(_key),
+                    AdvancedStrings.uintToString(_key),
                     ",",
-                    Strings.toString(_nonce)
+                    AdvancedStrings.uintToString(_nonce)
                 ),
                 signature,
                 signer
@@ -211,10 +210,10 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "flushCustomMetadata",
-                string.concat(_identity, ",", Strings.toString(_nonce)),
+                string.concat(_identity, ",", AdvancedStrings.uintToString(_nonce)),
                 signature,
                 signer
             );
@@ -228,10 +227,10 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "flushUsername",
-                string.concat(_username, ",", Strings.toString(_nonce)),
+                string.concat(_username, ",", AdvancedStrings.uintToString(_nonce)),
                 signature,
                 signer
             );

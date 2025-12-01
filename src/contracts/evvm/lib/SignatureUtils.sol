@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: EVVM-NONCOMMERCIAL-1.0
 // Full license terms available at: https://www.evvm.info/docs/EVVMNoncommercialLicense
 
-import {SignatureRecover} from "@evvm/testnet-contracts/library/SignatureRecover.sol";
-import {AdvancedStrings} from "@evvm/testnet-contracts/library/AdvancedStrings.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {SignatureUtil} from "@evvm/testnet-contracts/library/utils/SignatureUtil.sol";
+import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
 
 pragma solidity ^0.8.0;
 
@@ -13,6 +12,7 @@ library SignatureUtils {
      *       verify messages, the next functions are used to verify the messages signed
      *       by the users
      */
+
 
     /**
      *  @notice This function is used to verify the message signed for the payment
@@ -45,8 +45,8 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "pay",
                 string.concat(
                     _receiverAddress == address(0)
@@ -55,11 +55,11 @@ library SignatureUtils {
                     ",",
                     AdvancedStrings.addressToString(_token),
                     ",",
-                    Strings.toString(_amount),
+                    AdvancedStrings.uintToString(_amount),
                     ",",
-                    Strings.toString(_priorityFee),
+                    AdvancedStrings.uintToString(_priorityFee),
                     ",",
-                    Strings.toString(_nonce),
+                    AdvancedStrings.uintToString(_nonce),
                     ",",
                     _priorityFlag ? "true" : "false",
                     ",",
@@ -97,19 +97,19 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "dispersePay",
                 string.concat(
                     AdvancedStrings.bytes32ToString(hashList),
                     ",",
                     AdvancedStrings.addressToString(_token),
                     ",",
-                    Strings.toString(_amount),
+                    AdvancedStrings.uintToString(_amount),
                     ",",
-                    Strings.toString(_priorityFee),
+                    AdvancedStrings.uintToString(_priorityFee),
                     ",",
-                    Strings.toString(_nonce),
+                    AdvancedStrings.uintToString(_nonce),
                     ",",
                     _priorityFlag ? "true" : "false",
                     ",",

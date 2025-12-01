@@ -77,7 +77,7 @@ import {NameService} from "@evvm/testnet-contracts/contracts/nameService/NameSer
 import {EvvmStorage} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
 import {ErrorsLib} from "@evvm/testnet-contracts/contracts/evvm/lib/ErrorsLib.sol";
 import {SignatureUtils} from "@evvm/testnet-contracts/contracts/evvm/lib/SignatureUtils.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
 
 contract Evvm is EvvmStorage {
     /**
@@ -145,6 +145,8 @@ contract Evvm is EvvmStorage {
         address _stakingContractAddress,
         EvvmMetadata memory _evvmMetadata
     ) {
+        evvmMetadata = _evvmMetadata;
+        
         stakingContractAddress = _stakingContractAddress;
 
         admin.current = _initialOwner;
@@ -157,7 +159,7 @@ contract Evvm is EvvmStorage {
 
         breakerSetupNameServiceAddress = FLAG_IS_STAKER;
 
-        evvmMetadata = _evvmMetadata;
+        
     }
 
     /**
@@ -209,14 +211,14 @@ contract Evvm is EvvmStorage {
      * @dev Allows the admin to change the EVVM ID within a 1-day window after deployment
      */
     function setEvvmID(uint256 newEvvmID) external onlyAdmin {
-        if (newEvvmID == 0) {
+        if (evvmMetadata.EvvmID != 0) {
             if (block.timestamp > windowTimeToChangeEvvmID)
                 revert ErrorsLib.WindowToChangeEvvmIDExpired();
         }
 
         evvmMetadata.EvvmID = newEvvmID;
 
-        windowTimeToChangeEvvmID = block.timestamp + 1 minutes;
+        windowTimeToChangeEvvmID = block.timestamp + 24 hours;
     }
 
     /**
@@ -380,7 +382,7 @@ contract Evvm is EvvmStorage {
         if (priorityFlag && asyncUsedNonce[from][nonce])
             revert ErrorsLib.InvalidAsyncNonce();
 
-        address to = !Strings.equal(to_identity, "")
+        address to = !AdvancedStrings.equal(to_identity, "")
             ? NameService(nameServiceAddress).verifyStrictAndGetOwnerOfIdentity(
                 to_identity
             )
@@ -501,7 +503,7 @@ contract Evvm is EvvmStorage {
                 }
             }
 
-            to_aux = !Strings.equal(payData[iteration].to_identity, "")
+            to_aux = !AdvancedStrings.equal(payData[iteration].to_identity, "")
                 ? NameService(nameServiceAddress)
                     .verifyStrictAndGetOwnerOfIdentity(
                         payData[iteration].to_identity
@@ -633,7 +635,7 @@ contract Evvm is EvvmStorage {
         for (uint256 i = 0; i < toData.length; i++) {
             acomulatedAmount += toData[i].amount;
 
-            if (!Strings.equal(toData[i].to_identity, "")) {
+            if (!AdvancedStrings.equal(toData[i].to_identity, "")) {
                 if (
                     NameService(nameServiceAddress).strictVerifyIfIdentityExist(
                         toData[i].to_identity
@@ -950,7 +952,9 @@ contract Evvm is EvvmStorage {
      */
     function proposeImplementation(address _newImpl) external onlyAdmin {
         proposalImplementation = _newImpl;
-        timeToAcceptImplementation = block.timestamp + 30 days;
+        timeToAcceptImplementation =
+            block.timestamp +
+            TIME_TO_ACCEPT_IMPLEMENTATION;
     }
 
     /**
@@ -999,7 +1003,7 @@ contract Evvm is EvvmStorage {
         }
 
         admin.proposal = _newOwner;
-        admin.timeToAccept = block.timestamp + 1 minutes;
+        admin.timeToAccept = block.timestamp + TIME_TO_ACCEPT_PROPOSAL;
     }
 
     /**

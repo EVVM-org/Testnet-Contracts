@@ -20,4 +20,3 @@ library ErrorsLib {
     error ServiceDoesNotStakeInSameTx();
     error AddressMismatch();
 }
-

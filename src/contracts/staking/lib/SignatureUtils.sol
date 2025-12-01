@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: EVVM-NONCOMMERCIAL-1.0
 // Full license terms available at: https://www.evvm.info/docs/EVVMNoncommercialLicense
 
-import {SignatureRecover} from "@evvm/testnet-contracts/library/SignatureRecover.sol";
-import {AdvancedStrings} from "@evvm/testnet-contracts/library/AdvancedStrings.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {SignatureUtil} from "@evvm/testnet-contracts/library/utils/SignatureUtil.sol";
+import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
 
 pragma solidity ^0.8.0;
 
@@ -24,42 +23,15 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 isExternalStaking ? "publicStaking" : "presaleStaking",
                 string.concat(
                     _isStaking ? "true" : "false",
                     ",",
-                    Strings.toString(_amountOfStaking),
+                    AdvancedStrings.uintToString(_amountOfStaking),
                     ",",
-                    Strings.toString(_nonce)
-                ),
-                signature,
-                user
-            );
-    }
-
-    function verifyMessageSignedForPublicServiceStake(
-        uint256 evvmID,
-        address user,
-        address serviceAddress,
-        bool _isStaking,
-        uint256 _amountOfStaking,
-        uint256 _nonce,
-        bytes memory signature
-    ) internal pure returns (bool) {
-        return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
-                "publicServiceStaking",
-                string.concat(
-                    AdvancedStrings.addressToString(serviceAddress),
-                    ",",
-                    _isStaking ? "true" : "false",
-                    ",",
-                    Strings.toString(_amountOfStaking),
-                    ",",
-                    Strings.toString(_nonce)
+                    AdvancedStrings.uintToString(_nonce)
                 ),
                 signature,
                 user

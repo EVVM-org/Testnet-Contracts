@@ -4,15 +4,15 @@
 pragma solidity ^0.8.0;
 /**
  * @title Erc191TestBuilder
- * @author Mate labs
+ * @author jistro.eth
  * @notice this library is used to build ERC191 messages for foundry test scripts
  *         more info in
  *         https://book.getfoundry.sh/cheatcodes/create-wallet
  *         https://book.getfoundry.sh/cheatcodes/sign
  */
 
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {AdvancedStrings} from "./AdvancedStrings.sol";
+
+import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
 
 library Erc191TestBuilder {
     //-----------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ library Erc191TestBuilder {
         address _executor
     ) internal pure returns (bytes32 messageHash) {
         string memory messageToSign = string.concat(
-            Strings.toString(evvmID),
+            AdvancedStrings.uintToString(evvmID),
             ",",
             "pay",
             ",",
@@ -40,11 +40,11 @@ library Erc191TestBuilder {
             ",",
             AdvancedStrings.addressToString(_token),
             ",",
-            Strings.toString(_amount),
+            AdvancedStrings.uintToString(_amount),
             ",",
-            Strings.toString(_priorityFee),
+            AdvancedStrings.uintToString(_priorityFee),
             ",",
-            Strings.toString(_nonce),
+            AdvancedStrings.uintToString(_nonce),
             ",",
             _priority_boolean ? "true" : "false",
             ",",
@@ -66,7 +66,7 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "dispersePay",
                     ",",
@@ -74,11 +74,11 @@ library Erc191TestBuilder {
                     ",",
                     AdvancedStrings.addressToString(_token),
                     ",",
-                    Strings.toString(_amount),
+                    AdvancedStrings.uintToString(_amount),
                     ",",
-                    Strings.toString(_priorityFee),
+                    AdvancedStrings.uintToString(_priorityFee),
                     ",",
-                    Strings.toString(_nonce),
+                    AdvancedStrings.uintToString(_nonce),
                     ",",
                     _priority_boolean ? "true" : "false",
                     ",",
@@ -99,13 +99,13 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "preRegistrationUsername",
                     ",",
                     AdvancedStrings.bytes32ToString(_hashUsername),
                     ",",
-                    Strings.toString(_nameServiceNonce)
+                    AdvancedStrings.uintToString(_nameServiceNonce)
                 )
             );
     }
@@ -119,15 +119,15 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "registrationUsername",
                     ",",
                     _username,
                     ",",
-                    Strings.toString(_clowNumber),
+                    AdvancedStrings.uintToString(_clowNumber),
                     ",",
-                    Strings.toString(_nameServiceNonce)
+                    AdvancedStrings.uintToString(_nameServiceNonce)
                 )
             );
     }
@@ -142,17 +142,17 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "makeOffer",
                     ",",
                     _username,
                     ",",
-                    Strings.toString(_dateExpire),
+                    AdvancedStrings.uintToString(_dateExpire),
                     ",",
-                    Strings.toString(_amount),
+                    AdvancedStrings.uintToString(_amount),
                     ",",
-                    Strings.toString(_nameServiceNonce)
+                    AdvancedStrings.uintToString(_nameServiceNonce)
                 )
             );
     }
@@ -166,15 +166,15 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "withdrawOffer",
                     ",",
                     _username,
                     ",",
-                    Strings.toString(_offerId),
+                    AdvancedStrings.uintToString(_offerId),
                     ",",
-                    Strings.toString(_nameServiceNonce)
+                    AdvancedStrings.uintToString(_nameServiceNonce)
                 )
             );
     }
@@ -188,15 +188,15 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "acceptOffer",
                     ",",
                     _username,
                     ",",
-                    Strings.toString(_offerId),
+                    AdvancedStrings.uintToString(_offerId),
                     ",",
-                    Strings.toString(_nameServiceNonce)
+                    AdvancedStrings.uintToString(_nameServiceNonce)
                 )
             );
     }
@@ -209,13 +209,13 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "renewUsername",
                     ",",
                     _username,
                     ",",
-                    Strings.toString(_nameServiceNonce)
+                    AdvancedStrings.uintToString(_nameServiceNonce)
                 )
             );
     }
@@ -229,7 +229,7 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "addCustomMetadata",
                     ",",
@@ -237,7 +237,7 @@ library Erc191TestBuilder {
                     ",",
                     _value,
                     ",",
-                    Strings.toString(_nameServiceNonce)
+                    AdvancedStrings.uintToString(_nameServiceNonce)
                 )
             );
     }
@@ -251,15 +251,15 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "removeCustomMetadata",
                     ",",
                     _username,
                     ",",
-                    Strings.toString(_key),
+                    AdvancedStrings.uintToString(_key),
                     ",",
-                    Strings.toString(_nonce)
+                    AdvancedStrings.uintToString(_nonce)
                 )
             );
     }
@@ -272,13 +272,13 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "flushCustomMetadata",
                     ",",
                     _username,
                     ",",
-                    Strings.toString(_nonce)
+                    AdvancedStrings.uintToString(_nonce)
                 )
             );
     }
@@ -291,13 +291,13 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "flushUsername",
                     ",",
                     _username,
                     ",",
-                    Strings.toString(_nonce)
+                    AdvancedStrings.uintToString(_nonce)
                 )
             );
     }
@@ -316,7 +316,7 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "publicServiceStaking",
                     ",",
@@ -324,9 +324,9 @@ library Erc191TestBuilder {
                     ",",
                     _isStaking ? "true" : "false",
                     ",",
-                    Strings.toString(_amountOfStaking),
+                    AdvancedStrings.uintToString(_amountOfStaking),
                     ",",
-                    Strings.toString(_nonce)
+                    AdvancedStrings.uintToString(_nonce)
                 )
             );
     }
@@ -340,15 +340,15 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "publicStaking",
                     ",",
                     _isStaking ? "true" : "false",
                     ",",
-                    Strings.toString(_amountOfStaking),
+                    AdvancedStrings.uintToString(_amountOfStaking),
                     ",",
-                    Strings.toString(_nonce)
+                    AdvancedStrings.uintToString(_nonce)
                 )
             );
     }
@@ -362,15 +362,15 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "presaleStaking",
                     ",",
                     _isStaking ? "true" : "false",
                     ",",
-                    Strings.toString(_amountOfStaking),
+                    AdvancedStrings.uintToString(_amountOfStaking),
                     ",",
-                    Strings.toString(_nonce)
+                    AdvancedStrings.uintToString(_nonce)
                 )
             );
     }
@@ -390,19 +390,19 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "makeOrder",
                     ",",
-                    Strings.toString(_nonce),
+                    AdvancedStrings.uintToString(_nonce),
                     ",",
                     AdvancedStrings.addressToString(_tokenA),
                     ",",
                     AdvancedStrings.addressToString(_tokenB),
                     ",",
-                    Strings.toString(_amountA),
+                    AdvancedStrings.uintToString(_amountA),
                     ",",
-                    Strings.toString(_amountB)
+                    AdvancedStrings.uintToString(_amountB)
                 )
             );
     }
@@ -417,17 +417,17 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "cancelOrder",
                     ",",
-                    Strings.toString(_nonce),
+                    AdvancedStrings.uintToString(_nonce),
                     ",",
                     AdvancedStrings.addressToString(_tokenA),
                     ",",
                     AdvancedStrings.addressToString(_tokenB),
                     ",",
-                    Strings.toString(_orderId)
+                    AdvancedStrings.uintToString(_orderId)
                 )
             );
     }
@@ -442,17 +442,17 @@ library Erc191TestBuilder {
         return
             buildHashForSign(
                 string.concat(
-                    Strings.toString(evvmID),
+                    AdvancedStrings.uintToString(evvmID),
                     ",",
                     "dispatchOrder",
                     ",",
-                    Strings.toString(_nonce),
+                    AdvancedStrings.uintToString(_nonce),
                     ",",
                     AdvancedStrings.addressToString(_tokenA),
                     ",",
                     AdvancedStrings.addressToString(_tokenB),
                     ",",
-                    Strings.toString(_orderId)
+                    AdvancedStrings.uintToString(_orderId)
                 )
             );
     }
@@ -468,7 +468,7 @@ library Erc191TestBuilder {
             keccak256(
                 abi.encodePacked(
                     "\x19Ethereum Signed Message:\n",
-                    Strings.toString(bytes(messageToSign).length),
+                    AdvancedStrings.uintToString(bytes(messageToSign).length),
                     messageToSign
                 )
             );

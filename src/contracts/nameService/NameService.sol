@@ -57,8 +57,7 @@ pragma solidity ^0.8.0;
  */
 
 import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {AdvancedStrings} from "@evvm/testnet-contracts/library/AdvancedStrings.sol";
+import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
 import {ErrorsLib} from "@evvm/testnet-contracts/contracts/nameService/lib/ErrorsLib.sol";
 import {SignatureUtils} from "@evvm/testnet-contracts/contracts/nameService/lib/SignatureUtils.sol";
 
@@ -129,6 +128,11 @@ contract NameService {
         uint256 amount;
     }
 
+    uint256 constant TIME_TO_ACCEPT_PROPOSAL = 1 days;
+
+    /// @dev Amount of Principal Tokens locked in pending marketplace offers
+    uint256 private principalTokenTokenLockedForWithdrawOffers;
+
     /// @dev Nested mapping: username => offer ID => offer details
     mapping(string username => mapping(uint256 id => OfferMetadata))
         private usernameOffers;
@@ -152,9 +156,6 @@ contract NameService {
     /// @dev Constant address representing the Principal Token in the EVVM ecosystem
     address private constant PRINCIPAL_TOKEN_ADDRESS =
         0x0000000000000000000000000000000000000001;
-
-    /// @dev Amount of Principal Tokens locked in pending marketplace offers
-    uint256 private principalTokenTokenLockedForWithdrawOffers;
 
     /// @dev Restricts function access to the current admin address only
     modifier onlyAdmin() {
@@ -955,7 +956,7 @@ contract NameService {
         }
 
         admin.proposal = _adminToPropose;
-        admin.timeToAccept = block.timestamp + 1 minutes;
+        admin.timeToAccept = block.timestamp + TIME_TO_ACCEPT_PROPOSAL;
     }
 
     /**
@@ -1007,7 +1008,9 @@ contract NameService {
         }
 
         amountToWithdrawTokens.proposal = _amount;
-        amountToWithdrawTokens.timeToAccept = block.timestamp + 1 minutes;
+        amountToWithdrawTokens.timeToAccept =
+            block.timestamp +
+            TIME_TO_ACCEPT_PROPOSAL;
     }
 
     /**
@@ -1046,7 +1049,7 @@ contract NameService {
             revert();
         }
         evvmAddress.proposal = _newEvvmAddress;
-        evvmAddress.timeToAccept = block.timestamp + 1 minutes;
+        evvmAddress.timeToAccept = block.timestamp + TIME_TO_ACCEPT_PROPOSAL;
     }
 
     /**

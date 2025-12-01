@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: EVVM-NONCOMMERCIAL-1.0
 // Full license terms available at: https://www.evvm.info/docs/EVVMNoncommercialLicense
 
-import {SignatureRecover} from "@evvm/testnet-contracts/library/SignatureRecover.sol";
-import {AdvancedStrings} from "@evvm/testnet-contracts/library/AdvancedStrings.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {SignatureUtil} from "@evvm/testnet-contracts/library/utils/SignatureUtil.sol";
+import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
 
 pragma solidity ^0.8.0;
 
@@ -25,19 +24,19 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "makeOrder",
                 string.concat(
-                    Strings.toString(_nonce),
+                    AdvancedStrings.uintToString(_nonce),
                     ",",
                     AdvancedStrings.addressToString(_tokenA),
                     ",",
                     AdvancedStrings.addressToString(_tokenB),
                     ",",
-                    Strings.toString(_amountA),
+                    AdvancedStrings.uintToString(_amountA),
                     ",",
-                    Strings.toString(_amountB)
+                    AdvancedStrings.uintToString(_amountB)
                 ),
                 signature,
                 signer
@@ -54,17 +53,17 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "cancelOrder",
                 string.concat(
-                    Strings.toString(_nonce),
+                    AdvancedStrings.uintToString(_nonce),
                     ",",
                     AdvancedStrings.addressToString(_tokenA),
                     ",",
                     AdvancedStrings.addressToString(_tokenB),
                     ",",
-                    Strings.toString(_orderId)
+                    AdvancedStrings.uintToString(_orderId)
                 ),
                 signature,
                 signer
@@ -81,17 +80,17 @@ library SignatureUtils {
         bytes memory signature
     ) internal pure returns (bool) {
         return
-            SignatureRecover.signatureVerification(
-                Strings.toString(evvmID),
+            SignatureUtil.verifySignature(
+                evvmID,
                 "dispatchOrder",
                 string.concat(
-                    Strings.toString(_nonce),
+                    AdvancedStrings.uintToString(_nonce),
                     ",",
                     AdvancedStrings.addressToString(_tokenA),
                     ",",
                     AdvancedStrings.addressToString(_tokenB),
                     ",",
-                    Strings.toString(_orderId)
+                    AdvancedStrings.uintToString(_orderId)
                 ),
                 signature,
                 signer

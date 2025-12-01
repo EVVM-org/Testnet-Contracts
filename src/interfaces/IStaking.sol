@@ -3,7 +3,7 @@
 
 pragma solidity ^0.8.4;
 
-interface Staking {
+interface IStaking {
     struct BoolTypeProposal {
         bool flag;
         uint256 timeToAccept;

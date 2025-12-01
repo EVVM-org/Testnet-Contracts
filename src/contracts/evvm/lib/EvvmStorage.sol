@@ -20,6 +20,8 @@ import {EvvmStructs} from "./EvvmStructs.sol";
 abstract contract EvvmStorage is EvvmStructs {
     address constant ETH_ADDRESS = address(0);
     bytes1 constant FLAG_IS_STAKER = 0x01;
+    uint256 constant TIME_TO_ACCEPT_PROPOSAL = 1 days;
+    uint256 constant TIME_TO_ACCEPT_IMPLEMENTATION = 30 days;
 
     address nameServiceAddress;
 

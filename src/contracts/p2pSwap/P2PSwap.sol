@@ -38,69 +38,36 @@ pragma solidity ^0.8.0;
 
 import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
 import {Staking} from "@evvm/testnet-contracts/contracts/staking/Staking.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {SignatureRecover} from "@evvm/testnet-contracts/library/SignatureRecover.sol";
-import {SignatureUtils} from "@evvm/testnet-contracts/contracts/p2pSwap/lib/SignatureUtils.sol";
-import {AdvancedStrings} from "@evvm/testnet-contracts/library/AdvancedStrings.sol";
+import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
 import {EvvmStructs} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
-import {StakingServiceHooks} from "@evvm/testnet-contracts/library/StakingServiceHooks.sol";
+import {StakingServiceUtils} from "@evvm/testnet-contracts/library/utils/service/StakingServiceUtils.sol";
+import {SignatureUtils} from "@evvm/testnet-contracts/contracts/p2pSwap/lib/SignatureUtils.sol";
 
-contract P2PSwap is StakingServiceHooks {
-    using SignatureRecover for *;
-    using AdvancedStrings for *;
-
-    /// @notice Current contract owner with administrative privileges
+contract P2PSwap is StakingServiceUtils {
     address owner;
-    /// @notice Proposed new owner address pending acceptance
     address owner_proposal;
-    /// @notice Timestamp when the proposed owner change can be accepted
     uint256 owner_timeToAccept;
 
-    /// @notice Address of the EVVM core contract for payment processing
     address evvmAddress;
-    /// @notice Address of the Staking contract for service staking functionality
     address stakingAddress;
 
-    /// @notice Constant address representing the MATE token (Principal Token)
     address constant MATE_TOKEN_ADDRESS =
         0x0000000000000000000000000000000000000001;
-    /// @notice Constant address representing native ETH
     address constant ETH_ADDRESS = 0x0000000000000000000000000000000000000000;
 
-    /**
-     * @notice Market metadata containing token pair and order tracking information
-     * @param tokenA Address of the first token in the trading pair
-     * @param tokenB Address of the second token in the trading pair
-     * @param maxSlot Maximum order ID ever created in this market
-     * @param ordersAvailable Current number of active orders in the market
-     */
     struct MarketInformation {
         address tokenA;
         address tokenB;
         uint256 maxSlot;
         uint256 ordersAvailable;
     }
-    
-    /**
-     * @notice Individual order details within a market
-     * @param seller Address of the user who created the order
-     * @param amountA Amount of tokenA the seller is offering
-     * @param amountB Amount of tokenB the seller wants in return
-     */
+
     struct Order {
         address seller;
         uint256 amountA;
         uint256 amountB;
     }
 
-    /**
-     * @notice Extended order information for external queries
-     * @param marketId ID of the market containing this order
-     * @param orderId Unique order ID within the market
-     * @param seller Address of the user who created the order
-     * @param amountA Amount of tokenA being offered
-     * @param amountB Amount of tokenB being requested
-     */
     struct OrderForGetter {
         uint256 marketId;
         uint256 orderId;
@@ -109,26 +76,12 @@ contract P2PSwap is StakingServiceHooks {
         uint256 amountB;
     }
 
-    /**
-     * @notice Fee distribution percentages (in basis points, total must equal 10,000)
-     * @param seller Percentage of fees distributed to the order seller
-     * @param service Percentage of fees retained by the P2PSwap service
-     * @param mateStaker Percentage of fees distributed to MATE token stakers
-     */
     struct Percentage {
         uint256 seller;
         uint256 service;
         uint256 mateStaker;
     }
 
-    /**
-     * @notice Metadata required for creating a new order
-     * @param nonce Unique nonce to prevent replay attacks
-     * @param tokenA Address of the token being offered
-     * @param tokenB Address of the token being requested
-     * @param amountA Amount of tokenA to offer
-     * @param amountB Amount of tokenB requested in return
-     */
     struct MetadataMakeOrder {
         uint256 nonce;
         address tokenA;
@@ -137,14 +90,6 @@ contract P2PSwap is StakingServiceHooks {
         uint256 amountB;
     }
 
-    /**
-     * @notice Metadata required for canceling an existing order
-     * @param nonce Unique nonce to prevent replay attacks
-     * @param tokenA Address of the first token in the market
-     * @param tokenB Address of the second token in the market
-     * @param orderId ID of the order to cancel
-     * @param signature User's signature authorizing the cancellation
-     */
     struct MetadataCancelOrder {
         uint256 nonce;
         address tokenA;
@@ -153,15 +98,6 @@ contract P2PSwap is StakingServiceHooks {
         bytes signature;
     }
 
-    /**
-     * @notice Metadata required for executing/filling an order
-     * @param nonce Unique nonce to prevent replay attacks
-     * @param tokenA Address of the first token in the market
-     * @param tokenB Address of the second token in the market
-     * @param orderId ID of the order to execute
-     * @param amountOfTokenBToFill Amount of tokenB to pay (including fees)
-     * @param signature User's signature authorizing the execution
-     */
     struct MetadataDispatchOrder {
         uint256 nonce;
         address tokenA;
@@ -171,65 +107,40 @@ contract P2PSwap is StakingServiceHooks {
         bytes signature;
     }
 
-    /// @notice Current fee distribution percentages
     Percentage rewardPercentage;
-    /// @notice Proposed new fee distribution percentages
     Percentage rewardPercentage_proposal;
-    /// @notice Timestamp when reward percentage change can be accepted
     uint256 rewardPercentage_timeToAcceptNewChange;
 
-    /// @notice Current trading fee percentage (in basis points)
     uint256 percentageFee;
-    /// @notice Proposed new trading fee percentage
     uint256 percentageFee_proposal;
-    /// @notice Timestamp when fee percentage change can be accepted
     uint256 percentageFee_timeToAccept;
 
-    /// @notice Maximum fixed fee limit for order execution
     uint256 maxLimitFillFixedFee;
-    /// @notice Proposed new maximum fixed fee limit
     uint256 maxLimitFillFixedFee_proposal;
-    /// @notice Timestamp when max fee limit change can be accepted
     uint256 maxLimitFillFixedFee_timeToAccept;
 
-    /// @notice Token address for pending withdrawal
     address tokenToWithdraw;
-    /// @notice Amount for pending withdrawal
     uint256 amountToWithdraw;
-    /// @notice Recipient address for pending withdrawal
     address recipientToWithdraw;
-    /// @notice Timestamp when withdrawal can be executed
     uint256 timeToWithdrawal;
 
-    /// @notice Total number of markets created
     uint256 marketCount;
 
-    /// @notice Tracks used nonces per user to prevent replay attacks
     mapping(address user => mapping(uint256 nonce => bool isUsed)) nonceP2PSwap;
 
-    /// @notice Maps token pairs to their market ID
     mapping(address tokenA => mapping(address tokenB => uint256 id)) marketId;
 
-    /// @notice Stores market information by market ID
     mapping(uint256 id => MarketInformation info) marketMetadata;
 
-    /// @notice Stores orders within each market
     mapping(uint256 idMarket => mapping(uint256 idOrder => Order)) ordersInsideMarket;
 
-    /// @notice Tracks service fee balances accumulated per token
     mapping(address => uint256) balancesOfContract;
 
-    /**
-     * @notice Initializes the P2PSwap contract with required addresses and default parameters
-     * @param _evvmAddress Address of the EVVM core contract for payment processing
-     * @param _stakingAddress Address of the Staking contract for service functionality
-     * @param _owner Address that will have administrative privileges
-     */
     constructor(
         address _evvmAddress,
         address _stakingAddress,
         address _owner
-    ) StakingServiceHooks(_stakingAddress) {
+    ) StakingServiceUtils(_stakingAddress) {
         evvmAddress = _evvmAddress;
         owner = _owner;
         maxLimitFillFixedFee = 0.001 ether;
@@ -242,19 +153,6 @@ contract P2PSwap is StakingServiceHooks {
         stakingAddress = _stakingAddress;
     }
 
-    /**
-     * @notice Creates a new trading order in the specified market
-     * @dev Verifies signature, processes payment, creates/finds market, and assigns order slot
-     * @param user Address of the user creating the order
-     * @param metadata Order details including tokens, amounts, and nonce
-     * @param signature User's signature authorizing the order creation
-     * @param _priorityFee_Evvm Priority fee for EVVM transaction processing
-     * @param _nonce_Evvm Nonce for EVVM payment transaction
-     * @param _priority_Evvm Whether to use priority (async) processing
-     * @param _signature_Evvm Signature for EVVM payment authorization
-     * @return market ID of the market where order was created
-     * @return orderId Unique ID of the created order within the market
-     */
     function makeOrder(
         address user,
         MetadataMakeOrder memory metadata,
@@ -340,16 +238,6 @@ contract P2PSwap is StakingServiceHooks {
         nonceP2PSwap[user][metadata.nonce] = true;
     }
 
-    /**
-     * @notice Cancels an existing order and refunds tokens to the seller
-     * @dev Verifies signature, validates ownership, refunds tokenA, and removes order
-     * @param user Address of the user canceling the order
-     * @param metadata Cancel details including market info and order ID
-     * @param _priorityFee_Evvm Priority fee for EVVM transaction (optional)
-     * @param _nonce_Evvm Nonce for EVVM payment transaction (if priority fee > 0)
-     * @param _priority_Evvm Whether to use priority processing
-     * @param _signature_Evvm Signature for EVVM payment (if priority fee > 0)
-     */
     function cancelOrder(
         address user,
         MetadataCancelOrder memory metadata,
@@ -419,16 +307,6 @@ contract P2PSwap is StakingServiceHooks {
         nonceP2PSwap[user][metadata.nonce] = true;
     }
 
-    /**
-     * @notice Executes an order using proportional fee calculation
-     * @dev Calculates fee as percentage of order amount, distributes payments to all parties
-     * @param user Address of the user filling the order
-     * @param metadata Execution details including order ID and payment amount
-     * @param _priorityFee_Evvm Priority fee for EVVM transaction processing
-     * @param _nonce_Evvm Nonce for EVVM payment transaction
-     * @param _priority_Evvm Whether to use priority (async) processing
-     * @param _signature_Evvm Signature for EVVM payment authorization
-     */
     function dispatchOrder_fillPropotionalFee(
         address user,
         MetadataDispatchOrder memory metadata,
@@ -461,7 +339,7 @@ contract P2PSwap is StakingServiceHooks {
             market == 0 ||
             ordersInsideMarket[market][metadata.orderId].seller == address(0)
         ) {
-            revert();
+            revert("Invalid order");
         }
 
         uint256 fee = calculateFillPropotionalFee(
@@ -550,17 +428,6 @@ contract P2PSwap is StakingServiceHooks {
         nonceP2PSwap[user][metadata.nonce] = true;
     }
 
-    /**
-     * @notice Executes an order using fixed fee calculation with maximum limits
-     * @dev Calculates fee with upper bound, distributes payments, handles overpayment refunds
-     * @param user Address of the user filling the order
-     * @param metadata Execution details including order ID and payment amount
-     * @param _priorityFee_Evvm Priority fee for EVVM transaction processing
-     * @param _nonce_Evvm Nonce for EVVM payment transaction
-     * @param _priority_Evvm Whether to use priority (async) processing
-     * @param _signature_Evvm Signature for EVVM payment authorization
-     * @param maxFillFixedFee Maximum output amount for fee calculation (testing parameter)
-     */
     function dispatchOrder_fillFixedFee(
         address user,
         MetadataDispatchOrder memory metadata,
@@ -568,7 +435,7 @@ contract P2PSwap is StakingServiceHooks {
         uint256 _nonce_Evvm,
         bool _priority_Evvm,
         bytes memory _signature_Evvm,
-        uint256 maxFillFixedFee
+        uint256 maxFillFixedFee ///@dev for testing purposes
     ) external {
         if (
             !SignatureUtils.verifyMessageSignedForDispatchOrder(
@@ -581,20 +448,20 @@ contract P2PSwap is StakingServiceHooks {
                 metadata.signature
             )
         ) {
-            revert();
+            revert("Invalid signature");
         }
 
         uint256 market = findMarket(metadata.tokenA, metadata.tokenB);
 
         if (nonceP2PSwap[user][metadata.nonce]) {
-            revert();
+            revert("Invalid nonce");
         }
 
         if (
             market == 0 ||
             ordersInsideMarket[market][metadata.orderId].seller == address(0)
         ) {
-            revert();
+            revert("Invalid order");
         }
 
         (uint256 fee, uint256 fee10) = calculateFillFixedFee(
@@ -606,7 +473,7 @@ contract P2PSwap is StakingServiceHooks {
             metadata.amountOfTokenBToFill <
             ordersInsideMarket[market][metadata.orderId].amountB + fee - fee10
         ) {
-            revert();
+            revert("Insuficient amountOfTokenBToFill");
         }
 
         makePay(
@@ -688,26 +555,14 @@ contract P2PSwap is StakingServiceHooks {
         nonceP2PSwap[user][metadata.nonce] = true;
     }
 
-    /**
-     * @notice Calculates proportional trading fee as percentage of order amount
-     * @dev Fee is calculated as (amount * percentageFee) / 10,000 basis points
-     * @param amount The order amount to calculate fee for
-     * @return fee The calculated proportional fee amount
-     */
+    //devolver el 0.05% del monto de la orden
     function calculateFillPropotionalFee(
         uint256 amount
     ) internal view returns (uint256 fee) {
+        ///@dev get the % of the amount
         fee = (amount * percentageFee) / 10_000;
     }
 
-    /**
-     * @notice Calculates fixed trading fee with maximum limit constraints
-     * @dev Compares proportional fee with maximum output, applies 10% reduction if needed
-     * @param amount Order amount for proportional fee calculation
-     * @param maxFillFixedFee Maximum output amount for fee limiting
-     * @return fee The final calculated fee amount
-     * @return fee10 10% of the fee amount for specific calculations
-     */
     function calculateFillFixedFee(
         uint256 amount,
         uint256 maxFillFixedFee
@@ -720,13 +575,6 @@ contract P2PSwap is StakingServiceHooks {
         }
     }
 
-    /**
-     * @notice Creates a new trading market for a token pair
-     * @dev Increments market count, assigns market ID, initializes market metadata
-     * @param tokenA Address of the first token in the trading pair
-     * @param tokenB Address of the second token in the trading pair
-     * @return The newly created market ID
-     */
     function createMarket(
         address tokenA,
         address tokenB
@@ -741,17 +589,6 @@ contract P2PSwap is StakingServiceHooks {
     // Tools for Evvm
     //◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢
 
-    /**
-     * @notice Internal function to process payments through EVVM contract
-     * @dev Calls EVVM.pay() with all necessary parameters for token transfer
-     * @param _user_Evvm Address of the user making the payment
-     * @param _token_Evvm Address of the token being transferred
-     * @param _nonce_Evvm Nonce for the EVVM transaction
-     * @param _ammount_Evvm Amount of tokens to transfer
-     * @param _priorityFee_Evvm Additional priority fee for the transaction
-     * @param _priority_Evvm Whether to use priority (async) processing
-     * @param _signature_Evvm User's signature authorizing the payment
-     */
     function makePay(
         address _user_Evvm,
         address _token_Evvm,
@@ -775,13 +612,6 @@ contract P2PSwap is StakingServiceHooks {
         );
     }
 
-    /**
-     * @notice Internal function to distribute tokens from contract balance via EVVM
-     * @dev Calls EVVM.caPay() to transfer tokens from P2PSwap to specified user
-     * @param _user_Evvm Address of the recipient
-     * @param _token_Evvm Address of the token to transfer
-     * @param _ammount_Evvm Amount of tokens to transfer
-     */
     function makeCaPay(
         address _user_Evvm,
         address _token_Evvm,
@@ -790,13 +620,6 @@ contract P2PSwap is StakingServiceHooks {
         Evvm(evvmAddress).caPay(_user_Evvm, _token_Evvm, _ammount_Evvm);
     }
 
-    /**
-     * @notice Internal function to distribute tokens to multiple recipients via EVVM
-     * @dev Calls EVVM.disperseCaPay() for efficient batch token distribution
-     * @param toData Array of recipient addresses and amounts
-     * @param token Address of the token to distribute
-     * @param amount Total amount being distributed (must match sum of individual amounts)
-     */
     function makeDisperseCaPay(
         EvvmStructs.DisperseCaPayMetadata[] memory toData,
         address token,
@@ -809,23 +632,14 @@ contract P2PSwap is StakingServiceHooks {
     // Admin tools
     //◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢
 
-    /**
-     * @notice Proposes a new contract owner with 1-day delay
-     * @dev Only current owner can propose, starts time-delayed governance process
-     * @param _owner Address of the proposed new owner
-     */
     function proposeOwner(address _owner) external {
         if (msg.sender != owner) {
             revert();
         }
         owner_proposal = _owner;
-        owner_timeToAccept = block.timestamp + 1 minutes;
+        owner_timeToAccept = block.timestamp + 1 days;
     }
 
-    /**
-     * @notice Rejects the current owner change proposal
-     * @dev Only proposed owner can reject before deadline expires
-     */
     function rejectProposeOwner() external {
         if (
             msg.sender != owner_proposal || block.timestamp > owner_timeToAccept
@@ -835,10 +649,6 @@ contract P2PSwap is StakingServiceHooks {
         owner_proposal = address(0);
     }
 
-    /**
-     * @notice Accepts ownership transfer after time delay
-     * @dev Only proposed owner can accept after 1-day waiting period
-     */
     function acceptOwner() external {
         if (
             msg.sender != owner_proposal || block.timestamp > owner_timeToAccept
@@ -849,13 +659,6 @@ contract P2PSwap is StakingServiceHooks {
         owner_proposal = address(0);
     }
 
-    /**
-     * @notice Proposes new fee distribution percentages for fixed fee model
-     * @dev Percentages must sum to 10,000 basis points (100%)
-     * @param _seller Percentage for order sellers (basis points)
-     * @param _service Percentage for P2PSwap service (basis points)
-     * @param _mateStaker Percentage for MATE token stakers (basis points)
-     */
     function proposeFillFixedPercentage(
         uint256 _seller,
         uint256 _service,
@@ -868,13 +671,9 @@ contract P2PSwap is StakingServiceHooks {
             revert();
         }
         rewardPercentage_proposal = Percentage(_seller, _service, _mateStaker);
-        rewardPercentage_timeToAcceptNewChange = block.timestamp + 1 minutes;
+        rewardPercentage_timeToAcceptNewChange = block.timestamp + 1 days;
     }
 
-    /**
-     * @notice Rejects the current fee percentage proposal for fixed fee model
-     * @dev Only owner can reject before deadline expires, resets proposal to zero
-     */
     function rejectProposeFillFixedPercentage() external {
         if (
             msg.sender != owner ||
@@ -885,10 +684,6 @@ contract P2PSwap is StakingServiceHooks {
         rewardPercentage_proposal = Percentage(0, 0, 0);
     }
 
-    /**
-     * @notice Accepts the fee percentage proposal for fixed fee model after time delay
-     * @dev Only owner can accept after 1-day waiting period, applies new percentages
-     */
     function acceptFillFixedPercentage() external {
         if (
             msg.sender != owner ||
@@ -899,13 +694,6 @@ contract P2PSwap is StakingServiceHooks {
         rewardPercentage = rewardPercentage_proposal;
     }
 
-    /**
-     * @notice Proposes new fee distribution percentages for proportional fee model
-     * @dev Percentages must sum to 10,000 basis points (100%)
-     * @param _seller Percentage for order sellers (basis points)
-     * @param _service Percentage for P2PSwap service (basis points)
-     * @param _mateStaker Percentage for MATE token stakers (basis points)
-     */
     function proposeFillPropotionalPercentage(
         uint256 _seller,
         uint256 _service,
@@ -915,13 +703,9 @@ contract P2PSwap is StakingServiceHooks {
             revert();
         }
         rewardPercentage_proposal = Percentage(_seller, _service, _mateStaker);
-        rewardPercentage_timeToAcceptNewChange = block.timestamp + 1 minutes;
+        rewardPercentage_timeToAcceptNewChange = block.timestamp + 1 days;
     }
 
-    /**
-     * @notice Rejects the current fee percentage proposal for proportional fee model
-     * @dev Only owner can reject before deadline expires, resets proposal to zero
-     */
     function rejectProposeFillPropotionalPercentage() external {
         if (
             msg.sender != owner ||
@@ -932,10 +716,6 @@ contract P2PSwap is StakingServiceHooks {
         rewardPercentage_proposal = Percentage(0, 0, 0);
     }
 
-    /**
-     * @notice Accepts the fee percentage proposal for proportional fee model after time delay
-     * @dev Only owner can accept after 1-day waiting period, applies new percentages
-     */
     function acceptFillPropotionalPercentage() external {
         if (
             msg.sender != owner ||
@@ -946,23 +726,14 @@ contract P2PSwap is StakingServiceHooks {
         rewardPercentage = rewardPercentage_proposal;
     }
 
-    /**
-     * @notice Proposes a new percentage fee for proportional fee calculation
-     * @dev Only owner can propose, starts time-delayed governance process
-     * @param _percentageFee New percentage fee value in basis points
-     */
     function proposePercentageFee(uint256 _percentageFee) external {
         if (msg.sender != owner) {
             revert();
         }
         percentageFee_proposal = _percentageFee;
-        percentageFee_timeToAccept = block.timestamp + 1 minutes;
+        percentageFee_timeToAccept = block.timestamp + 1 days;
     }
 
-    /**
-     * @notice Rejects the current percentage fee proposal
-     * @dev Only owner can reject before deadline expires, resets proposal to zero
-     */
     function rejectProposePercentageFee() external {
         if (
             msg.sender != owner || block.timestamp > percentageFee_timeToAccept
@@ -972,10 +743,6 @@ contract P2PSwap is StakingServiceHooks {
         percentageFee_proposal = 0;
     }
 
-    /**
-     * @notice Accepts the percentage fee proposal after time delay
-     * @dev Only owner can accept after 1-day waiting period, applies new fee
-     */
     function acceptPercentageFee() external {
         if (
             msg.sender != owner || block.timestamp > percentageFee_timeToAccept
@@ -985,11 +752,6 @@ contract P2PSwap is StakingServiceHooks {
         percentageFee = percentageFee_proposal;
     }
 
-    /**
-     * @notice Proposes a new maximum limit for fixed fee calculations
-     * @dev Only owner can propose, starts time-delayed governance process
-     * @param _maxLimitFillFixedFee New maximum limit value for fixed fee calculations
-     */
     function proposeMaxLimitFillFixedFee(
         uint256 _maxLimitFillFixedFee
     ) external {
@@ -997,13 +759,9 @@ contract P2PSwap is StakingServiceHooks {
             revert();
         }
         maxLimitFillFixedFee_proposal = _maxLimitFillFixedFee;
-        maxLimitFillFixedFee_timeToAccept = block.timestamp + 1 minutes;
+        maxLimitFillFixedFee_timeToAccept = block.timestamp + 1 days;
     }
 
-    /**
-     * @notice Rejects the current maximum limit proposal for fixed fees
-     * @dev Only owner can reject before deadline expires, resets proposal to zero
-     */
     function rejectProposeMaxLimitFillFixedFee() external {
         if (
             msg.sender != owner ||
@@ -1014,10 +772,6 @@ contract P2PSwap is StakingServiceHooks {
         maxLimitFillFixedFee_proposal = 0;
     }
 
-    /**
-     * @notice Accepts the maximum limit proposal for fixed fees after time delay
-     * @dev Only owner can accept after 1-day waiting period, applies new limit
-     */
     function acceptMaxLimitFillFixedFee() external {
         if (
             msg.sender != owner ||
@@ -1028,13 +782,6 @@ contract P2PSwap is StakingServiceHooks {
         maxLimitFillFixedFee = maxLimitFillFixedFee_proposal;
     }
 
-    /**
-     * @notice Proposes withdrawal of accumulated service fees
-     * @dev Only owner can propose, amount must not exceed available balance
-     * @param _tokenToWithdraw Address of token to withdraw
-     * @param _amountToWithdraw Amount of tokens to withdraw
-     * @param _to Recipient address for the withdrawal
-     */
     function proposeWithdrawal(
         address _tokenToWithdraw,
         uint256 _amountToWithdraw,
@@ -1049,13 +796,9 @@ contract P2PSwap is StakingServiceHooks {
         tokenToWithdraw = _tokenToWithdraw;
         amountToWithdraw = _amountToWithdraw;
         recipientToWithdraw = _to;
-        timeToWithdrawal = block.timestamp + 1 minutes;
+        timeToWithdrawal = block.timestamp + 1 days;
     }
 
-    /**
-     * @notice Rejects the current withdrawal proposal
-     * @dev Only owner can reject before deadline expires, clears all withdrawal data
-     */
     function rejectProposeWithdrawal() external {
         if (msg.sender != owner || block.timestamp > timeToWithdrawal) {
             revert();
@@ -1066,10 +809,6 @@ contract P2PSwap is StakingServiceHooks {
         timeToWithdrawal = 0;
     }
 
-    /**
-     * @notice Executes the withdrawal proposal after time delay
-     * @dev Transfers tokens via EVVM, updates balance, and clears withdrawal data
-     */
     function acceptWithdrawal() external {
         if (msg.sender != owner || block.timestamp > timeToWithdrawal) {
             revert();
@@ -1083,11 +822,6 @@ contract P2PSwap is StakingServiceHooks {
         timeToWithdrawal = 0;
     }
 
-    /**
-     * @notice Stakes accumulated MATE tokens using service staking functionality
-     * @dev Only owner can stake, requires sufficient MATE token balance
-     * @param amount Number of staking tokens to stake (not MATE token amount)
-     */
     function stake(uint256 amount) external {
         if (
             msg.sender != owner ||
@@ -1098,23 +832,12 @@ contract P2PSwap is StakingServiceHooks {
         _makeStakeService(amount);
     }
 
-    /**
-     * @notice Unstakes service staking tokens and receives MATE tokens
-     * @dev Only owner can unstake, subject to staking contract time locks
-     * @param amount Number of staking tokens to unstake
-     */
     function unstake(uint256 amount) external {
         if (msg.sender != owner) revert();
 
         _makeUnstakeService(amount);
     }
 
-    /**
-     * @notice Manually adds balance to the contract for a specific token
-     * @dev Only owner can add balance, useful for reconciling accounting discrepancies
-     * @param _token Address of the token to add balance for
-     * @param _amount Amount to add to the contract's balance tracking
-     */
     function addBalance(address _token, uint256 _amount) external {
         if (msg.sender != owner) {
             revert();
@@ -1125,12 +848,6 @@ contract P2PSwap is StakingServiceHooks {
     //◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢
     //getters
     //◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢
-    /**
-     * @notice Retrieves all active orders in a specific market
-     * @dev Returns array with extended order information including market and order IDs
-     * @param market The market ID to query orders from
-     * @return orders Array of OrderForGetter structs containing all active orders
-     */
     function getAllMarketOrders(
         uint256 market
     ) public view returns (OrderForGetter[] memory orders) {
@@ -1150,12 +867,6 @@ contract P2PSwap is StakingServiceHooks {
         return orders;
     }
 
-    /**
-     * @notice Retrieves a specific order by market and order ID
-     * @param market The market ID containing the order
-     * @param orderId The specific order ID to retrieve
-     * @return order The Order struct containing seller address and amounts
-     */
     function getOrder(
         uint256 market,
         uint256 orderId
@@ -1164,13 +875,6 @@ contract P2PSwap is StakingServiceHooks {
         return order;
     }
 
-    /**
-     * @notice Retrieves all orders from a specific user in a specific market
-     * @dev Returns array with extended order information for user's orders only
-     * @param user Address of the user whose orders to retrieve
-     * @param market The market ID to query orders from
-     * @return orders Array of OrderForGetter structs containing user's orders in the market
-     */
     function getMyOrdersInSpecificMarket(
         address user,
         uint256 market
@@ -1191,12 +895,6 @@ contract P2PSwap is StakingServiceHooks {
         return orders;
     }
 
-    /**
-     * @notice Finds the market ID for a specific token pair
-     * @param tokenA Address of the first token
-     * @param tokenB Address of the second token
-     * @return The market ID for the token pair, or 0 if market doesn't exist
-     */
     function findMarket(
         address tokenA,
         address tokenB
@@ -1204,22 +902,12 @@ contract P2PSwap is StakingServiceHooks {
         return marketId[tokenA][tokenB];
     }
 
-    /**
-     * @notice Retrieves metadata information for a specific market
-     * @param market The market ID to get metadata for
-     * @return MarketInformation struct containing token addresses, max slot, and other metadata
-     */
     function getMarketMetadata(
         uint256 market
     ) public view returns (MarketInformation memory) {
         return marketMetadata[market];
     }
 
-    /**
-     * @notice Retrieves metadata information for all existing markets
-     * @dev Returns array of all market metadata from market ID 1 to marketCount
-     * @return Array of MarketInformation structs containing all markets data
-     */
     function getAllMarketsMetadata()
         public
         view
@@ -1234,13 +922,6 @@ contract P2PSwap is StakingServiceHooks {
         return markets;
     }
 
-    /**
-     * @notice Checks if a nonce has been used by a specific user
-     * @dev Used to prevent replay attacks in P2P swap operations
-     * @param user Address of the user to check
-     * @param nonce The nonce value to verify
-     * @return True if nonce has been used, false otherwise
-     */
     function checkIfANonceP2PSwapIsUsed(
         address user,
         uint256 nonce
@@ -1248,45 +929,24 @@ contract P2PSwap is StakingServiceHooks {
         return nonceP2PSwap[user][nonce];
     }
 
-    /**
-     * @notice Returns the accumulated service fee balance for a specific token
-     * @param token Address of the token to check balance for
-     * @return The accumulated balance of the specified token
-     */
     function getBalanceOfContract(
         address token
     ) external view returns (uint256) {
         return balancesOfContract[token];
     }
 
-    /**
-     * @notice Returns the currently proposed new owner address
-     * @return Address of the proposed owner, or address(0) if no proposal exists
-     */
     function getOwnerProposal() external view returns (address) {
         return owner_proposal;
     }
 
-    /**
-     * @notice Returns the current contract owner address
-     * @return Address of the current contract owner
-     */
     function getOwner() external view returns (address) {
         return owner;
     }
 
-    /**
-     * @notice Returns the deadline timestamp for accepting ownership transfer
-     * @return Timestamp until which the ownership proposal can be accepted
-     */
     function getOwnerTimeToAccept() external view returns (uint256) {
         return owner_timeToAccept;
     }
 
-    /**
-     * @notice Returns the currently proposed reward percentage distribution
-     * @return Percentage struct with proposed seller, service, and staker percentages
-     */
     function getRewardPercentageProposal()
         external
         view
@@ -1295,54 +955,26 @@ contract P2PSwap is StakingServiceHooks {
         return rewardPercentage_proposal;
     }
 
-    /**
-     * @notice Returns the current active reward percentage distribution
-     * @return Percentage struct with active seller, service, and staker percentages
-     */
     function getRewardPercentage() external view returns (Percentage memory) {
         return rewardPercentage;
     }
 
-    /**
-     * @notice Returns the currently proposed percentage fee value
-     * @return Proposed percentage fee in basis points for proportional fee calculation
-     */
     function getProposalPercentageFee() external view returns (uint256) {
         return percentageFee_proposal;
     }
 
-    /**
-     * @notice Returns the current active percentage fee value
-     * @return Active percentage fee in basis points for proportional fee calculation
-     */
     function getPercentageFee() external view returns (uint256) {
         return percentageFee;
     }
 
-    /**
-     * @notice Returns the currently proposed maximum limit for fixed fee calculations
-     * @return Proposed maximum limit value for fixed fee model
-     */
     function getMaxLimitFillFixedFeeProposal() external view returns (uint256) {
         return maxLimitFillFixedFee_proposal;
     }
 
-    /**
-     * @notice Returns the current active maximum limit for fixed fee calculations
-     * @return Active maximum limit value for fixed fee model
-     */
     function getMaxLimitFillFixedFee() external view returns (uint256) {
         return maxLimitFillFixedFee;
     }
 
-    /**
-     * @notice Returns complete information about the current withdrawal proposal
-     * @dev Returns all withdrawal parameters including token, amount, recipient, and deadline
-     * @return tokenToWithdraw Address of token to be withdrawn
-     * @return amountToWithdraw Amount of tokens to be withdrawn
-     * @return recipientToWithdraw Address that will receive the tokens
-     * @return timeToWithdrawal Deadline timestamp for accepting the withdrawal
-     */
     function getProposedWithdrawal()
         external
         view
