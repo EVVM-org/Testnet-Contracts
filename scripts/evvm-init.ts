@@ -39,22 +39,33 @@ const CHAIN_CONFIGS: Record<string, any> = {
   'arb': arbitrumSepolia
 };
 
-// RPC Fallback endpoints for Ethereum Sepolia
+// Block explorer URLs for each network
+const EXPLORER_TX_URLS: Record<string, string> = {
+  'eth': 'https://sepolia.etherscan.io/tx/',
+  'arb': 'https://sepolia.arbiscan.io/tx/'
+};
+
+const EXPLORER_ADDRESS_URLS: Record<string, string> = {
+  'eth': 'https://sepolia.etherscan.io/address/',
+  'arb': 'https://sepolia.arbiscan.io/address/'
+};
+
+// RPC Fallback endpoints for Ethereum Sepolia (ordered by latency/reliability)
 const ETH_SEPOLIA_RPC_FALLBACKS = [
-  'https://0xrpc.io/sep',                              // 0xRPC (currently in .env)
-  'https://ethereum-sepolia.rpc.subquery.network/public', // SubQuery (fastest: 0.165s)
-  'https://ethereum-sepolia.gateway.tatum.io',         // Tatum
-  'https://sepolia.drpc.org',                          // dRPC
-  'https://gateway.tenderly.co/public/sepolia',        // Tenderly
+  'https://1rpc.io/sepolia',                          // 1RPC (fastest: 0.113s)
+  'https://ethereum-sepolia.rpc.subquery.network/public', // SubQuery (0.126s)
+  'https://ethereum-sepolia-rpc.publicnode.com',      // PublicNode (stable)
+  'https://sepolia.drpc.org',                         // dRPC
+  'https://gateway.tenderly.co/public/sepolia',       // Tenderly
 ];
 
-// RPC Fallback endpoints for Arbitrum Sepolia
+// RPC Fallback endpoints for Arbitrum Sepolia (ordered by latency/reliability)
 const ARB_SEPOLIA_RPC_FALLBACKS = [
-  'https://sepolia-rollup.arbitrum.io/rpc',           // Official Arbitrum (most reliable)
-  'https://arbitrum-sepolia.gateway.tenderly.co',     // Tenderly (fastest)
-  'https://endpoints.omniatech.io/v1/arbitrum/sepolia/public', // Omnia
-  'https://arbitrum-sepolia.drpc.org',                // dRPC
-  'https://arbitrum-sepolia-rpc.publicnode.com',      // PublicNode
+  'https://sepolia-rollup.arbitrum.io/rpc',           // Official Arbitrum (0.092s)
+  'https://arbitrum-sepolia.gateway.tenderly.co',     // Tenderly (0.139s)
+  'https://endpoints.omniatech.io/v1/arbitrum/sepolia/public', // Omnia (0.180s)
+  'https://arbitrum-sepolia-rpc.publicnode.com',      // PublicNode (0.215s)
+  'https://arbitrum-sepolia.drpc.org',                // dRPC (0.325s)
 ];
 
 // Contract ABIs
@@ -101,6 +112,33 @@ const commandExists = async (command: string): Promise<boolean> => {
   }
 };
 
+// Check .env configuration
+const checkEnvConfig = (): { configured: boolean; warnings: string[] } => {
+  const warnings: string[] = [];
+  const envPath = join(process.cwd(), '.env');
+
+  if (!existsSync(envPath)) {
+    return {
+      configured: false,
+      warnings: ['.env file not found. Copy .env.example to .env and configure it.']
+    };
+  }
+
+  // Check for RPC URLs (at least one should be configured for deployment)
+  const hasEthRpc = process.env.RPC_URL_ETH_SEPOLIA && process.env.RPC_URL_ETH_SEPOLIA.length > 0;
+  const hasArbRpc = process.env.RPC_URL_ARB_SEPOLIA && process.env.RPC_URL_ARB_SEPOLIA.length > 0;
+  const hasEtherscan = process.env.ETHERSCAN_API && process.env.ETHERSCAN_API.length > 0;
+
+  if (!hasEthRpc && !hasArbRpc) {
+    warnings.push('No RPC URLs configured. Deployment will use fallback RPCs.');
+  }
+  if (!hasEtherscan) {
+    warnings.push('ETHERSCAN_API not configured. Contract verification may fail.');
+  }
+
+  return { configured: true, warnings };
+};
+
 // Check prerequisites
 const checkPrerequisites = async (): Promise<void> => {
   console.log(chalk.blue('\n🔍 Checking prerequisites...'));
@@ -122,6 +160,24 @@ const checkPrerequisites = async (): Promise<void> => {
       if (check.required) {
         allPassed = false;
       }
+    }
+  }
+
+  // Check .env configuration
+  const envCheck = checkEnvConfig();
+  if (envCheck.configured) {
+    if (envCheck.warnings.length === 0) {
+      console.log(chalk.green('  ✓ Environment (.env)'));
+    } else {
+      console.log(chalk.yellow('  ⚠ Environment (.env) - warnings:'));
+      for (const warning of envCheck.warnings) {
+        console.log(chalk.yellow(`    - ${warning}`));
+      }
+    }
+  } else {
+    console.log(chalk.yellow('  ⚠ Environment (.env) not configured'));
+    for (const warning of envCheck.warnings) {
+      console.log(chalk.yellow(`    - ${warning}`));
     }
   }
 
@@ -293,6 +349,44 @@ const parseDeploymentArtifacts = (network: string): ParsedDeployment | null => {
   }
 };
 
+// Get working RPC endpoint with fallback
+const getWorkingRpc = async (network: 'eth' | 'arb'): Promise<string> => {
+  const fallbacks = network === 'eth' ? ETH_SEPOLIA_RPC_FALLBACKS : ARB_SEPOLIA_RPC_FALLBACKS;
+  const envVar = network === 'eth' ? 'RPC_URL_ETH_SEPOLIA' : 'RPC_URL_ARB_SEPOLIA';
+
+  // Try env variable first
+  const envRpc = process.env[envVar];
+  if (envRpc) {
+    try {
+      const client = createPublicClient({
+        chain: network === 'eth' ? sepoliaChain : arbitrumSepolia,
+        transport: http(envRpc)
+      });
+      await client.getBlockNumber();
+      return envRpc;
+    } catch {
+      console.log(chalk.yellow(`   Primary RPC from .env failed, trying fallbacks...`));
+    }
+  }
+
+  // Try fallback RPCs
+  for (const rpc of fallbacks) {
+    try {
+      const client = createPublicClient({
+        chain: network === 'eth' ? sepoliaChain : arbitrumSepolia,
+        transport: http(rpc)
+      });
+      await client.getBlockNumber();
+      console.log(chalk.gray(`   Using RPC: ${rpc}`));
+      return rpc;
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error(`No working RPC found for ${network === 'eth' ? 'Ethereum Sepolia' : 'Arbitrum Sepolia'}`);
+};
+
 // Register with Registry EVVM on Ethereum Sepolia
 const registerWithRegistry = async (
   chainId: number,
@@ -308,11 +402,8 @@ const registerWithRegistry = async (
     const privateKey = await getPrivateKeyFromWallet(walletName);
     const account = privateKeyToAccount(privateKey);
 
-    // Get RPC URL for Ethereum Sepolia
-    const ethSepoliaRpc = process.env.RPC_URL_ETH_SEPOLIA;
-    if (!ethSepoliaRpc) {
-      throw new Error('RPC_URL_ETH_SEPOLIA not found in .env file');
-    }
+    // Get working RPC URL for Ethereum Sepolia with fallback
+    const ethSepoliaRpc = await getWorkingRpc('eth');
 
     // Create clients
     const publicClient = createPublicClient({
@@ -345,9 +436,13 @@ const registerWithRegistry = async (
     const hash = await walletClient.writeContract(request);
     console.log(chalk.gray(`   Transaction hash: ${hash}`));
 
-    // Wait for transaction receipt
-    console.log(chalk.gray('   Waiting for confirmation...'));
-    const receipt = await publicClient.waitForTransactionReceipt({ hash });
+    // Wait for transaction receipt with extended timeout for slow networks
+    console.log(chalk.gray('   Waiting for confirmation (this may take a few minutes)...'));
+    const receipt = await publicClient.waitForTransactionReceipt({
+      hash,
+      timeout: 180_000,  // 3 minutes timeout
+      pollingInterval: 4_000,  // Check every 4 seconds
+    });
 
     if (receipt.status !== 'success') {
       throw new Error('Transaction failed');
@@ -389,14 +484,11 @@ const setEvvmId = async (
     const privateKey = await getPrivateKeyFromWallet(walletName);
     const account = privateKeyToAccount(privateKey);
 
-    // Get RPC URL for deployment chain
-    const rpcUrl = network === 'eth'
-      ? process.env.RPC_URL_ETH_SEPOLIA
-      : process.env.RPC_URL_ARB_SEPOLIA;
-
-    if (!rpcUrl) {
-      throw new Error(`RPC URL not found for network: ${network}`);
+    // Get working RPC URL for deployment chain with fallback
+    if (network !== 'eth' && network !== 'arb') {
+      throw new Error(`Unsupported network: ${network}`);
     }
+    const rpcUrl = await getWorkingRpc(network);
 
     const chain = CHAIN_CONFIGS[network];
     if (!chain) {
@@ -430,19 +522,38 @@ const setEvvmId = async (
     const hash = await walletClient.writeContract(request);
     console.log(chalk.gray(`   Transaction hash: ${hash}`));
 
-    // Wait for confirmation
-    console.log(chalk.gray('   Waiting for confirmation...'));
-    const receipt = await publicClient.waitForTransactionReceipt({ hash });
+    // Wait for confirmation with extended timeout for slow networks
+    console.log(chalk.gray('   Waiting for confirmation (this may take a few minutes)...'));
+    const receipt = await publicClient.waitForTransactionReceipt({
+      hash,
+      timeout: 180_000,  // 3 minutes timeout
+      pollingInterval: 4_000,  // Check every 4 seconds
+    });
 
     if (receipt.status !== 'success') {
       throw new Error('Transaction failed');
     }
 
+    const explorerTxUrl = EXPLORER_TX_URLS[network] || EXPLORER_TX_URLS['eth'];
     console.log(chalk.green('   ✓ EVVM ID set successfully!'));
+    console.log(chalk.blue(`   ${explorerTxUrl}${hash}`));
     return true;
 
   } catch (error: any) {
-    console.log(chalk.red(`\n✖ Failed to set EVVM ID: ${error.message}`));
+    // Provide helpful message for timeout errors
+    if (error.message?.includes('Timed out')) {
+      const txHash = error.message.match(/0x[a-fA-F0-9]{64}/)?.[0] || 'unknown';
+      const explorerTxUrl = EXPLORER_TX_URLS[network] || EXPLORER_TX_URLS['eth'];
+      console.log(chalk.yellow(`\n⚠ Transaction confirmation timed out`));
+      console.log(chalk.gray(`   Transaction hash: ${txHash}`));
+      if (txHash !== 'unknown') {
+        console.log(chalk.gray(`   Explorer: ${explorerTxUrl}${txHash}`));
+      }
+      console.log(chalk.gray('   The transaction may still be pending. Check the explorer.'));
+      console.log(chalk.gray('   If confirmed, you can manually verify EVVM ID was set.'));
+    } else {
+      console.log(chalk.red(`\n✖ Failed to set EVVM ID: ${error.message}`));
+    }
     return false;
   }
 };
@@ -564,15 +675,21 @@ const generateConfigFiles = (config: ConfigurationData): void => {
   );
 
   // Generate evvmAdvancedMetadata.json
+  // IMPORTANT:
+  // 1. Fields MUST be in alphabetical order for Foundry's vm.parseJson
+  //    (vm.parseJson decodes fields alphabetically, not by struct field order)
+  // 2. Values MUST be unquoted numbers, not strings, for uint256 parsing
+  //    (JSON.stringify would quote these as strings, breaking Solidity parsing)
   const advancedMetadataPath = join(inputDir, 'evvmAdvancedMetadata.json');
-  const advancedMetadataJson = {
-    totalSupply: config.advancedMetadata.totalSupply,
-    eraTokens: config.advancedMetadata.eraTokens,
-    reward: config.advancedMetadata.reward,
-  };
+  const advancedMetadataContent = `{
+  "eraTokens": ${config.advancedMetadata.eraTokens},
+  "reward": ${config.advancedMetadata.reward},
+  "totalSupply": ${config.advancedMetadata.totalSupply}
+}
+`;
   writeFileSync(
     advancedMetadataPath,
-    JSON.stringify(advancedMetadataJson, null, 2) + '\n',
+    advancedMetadataContent,
     'utf-8'
   );
 
@@ -954,9 +1071,7 @@ const main = async (): Promise<void> => {
       console.log(chalk.cyan('═══════════════════════════════════════════════════════════\n'));
 
       const networkName = networkResponse.network === 'eth' ? 'Ethereum Sepolia' : 'Arbitrum Sepolia';
-      const explorerBase = networkResponse.network === 'eth'
-        ? 'https://sepolia.etherscan.io/address/'
-        : 'https://sepolia.arbiscan.io/address/';
+      const explorerBase = EXPLORER_ADDRESS_URLS[networkResponse.network] || EXPLORER_ADDRESS_URLS['eth'];
 
       console.log(chalk.white(`Network: ${chalk.green(networkName)} (Chain ID: ${deployment.chainId})\n`));
 

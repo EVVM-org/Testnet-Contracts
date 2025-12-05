@@ -356,11 +356,13 @@ If you prefer manual control over configuration, create these files in `input/`:
 **input/evvmAdvancedMetadata.json**:
 ```json
 {
-  "totalSupply": 2033333333000000000000000000,
   "eraTokens": 1016666666500000000000000000,
-  "reward": 5000000000000000000
+  "reward": 5000000000000000000,
+  "totalSupply": 2033333333000000000000000000
 }
 ```
+
+> **Important**: The field order in `evvmAdvancedMetadata.json` **must be alphabetical** (`eraTokens`, `reward`, `totalSupply`). Foundry's `vm.parseJson` decodes fields alphabetically, not by matching field names. Do not use code formatters (like Prettier) on these files as they may reorder fields incorrectly.
 
 ## Local Development & Manual Deployment
 
