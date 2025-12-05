@@ -315,8 +315,8 @@ The interactive deployment wizard will guide you through:
 - **Wallet selection** (from your Foundry keystores)
 - **Automatic deployment** with contract verification
 - **Deployment summary** with all contract addresses and explorer links
-- **Registry EVVM registration** (automatic for supported networks)
-- **EVVM ID configuration** (automatic setup)
+- **Registry EVVM registration** (cross-chain registration on Ethereum Sepolia)
+- **EVVM ID configuration** (automatic setup on your deployment chain)
 
 **What happens after deployment:**
 - All 6 core contracts deployed and verified on your chosen network
@@ -325,8 +325,11 @@ The interactive deployment wizard will guide you through:
   - Treasury contract address
   - Staking, Estimator, NameService, and P2PSwap addresses
   - Direct links to block explorer for each contract
-- Automatic registration with Registry EVVM (Ethereum Sepolia)
-- EVVM ID assigned and configured
+- **Cross-chain registration flow:**
+  1. Registry registration happens on Ethereum Sepolia (where the Registry EVVM lives)
+  2. You receive a unique EVVM ID (e.g., ID: 1090)
+  3. The EVVM ID is then set on your deployed contract (on your deployment chain)
+  4. Both transactions show explorer links for verification
 
 That's it! Your EVVM virtual blockchain is now deployed, verified, and ready to use.
 
@@ -423,18 +426,18 @@ The deployment wizard includes an intelligent RPC fallback mechanism to ensure m
 **Multi-Provider Support**: Each network has 5 verified RPC endpoints:
 
 **Ethereum Sepolia Fallback Chain:**
-1. `https://0xrpc.io/sep` (Primary)
-2. `https://ethereum-sepolia.rpc.subquery.network/public` (0.165s latency)
-3. `https://ethereum-sepolia.gateway.tatum.io` (0.172s latency)
-4. `https://sepolia.drpc.org` (0.192s latency)
-5. `https://gateway.tenderly.co/public/sepolia` (0.184s latency)
+1. `https://1rpc.io/sepolia` (1RPC - fastest)
+2. `https://ethereum-sepolia.rpc.subquery.network/public` (SubQuery)
+3. `https://ethereum-sepolia-rpc.publicnode.com` (PublicNode - stable)
+4. `https://sepolia.drpc.org` (dRPC)
+5. `https://gateway.tenderly.co/public/sepolia` (Tenderly)
 
 **Arbitrum Sepolia Fallback Chain:**
 1. `https://sepolia-rollup.arbitrum.io/rpc` (Official Arbitrum)
-2. `https://arbitrum-sepolia.gateway.tenderly.co` (0.167s latency)
-3. `https://endpoints.omniatech.io/v1/arbitrum/sepolia/public` (0.258s latency)
-4. `https://arbitrum-sepolia.drpc.org` (0.590s latency)
-5. `https://arbitrum-sepolia-rpc.publicnode.com` (0.430s latency)
+2. `https://arbitrum-sepolia.gateway.tenderly.co` (Tenderly)
+3. `https://endpoints.omniatech.io/v1/arbitrum/sepolia/public` (Omnia)
+4. `https://arbitrum-sepolia-rpc.publicnode.com` (PublicNode)
+5. `https://arbitrum-sepolia.drpc.org` (dRPC)
 
 **Smart Retry Logic**: The wizard displays clear progress messages during fallback attempts and provides troubleshooting tips if all endpoints fail.
 
@@ -454,19 +457,32 @@ After successful deployment, the wizard displays a comprehensive summary of all 
                  DEPLOYED CONTRACTS SUMMARY
 ═══════════════════════════════════════════════════════════
 
-Network: Ethereum Sepolia (Chain ID: 11155111)
+Network: Arbitrum Sepolia (Chain ID: 421614)
 
 Core Contracts:
-  EVVM:        0xb0994626541c9bd3d64605dee610386c7a005a39
-               https://sepolia.etherscan.io/address/0xb099...
-  Treasury:    0x47be342c4d803490530737cac7bcf34916cf7e80
-               https://sepolia.etherscan.io/address/0x47be...
+  EVVM:        0x3e562a2e932afd6c1630d5f3b8eb3d88a4b058c2
+               https://sepolia.arbiscan.io/address/0x3e56...
+  Treasury:    0x5c3a673dcf38e08b1f4e361ed7ed7be76df7b188
+               https://sepolia.arbiscan.io/address/0x5c3a...
 
 Supporting Contracts:
-  Staking:     0xc2cd4ec40bb4fa6f98c7b7095f692588e6b68fd4
-  Estimator:   0x1adf3fd08f0744f24bb29bbfcfb57a5f37f144cb
-  NameService: 0xe28eedff481b7c640394f44070309a0afe06de00
-  P2PSwap:     0xc90dc57d848fae4ecf46268b8a90015085968645
+  Staking:     0xcdef28d767f0029f0e75563c8e7ed44a2aab6cf2
+  Estimator:   0xcfff3e950c3b1f7b850394d4cf3d60b31041f139
+  NameService: 0xdfa5e2529b06683dcec37f67f0607f294809a512
+  P2PSwap:     0xef2efb60d353731287696d74d360c635844f0ae2
+
+═══════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════
+                    REGISTRY EVVM REGISTRATION
+═══════════════════════════════════════════════════════════
+
+  EVVM Address: 0x3e562a2e932afd6c1630d5f3b8eb3d88a4b058c2
+  Deployed on: Arbitrum Sepolia (Chain ID: 421614)
+  Registry: Ethereum Sepolia (cross-chain registration)
+
+✓ EVVM registered! ID: 1090
+✓ EVVM ID 1090 set on Arbitrum Sepolia!
 
 ═══════════════════════════════════════════════════════════
 ```
@@ -474,8 +490,9 @@ Supporting Contracts:
 This summary includes:
 - Network name and chain ID
 - All 6 deployed contract addresses
-- Direct links to block explorer for verification
+- Direct links to block explorer for verification (Etherscan for ETH Sepolia, Arbiscan for Arbitrum Sepolia)
 - Organized by contract importance (Core vs Supporting)
+- Cross-chain registration status and assigned EVVM ID
 
 ## Troubleshooting
 
