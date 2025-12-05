@@ -39,6 +39,17 @@ const CHAIN_CONFIGS: Record<string, any> = {
   'arb': arbitrumSepolia
 };
 
+// Block explorer URLs for each network
+const EXPLORER_TX_URLS: Record<string, string> = {
+  'eth': 'https://sepolia.etherscan.io/tx/',
+  'arb': 'https://sepolia.arbiscan.io/tx/'
+};
+
+const EXPLORER_ADDRESS_URLS: Record<string, string> = {
+  'eth': 'https://sepolia.etherscan.io/address/',
+  'arb': 'https://sepolia.arbiscan.io/address/'
+};
+
 // RPC Fallback endpoints for Ethereum Sepolia (ordered by latency/reliability)
 const ETH_SEPOLIA_RPC_FALLBACKS = [
   'https://1rpc.io/sepolia',                          // 1RPC (fastest: 0.113s)
@@ -523,14 +534,21 @@ const setEvvmId = async (
       throw new Error('Transaction failed');
     }
 
+    const explorerTxUrl = EXPLORER_TX_URLS[network] || EXPLORER_TX_URLS['eth'];
     console.log(chalk.green('   ✓ EVVM ID set successfully!'));
+    console.log(chalk.blue(`   ${explorerTxUrl}${hash}`));
     return true;
 
   } catch (error: any) {
     // Provide helpful message for timeout errors
     if (error.message?.includes('Timed out')) {
+      const txHash = error.message.match(/0x[a-fA-F0-9]{64}/)?.[0] || 'unknown';
+      const explorerTxUrl = EXPLORER_TX_URLS[network] || EXPLORER_TX_URLS['eth'];
       console.log(chalk.yellow(`\n⚠ Transaction confirmation timed out`));
-      console.log(chalk.gray(`   Transaction hash: ${error.message.match(/0x[a-fA-F0-9]{64}/)?.[0] || 'unknown'}`));
+      console.log(chalk.gray(`   Transaction hash: ${txHash}`));
+      if (txHash !== 'unknown') {
+        console.log(chalk.gray(`   Explorer: ${explorerTxUrl}${txHash}`));
+      }
       console.log(chalk.gray('   The transaction may still be pending. Check the explorer.'));
       console.log(chalk.gray('   If confirmed, you can manually verify EVVM ID was set.'));
     } else {
@@ -1053,9 +1071,7 @@ const main = async (): Promise<void> => {
       console.log(chalk.cyan('═══════════════════════════════════════════════════════════\n'));
 
       const networkName = networkResponse.network === 'eth' ? 'Ethereum Sepolia' : 'Arbitrum Sepolia';
-      const explorerBase = networkResponse.network === 'eth'
-        ? 'https://sepolia.etherscan.io/address/'
-        : 'https://sepolia.arbiscan.io/address/';
+      const explorerBase = EXPLORER_ADDRESS_URLS[networkResponse.network] || EXPLORER_ADDRESS_URLS['eth'];
 
       console.log(chalk.white(`Network: ${chalk.green(networkName)} (Chain ID: ${deployment.chainId})\n`));
 
