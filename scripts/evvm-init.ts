@@ -798,8 +798,17 @@ const deployContracts = async (
       // If we reach here, deployment succeeded
       return;
 
-    } catch (error) {
+    } catch (error: any) {
       lastError = error;
+
+      // Check if this is just a verification failure (deployment succeeded)
+      // Don't retry for verification-only failures
+      const errorMessage = error?.message || error?.stderr || '';
+      if (errorMessage.includes('Not all') && errorMessage.includes('contracts were verified')) {
+        console.log(chalk.yellow('\n⚠ Some contracts failed verification, but deployment succeeded'));
+        console.log(chalk.gray('   You can verify manually later using: forge verify-contract'));
+        return; // Deployment succeeded, just verification issue
+      }
 
       // If we have more fallbacks available, continue to next attempt
       if (hasFailover && attempt < maxRetries - 1) {
@@ -1096,12 +1105,15 @@ const main = async (): Promise<void> => {
 
     // Auto-registration flow (only for supported networks)
     if (networkResponse.network !== 'custom' && deployment) {
+      const deploymentNetworkName = networkResponse.network === 'eth' ? 'Ethereum Sepolia' : 'Arbitrum Sepolia';
+
       console.log(chalk.cyan('═══════════════════════════════════════════════════════════'));
       console.log(chalk.cyan('                    REGISTRY EVVM REGISTRATION'));
       console.log(chalk.cyan('═══════════════════════════════════════════════════════════\n'));
 
       console.log(chalk.gray(`  EVVM Address: ${deployment.evvmAddress}`));
-      console.log(chalk.gray(`  Chain ID: ${deployment.chainId}\n`));
+      console.log(chalk.gray(`  Deployed on: ${deploymentNetworkName} (Chain ID: ${deployment.chainId})`));
+      console.log(chalk.gray(`  Registry: Ethereum Sepolia (cross-chain registration)\n`));
 
         const registerPrompt = await prompts({
           type: 'confirm',
@@ -1129,12 +1141,15 @@ const main = async (): Promise<void> => {
             });
 
             if (setIdPrompt.setId) {
-              await setEvvmId(
+              const success = await setEvvmId(
                 deployment.evvmAddress,
                 evvmId,
                 networkResponse.network,
                 walletResponse.wallet
               );
+              if (success) {
+                console.log(chalk.green(`\n✓ EVVM ID ${evvmId} set on ${deploymentNetworkName}!`));
+              }
             } else {
               console.log(chalk.yellow('\n⚠ Remember to set EVVM ID within 1 hour!'));
               console.log(chalk.gray(`  EVVM ID: ${evvmId}`));
