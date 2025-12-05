@@ -28,6 +28,8 @@ reportWake.txt
 
 # Claude Code documentation
 CLAUDE.md
+.claude/
+claudestuff/
 
 # TypeScript compilation
 dist/

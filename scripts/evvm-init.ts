@@ -39,22 +39,22 @@ const CHAIN_CONFIGS: Record<string, any> = {
   'arb': arbitrumSepolia
 };
 
-// RPC Fallback endpoints for Ethereum Sepolia
+// RPC Fallback endpoints for Ethereum Sepolia (ordered by latency/reliability)
 const ETH_SEPOLIA_RPC_FALLBACKS = [
-  'https://0xrpc.io/sep',                              // 0xRPC (currently in .env)
-  'https://ethereum-sepolia.rpc.subquery.network/public', // SubQuery (fastest: 0.165s)
-  'https://ethereum-sepolia.gateway.tatum.io',         // Tatum
-  'https://sepolia.drpc.org',                          // dRPC
-  'https://gateway.tenderly.co/public/sepolia',        // Tenderly
+  'https://1rpc.io/sepolia',                          // 1RPC (fastest: 0.113s)
+  'https://ethereum-sepolia.rpc.subquery.network/public', // SubQuery (0.126s)
+  'https://ethereum-sepolia-rpc.publicnode.com',      // PublicNode (stable)
+  'https://sepolia.drpc.org',                         // dRPC
+  'https://gateway.tenderly.co/public/sepolia',       // Tenderly
 ];
 
-// RPC Fallback endpoints for Arbitrum Sepolia
+// RPC Fallback endpoints for Arbitrum Sepolia (ordered by latency/reliability)
 const ARB_SEPOLIA_RPC_FALLBACKS = [
-  'https://sepolia-rollup.arbitrum.io/rpc',           // Official Arbitrum (most reliable)
-  'https://arbitrum-sepolia.gateway.tenderly.co',     // Tenderly (fastest)
-  'https://endpoints.omniatech.io/v1/arbitrum/sepolia/public', // Omnia
-  'https://arbitrum-sepolia.drpc.org',                // dRPC
-  'https://arbitrum-sepolia-rpc.publicnode.com',      // PublicNode
+  'https://sepolia-rollup.arbitrum.io/rpc',           // Official Arbitrum (0.092s)
+  'https://arbitrum-sepolia.gateway.tenderly.co',     // Tenderly (0.139s)
+  'https://endpoints.omniatech.io/v1/arbitrum/sepolia/public', // Omnia (0.180s)
+  'https://arbitrum-sepolia-rpc.publicnode.com',      // PublicNode (0.215s)
+  'https://arbitrum-sepolia.drpc.org',                // dRPC (0.325s)
 ];
 
 // Contract ABIs
@@ -293,6 +293,44 @@ const parseDeploymentArtifacts = (network: string): ParsedDeployment | null => {
   }
 };
 
+// Get working RPC endpoint with fallback
+const getWorkingRpc = async (network: 'eth' | 'arb'): Promise<string> => {
+  const fallbacks = network === 'eth' ? ETH_SEPOLIA_RPC_FALLBACKS : ARB_SEPOLIA_RPC_FALLBACKS;
+  const envVar = network === 'eth' ? 'RPC_URL_ETH_SEPOLIA' : 'RPC_URL_ARB_SEPOLIA';
+
+  // Try env variable first
+  const envRpc = process.env[envVar];
+  if (envRpc) {
+    try {
+      const client = createPublicClient({
+        chain: network === 'eth' ? sepoliaChain : arbitrumSepolia,
+        transport: http(envRpc)
+      });
+      await client.getBlockNumber();
+      return envRpc;
+    } catch {
+      console.log(chalk.yellow(`   Primary RPC from .env failed, trying fallbacks...`));
+    }
+  }
+
+  // Try fallback RPCs
+  for (const rpc of fallbacks) {
+    try {
+      const client = createPublicClient({
+        chain: network === 'eth' ? sepoliaChain : arbitrumSepolia,
+        transport: http(rpc)
+      });
+      await client.getBlockNumber();
+      console.log(chalk.gray(`   Using RPC: ${rpc}`));
+      return rpc;
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error(`No working RPC found for ${network === 'eth' ? 'Ethereum Sepolia' : 'Arbitrum Sepolia'}`);
+};
+
 // Register with Registry EVVM on Ethereum Sepolia
 const registerWithRegistry = async (
   chainId: number,
@@ -308,11 +346,8 @@ const registerWithRegistry = async (
     const privateKey = await getPrivateKeyFromWallet(walletName);
     const account = privateKeyToAccount(privateKey);
 
-    // Get RPC URL for Ethereum Sepolia
-    const ethSepoliaRpc = process.env.RPC_URL_ETH_SEPOLIA;
-    if (!ethSepoliaRpc) {
-      throw new Error('RPC_URL_ETH_SEPOLIA not found in .env file');
-    }
+    // Get working RPC URL for Ethereum Sepolia with fallback
+    const ethSepoliaRpc = await getWorkingRpc('eth');
 
     // Create clients
     const publicClient = createPublicClient({
@@ -389,14 +424,11 @@ const setEvvmId = async (
     const privateKey = await getPrivateKeyFromWallet(walletName);
     const account = privateKeyToAccount(privateKey);
 
-    // Get RPC URL for deployment chain
-    const rpcUrl = network === 'eth'
-      ? process.env.RPC_URL_ETH_SEPOLIA
-      : process.env.RPC_URL_ARB_SEPOLIA;
-
-    if (!rpcUrl) {
-      throw new Error(`RPC URL not found for network: ${network}`);
+    // Get working RPC URL for deployment chain with fallback
+    if (network !== 'eth' && network !== 'arb') {
+      throw new Error(`Unsupported network: ${network}`);
     }
+    const rpcUrl = await getWorkingRpc(network);
 
     const chain = CHAIN_CONFIGS[network];
     if (!chain) {
@@ -564,11 +596,13 @@ const generateConfigFiles = (config: ConfigurationData): void => {
   );
 
   // Generate evvmAdvancedMetadata.json
+  // IMPORTANT: Fields MUST be in alphabetical order for Foundry's vm.parseJson
+  // vm.parseJson decodes fields alphabetically, not by struct field order
   const advancedMetadataPath = join(inputDir, 'evvmAdvancedMetadata.json');
   const advancedMetadataJson = {
-    totalSupply: config.advancedMetadata.totalSupply,
     eraTokens: config.advancedMetadata.eraTokens,
     reward: config.advancedMetadata.reward,
+    totalSupply: config.advancedMetadata.totalSupply,
   };
   writeFileSync(
     advancedMetadataPath,
