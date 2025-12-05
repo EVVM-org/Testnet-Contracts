@@ -425,9 +425,13 @@ const registerWithRegistry = async (
     const hash = await walletClient.writeContract(request);
     console.log(chalk.gray(`   Transaction hash: ${hash}`));
 
-    // Wait for transaction receipt
-    console.log(chalk.gray('   Waiting for confirmation...'));
-    const receipt = await publicClient.waitForTransactionReceipt({ hash });
+    // Wait for transaction receipt with extended timeout for slow networks
+    console.log(chalk.gray('   Waiting for confirmation (this may take a few minutes)...'));
+    const receipt = await publicClient.waitForTransactionReceipt({
+      hash,
+      timeout: 180_000,  // 3 minutes timeout
+      pollingInterval: 4_000,  // Check every 4 seconds
+    });
 
     if (receipt.status !== 'success') {
       throw new Error('Transaction failed');
@@ -507,9 +511,13 @@ const setEvvmId = async (
     const hash = await walletClient.writeContract(request);
     console.log(chalk.gray(`   Transaction hash: ${hash}`));
 
-    // Wait for confirmation
-    console.log(chalk.gray('   Waiting for confirmation...'));
-    const receipt = await publicClient.waitForTransactionReceipt({ hash });
+    // Wait for confirmation with extended timeout for slow networks
+    console.log(chalk.gray('   Waiting for confirmation (this may take a few minutes)...'));
+    const receipt = await publicClient.waitForTransactionReceipt({
+      hash,
+      timeout: 180_000,  // 3 minutes timeout
+      pollingInterval: 4_000,  // Check every 4 seconds
+    });
 
     if (receipt.status !== 'success') {
       throw new Error('Transaction failed');
@@ -519,7 +527,15 @@ const setEvvmId = async (
     return true;
 
   } catch (error: any) {
-    console.log(chalk.red(`\n✖ Failed to set EVVM ID: ${error.message}`));
+    // Provide helpful message for timeout errors
+    if (error.message?.includes('Timed out')) {
+      console.log(chalk.yellow(`\n⚠ Transaction confirmation timed out`));
+      console.log(chalk.gray(`   Transaction hash: ${error.message.match(/0x[a-fA-F0-9]{64}/)?.[0] || 'unknown'}`));
+      console.log(chalk.gray('   The transaction may still be pending. Check the explorer.'));
+      console.log(chalk.gray('   If confirmed, you can manually verify EVVM ID was set.'));
+    } else {
+      console.log(chalk.red(`\n✖ Failed to set EVVM ID: ${error.message}`));
+    }
     return false;
   }
 };
