@@ -101,6 +101,33 @@ const commandExists = async (command: string): Promise<boolean> => {
   }
 };
 
+// Check .env configuration
+const checkEnvConfig = (): { configured: boolean; warnings: string[] } => {
+  const warnings: string[] = [];
+  const envPath = join(process.cwd(), '.env');
+
+  if (!existsSync(envPath)) {
+    return {
+      configured: false,
+      warnings: ['.env file not found. Copy .env.example to .env and configure it.']
+    };
+  }
+
+  // Check for RPC URLs (at least one should be configured for deployment)
+  const hasEthRpc = process.env.RPC_URL_ETH_SEPOLIA && process.env.RPC_URL_ETH_SEPOLIA.length > 0;
+  const hasArbRpc = process.env.RPC_URL_ARB_SEPOLIA && process.env.RPC_URL_ARB_SEPOLIA.length > 0;
+  const hasEtherscan = process.env.ETHERSCAN_API && process.env.ETHERSCAN_API.length > 0;
+
+  if (!hasEthRpc && !hasArbRpc) {
+    warnings.push('No RPC URLs configured. Deployment will use fallback RPCs.');
+  }
+  if (!hasEtherscan) {
+    warnings.push('ETHERSCAN_API not configured. Contract verification may fail.');
+  }
+
+  return { configured: true, warnings };
+};
+
 // Check prerequisites
 const checkPrerequisites = async (): Promise<void> => {
   console.log(chalk.blue('\n🔍 Checking prerequisites...'));
@@ -122,6 +149,24 @@ const checkPrerequisites = async (): Promise<void> => {
       if (check.required) {
         allPassed = false;
       }
+    }
+  }
+
+  // Check .env configuration
+  const envCheck = checkEnvConfig();
+  if (envCheck.configured) {
+    if (envCheck.warnings.length === 0) {
+      console.log(chalk.green('  ✓ Environment (.env)'));
+    } else {
+      console.log(chalk.yellow('  ⚠ Environment (.env) - warnings:'));
+      for (const warning of envCheck.warnings) {
+        console.log(chalk.yellow(`    - ${warning}`));
+      }
+    }
+  } else {
+    console.log(chalk.yellow('  ⚠ Environment (.env) not configured'));
+    for (const warning of envCheck.warnings) {
+      console.log(chalk.yellow(`    - ${warning}`));
     }
   }
 
@@ -596,17 +641,21 @@ const generateConfigFiles = (config: ConfigurationData): void => {
   );
 
   // Generate evvmAdvancedMetadata.json
-  // IMPORTANT: Fields MUST be in alphabetical order for Foundry's vm.parseJson
-  // vm.parseJson decodes fields alphabetically, not by struct field order
+  // IMPORTANT:
+  // 1. Fields MUST be in alphabetical order for Foundry's vm.parseJson
+  //    (vm.parseJson decodes fields alphabetically, not by struct field order)
+  // 2. Values MUST be unquoted numbers, not strings, for uint256 parsing
+  //    (JSON.stringify would quote these as strings, breaking Solidity parsing)
   const advancedMetadataPath = join(inputDir, 'evvmAdvancedMetadata.json');
-  const advancedMetadataJson = {
-    eraTokens: config.advancedMetadata.eraTokens,
-    reward: config.advancedMetadata.reward,
-    totalSupply: config.advancedMetadata.totalSupply,
-  };
+  const advancedMetadataContent = `{
+  "eraTokens": ${config.advancedMetadata.eraTokens},
+  "reward": ${config.advancedMetadata.reward},
+  "totalSupply": ${config.advancedMetadata.totalSupply}
+}
+`;
   writeFileSync(
     advancedMetadataPath,
-    JSON.stringify(advancedMetadataJson, null, 2) + '\n',
+    advancedMetadataContent,
     'utf-8'
   );
 
