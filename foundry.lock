@@ -1,9 +1,6 @@
 {
-  "lib/solady": {
-    "tag": {
-      "name": "v0.1.26",
-      "rev": "acd959aa4bd04720d640bf4e6a5c71037510cc4b"
-    }
+  "lib/LayerZero-v2": {
+    "rev": "4645b5795185a196713263311f76a497a3267dcc"
   },
   "lib/axelar-gmp-sdk-solidity": {
     "tag": {
@@ -14,8 +11,11 @@
   "lib/devtools": {
     "rev": "5268e9c0c70106a9b74ceaf519ffaa41d8b503ec"
   },
-  "lib/LayerZero-v2": {
-    "rev": "4645b5795185a196713263311f76a497a3267dcc"
+  "lib/solady": {
+    "tag": {
+      "name": "v0.1.26",
+      "rev": "acd959aa4bd04720d640bf4e6a5c71037510cc4b"
+    }
   },
   "lib/solidity-bytes-utils": {
     "rev": "fc502455bb2a7e26a743378df042612dd50d1eb9"

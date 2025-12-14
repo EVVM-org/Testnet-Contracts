@@ -36,18 +36,13 @@
     "access": "public"
   },
   "scripts": {
-    "build": "npm run copy-files",
+    "build": "bun run copy-files",
     "copy-files": "cp -r src/contracts . && cp -r src/interfaces . && cp -r src/library .",
     "clean": "rm -rf contracts interfaces library",
-    "prepare-publish": "npm run copy-files && npm pack",
-    "publish-package": "npm run copy-files && npm publish && npm run clean",
-    "compile": "forge build",
-    "test": "forge test",
-    "deploy:anvil": "make deployLocalTestnet",
-    "deploy:sepolia": "make deployTestnet NETWORK=eth",
-    "deploy:arbitrum": "make deployTestnet NETWORK=arb",
-    "wizard": "tsx scripts/evvm-init.ts",
-    "wizard:deploy": "tsx scripts/evvm-init.ts --deploy"
+    "prepare-publish": "bun run copy-files && bun run pack",
+    "publish-package": "bun run copy-files && bun publish && bun run clean",
+    "evvm": "bun run cli/index.ts",
+    "buildCli": "bun build cli/index.ts --compile --outfile evvm"
   },
   "peerDependencies": {
     "@openzeppelin/contracts": "^5.0.0"
@@ -64,7 +59,6 @@
     "@types/node": "^20.11.0",
     "@types/prompts": "^2.4.9",
     "forge-std": "^1.0.0",
-    "tsx": "^4.7.0",
     "typescript": "^5.3.0"
   }
 }
