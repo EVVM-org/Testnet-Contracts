@@ -347,7 +347,7 @@ export async function deployEvvm(args: string[], options: any) {
     `   ${colors.darkGray}📖 For more details, visit:${colors.reset}`
   );
   console.log(
-    `   ${colors.blue}https://www.evvm.info/docs/QuickStart#7-register-in-registry-evvm${colors.reset}`
+    `   ${colors.blue}https://www.evvm.info/docs/QuickStart#6-register-in-registry-evvm${colors.reset}`
   );
   console.log();
 
