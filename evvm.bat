@@ -8,7 +8,7 @@ set OS=windows
 :: Determine the executable
 if "%OS%"=="windows" (
     if "%ARCH%"=="64-bit" (
-        set EXECUTABLE=evvm-windows-x64.exe
+        set EXECUTABLE=.executables\evvm-windows-x64.exe
     ) else (
         echo Unsupported architecture: %ARCH%
         exit /b 1

@@ -6,19 +6,19 @@ ARCH=$(uname -m)
 
 # Determine the executable
 if [[ "$OS" == "linux" && "$ARCH" == "x86_64" ]]; then
-  EXECUTABLE="./evvm-linux-x64"
+  EXECUTABLE="./.executables/evvm-linux-x64"
 elif [[ "$OS" == "linux" && "$ARCH" == "aarch64" ]]; then
-  EXECUTABLE="./evvm-linux-arm64"
+  EXECUTABLE="./.executables/evvm-linux-arm64"
 elif [[ "$OS" == "linux" && "$ARCH" == "x86_64" && "$MUSL" == "1" ]]; then
-  EXECUTABLE="./evvm-linux-x64-musl"
+  EXECUTABLE="./.executables/evvm-linux-x64-musl"
 elif [[ "$OS" == "linux" && "$ARCH" == "aarch64" && "$MUSL" == "1" ]]; then
-  EXECUTABLE="./evvm-linux-arm64-musl"
+  EXECUTABLE="./.executables/evvm-linux-arm64-musl"
 elif [[ "$OS" == "darwin" && "$ARCH" == "x86_64" ]]; then
-  EXECUTABLE="./evvm-darwin-x64"
+  EXECUTABLE="./.executables/evvm-darwin-x64"
 elif [[ "$OS" == "darwin" && "$ARCH" == "arm64" ]]; then
-  EXECUTABLE="./evvm-darwin-arm64"
+  EXECUTABLE="./.executables/evvm-darwin-arm64"
 elif [[ "$OS" == "cygwin" || "$OS" == "mingw"* ]]; then
-  EXECUTABLE="./evvm-windows-x64.exe"
+  EXECUTABLE="./.executables/evvm-windows-x64.exe"
 else
   echo "Unsupported platform or architecture: $OS-$ARCH"
   exit 1
