@@ -42,7 +42,11 @@
     "prepare-publish": "bun run copy-files && bun run pack",
     "publish-package": "bun run copy-files && bun publish && bun run clean",
     "evvm": "bun run cli/index.ts",
-    "buildCli": "bun build cli/index.ts --compile --outfile evvm"
+    "buildCli": "bun build cli/index.ts --compile --outfile evvm",
+    "build-all": "bun run build-linux && bun run build-windows && bun run build-macos",
+    "build-linux": "bun build cli/index.ts --compile --outfile evvm-linux-x64 && bun build cli/index.ts --compile --outfile evvm-linux-arm64 && bun build cli/index.ts --compile --outfile evvm-linux-x64-musl && bun build cli/index.ts --compile --outfile evvm-linux-arm64-musl",
+    "build-windows": "bun build cli/index.ts --compile --outfile evvm-windows-x64.exe",
+    "build-macos": "bun build cli/index.ts --compile --outfile evvm-darwin-x64 && bun build cli/index.ts --compile --outfile evvm-darwin-arm64"
   },
   "peerDependencies": {
     "@openzeppelin/contracts": "^5.0.0"
