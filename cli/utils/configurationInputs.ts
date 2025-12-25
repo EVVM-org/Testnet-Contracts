@@ -42,7 +42,7 @@ export async function configurationBasic(): Promise<boolean> {
     activator: null,
   };
 
-  while (!confirmationDone) {
+  do {
     for (const key of Object.keys(addresses) as (keyof BaseInputAddresses)[]) {
       addresses[key] = promptAddress(
         `${colors.yellow}Enter the ${key} address:${colors.reset}`
@@ -119,17 +119,16 @@ export async function configurationBasic(): Promise<boolean> {
       console.log(`  ${colors.blue}${metaKey}:${colors.reset} ${displayValue}`);
     }
     console.log();
-
-    confirmationDone =
-      promptYesNo(
-        `${colors.yellow}Confirm configuration? (y/n):${colors.reset}`
-      ).toLowerCase() === "y";
-  }
+  } while (
+    promptYesNo(
+      `${colors.yellow}Confirm configuration? (y/n):${colors.reset}`
+    ).toLowerCase() === "n"
+  );
 
   if (!(await writeBaseInputsFile(addresses, evvmMetadata))) {
     showError(
       "Failed to write inputs file.",
-      `Please try again. If the issue persists, create an issue on GitHub:\n${colors.blue}https://github.com/EVVM-org/Playgrounnd-Contracts/issues${colors.reset}`
+      `Please try again. If the issue persists, create an issue on GitHub:\n${colors.blue}https://github.com/EVVM-org/Testnet-Contracts/issues${colors.reset}`
     );
     return false;
   }
@@ -193,7 +192,7 @@ export async function configurationCrossChain(): Promise<{
   let hostRpcUrl: string | null = null;
   let hostChainId: number | null = null;
 
-  while (!confirmationCrossChainDone) {
+  do {
     ({ rpcUrl: externalRpcUrl, chainId: externalChainId } =
       await getRPCUrlAndChainId(process.env.EXTERNAL_RPC_URL)),
       `${colors.yellow}Please enter the External Chain RPC URL:${colors.reset}`;
@@ -331,15 +330,11 @@ export async function configurationCrossChain(): Promise<{
       `  ${colors.darkGray}→${colors.reset} Axelar Gas Service: ${colors.blue}${crossChainInputs.crosschainConfigExternal.axelar.gasServiceAddress}${colors.reset}`
     );
     console.log();
-
-    if (
-      promptYesNo(
-        `${colors.yellow}Confirm cross-chain configuration? (y/n):${colors.reset}`
-      ).toLowerCase() === "y"
-    ) {
-      confirmationCrossChainDone = true;
-    }
-  }
+  } while (
+    promptYesNo(
+      `${colors.yellow}Confirm cross-chain configuration? (y/n):${colors.reset}`
+    ).toLowerCase() === "n"
+  );
 
   if (!(await writeCrossChainInputsFile(crossChainInputs))) {
     showError(
@@ -397,8 +392,6 @@ export async function writeBaseInputsFile(
     await Bun.write(inputFile, "");
     console.log(`${colors.blue}Created ${inputFile}${colors.reset}`);
   }
-
-  
 
   const inputFileContent = `// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;

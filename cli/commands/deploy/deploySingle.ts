@@ -21,7 +21,6 @@ import {
 import { getRPCUrlAndChainId } from "../../utils/rpc";
 import { explorerVerification } from "../../utils/explorerVerification";
 import { configurationBasic } from "../../utils/configurationInputs";
-import { register } from "module";
 import { registerSingle } from "../register/registerSingle";
 
 /**
