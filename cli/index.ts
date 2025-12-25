@@ -12,12 +12,13 @@
 import { parseArgs } from "util";
 import { colors } from "./constants";
 import {
+  register,
   showHelp,
   showVersion,
-  deployEvvm,
-  install,
-  registerEvvm,
 } from "./commands";
+import { developer } from "./commands/developer";
+import { setUpCrossChainTreasuries } from "./commands/setUpCrossChainTreasuries";
+import { deploy } from "./commands/deploy";
 
 /**
  * Available CLI commands mapped to their handler functions
@@ -25,9 +26,10 @@ import {
 const commands = {
   help: showHelp,
   version: showVersion,
-  deploy: deployEvvm,
-  install: install,
-  register: registerEvvm,
+  deploy: deploy,
+  register: register,
+  setUpCrossChainTreasuries: setUpCrossChainTreasuries,
+  dev: developer,
 };
 
 /**
@@ -57,14 +59,29 @@ async function main() {
   const { values, positionals } = parseArgs({
     args,
     options: {
+      // general options
       help: { type: "boolean", short: "h" },
       version: { type: "boolean", short: "v" },
       name: { type: "string", short: "n" },
       verbose: { type: "boolean" },
+      crossChain: { type: "boolean", short: "c" },
+      
+      // general deploy command options
       skipInputConfig: { type: "boolean", short: "s" },
       walletName: { type: "string", short: "w" },
+
+      // setUpCrossChainTreasuries command specific
+      treasuryHostStationAddress: { type: "string"},
+      treasuryExternalStationAddress: { type: "string"},
+      walletNameHost: { type: "string"},
+      walletNameExternal: { type: "string"},
+
+      // register command specific
       evvmAddress: { type: "string" },
       useCustomEthRpc: { type: "boolean" },
+
+      //dev command specific
+      makeInterface: { type: "boolean", short: "i"},
     },
     allowPositionals: true,
   });

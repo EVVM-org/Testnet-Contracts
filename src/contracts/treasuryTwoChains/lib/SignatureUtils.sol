@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: EVVM-NONCOMMERCIAL-1.0
 // Full license terms available at: https://www.evvm.info/docs/EVVMNoncommercialLicense
+pragma solidity ^0.8.0;
 
 import {SignatureUtil} from "@evvm/testnet-contracts/library/utils/SignatureUtil.sol";
 import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-
-pragma solidity ^0.8.0;
 
 /**
  * @title SignatureUtils
@@ -13,14 +11,14 @@ pragma solidity ^0.8.0;
  * @notice Signature verification utilities for Treasury Cross-Chain Fisher Bridge operations
  * @dev Specialized signature verification for Fisher Bridge transactions in the EVVM cross-chain treasury system
  *      Provides EIP-191 compliant signature verification with structured message format for enhanced security
- * 
+ *
  * Key Features:
  * - EIP-191 standard message signing format for wallet compatibility
  * - Fisher Bridge specific message structure for transaction authenticity
  * - Nonce-based replay attack prevention
  * - EVVM ID integration for cross-instance security
  * - Support for both ETH and ERC20 token bridge operations
- * 
+ *
  * Security Model:
  * - Structured message format: "{evvmID},fisherBridge,{parameters}"
  * - Nonce validation prevents replay attacks across chains
@@ -32,7 +30,7 @@ library SignatureUtils {
     /// @dev Constructs and verifies structured message for Fisher Bridge cross-chain operations
     ///      Message format: "{evvmID},fisherBridge,{addressToReceive},{nonce},{tokenAddress},{priorityFee},{amount}"
     ///      This ensures each signature is unique and prevents cross-chain replay attacks
-    /// 
+    ///
     /// @param evvmID Unique identifier of the EVVM instance (prevents cross-instance replay)
     /// @param signer Address that should have signed the message (transaction originator)
     /// @param addressToReceive Destination address on the target chain for the bridged tokens
@@ -42,7 +40,7 @@ library SignatureUtils {
     /// @param amount Total amount of tokens being bridged across chains
     /// @param signature ECDSA signature (65 bytes) created by the signer using their private key
     /// @return bool True if the signature is valid and matches the expected signer, false otherwise
-    /// 
+    ///
     /// @dev Security Features:
     ///      - EIP-191 compliance ensures wallet compatibility (MetaMask, WalletConnect, etc.)
     ///      - Structured message prevents parameter manipulation

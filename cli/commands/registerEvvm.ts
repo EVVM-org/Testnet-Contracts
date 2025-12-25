@@ -8,7 +8,7 @@
  */
 
 import { colors, EthSepoliaPublicRpc } from "../constants";
-import { promptAddress, promptNumber, promptString } from "../utils/prompts";
+import { promptAddress, promptString } from "../utils/prompts";
 import {
   callRegisterEvvm,
   callSetEvvmID,
@@ -43,35 +43,26 @@ export async function registerEvvm(_args: string[], options: any) {
 
   let ethRPC: string | undefined;
 
-  // If --useCustomEthRpc is present, look for ETH_SEPOLIA_RPC in .env or prompt user
-  if (useCustomEthRpc) {
-    ethRPC = process.env.ETH_SEPOLIA_RPC;
-    if (!ethRPC) {
-      ethRPC = promptString(
+  // If --useCustomEthRpc is present, look for EVVM_REGISTRATION_RPC_URL in .env or prompt user
+  ethRPC = useCustomEthRpc
+    ? process.env.EVVM_REGISTRATION_RPC_URL || promptString(
         `${colors.yellow}Enter the custom Ethereum Sepolia RPC URL:${colors.reset}`
-      );
-    }
-  } else {
-    ethRPC = EthSepoliaPublicRpc;
-  }
+      )
+    : EthSepoliaPublicRpc;
 
   if (!(await verifyFoundryInstalledAndAccountSetup(walletName))) {
     return;
   }
 
   // Validate or prompt for missing values
-  if (!evvmAddress) {
-    evvmAddress = promptAddress(
-      `${colors.yellow}Enter the EVVM Address:${colors.reset}`
-    );
-  }
+  evvmAddress ||= promptAddress(
+    `${colors.yellow}Enter the EVVM Address:${colors.reset}`
+  );
 
   let { rpcUrl, chainId } = await getRPCUrlAndChainId(process.env.RPC_URL);
 
-  const isDeployingOnLocalBlockchain: boolean =
-    chainId === 31337 || chainId === 1337;
 
-  if (isDeployingOnLocalBlockchain) {
+  if (chainId === 31337 || chainId === 1337) {
     console.log(`\n${colors.orange}Local Blockchain Detected${colors.reset}`);
     console.log(
       `${colors.darkGray}Skipping registry contract registration for local development${colors.reset}`
@@ -83,7 +74,7 @@ export async function registerEvvm(_args: string[], options: any) {
   if (isSupported === undefined) {
     showError(
       `EVVM registration failed.`,
-      `Please try again. If the issue persists, create an issue on GitHub:\n${colors.blue}https://github.com/EVVM-org/Testnet-Contracts/issues${colors.reset}`
+      `Please try again or if the issue persists, make an issue on GitHub.`
     );
     return;
   }
@@ -118,7 +109,7 @@ export async function registerEvvm(_args: string[], options: any) {
   if (!evvmID) {
     showError(
       `EVVM registration failed.`,
-      `Please try again. If the issue persists, create an issue on GitHub:\n${colors.blue}https://github.com/EVVM-org/Testnet-Contracts/issues${colors.reset}`
+      `Please try again or if the issue persists, make an issue on GitHub.`
     );
     return;
   }

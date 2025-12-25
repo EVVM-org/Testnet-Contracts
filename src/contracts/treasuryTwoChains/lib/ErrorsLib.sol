@@ -43,4 +43,6 @@ library ErrorsLib {
     /// @notice Thrown when Fisher bridge signature verification fails
     /// @dev Security check for Fisher bridge operations to ensure transaction authenticity and prevent replay attacks
     error InvalidSignature();
+
+    error WindowToChangeEvvmIDExpired();
 }

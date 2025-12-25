@@ -60,21 +60,10 @@ abstract contract ExternalChainStationStructs {
 
     /// @notice Unified cross-chain configuration for all supported protocols
     /// @dev Single structure containing all protocol configurations for deployment
-    /// @param hostChainStationDomainId Hyperlane domain ID for host chain
-    /// @param mailboxAddress Hyperlane mailbox contract address
-    /// @param hostChainStationEid LayerZero endpoint ID for host chain
-    /// @param endpointAddress LayerZero V2 endpoint contract address
-    /// @param hostChainStationChainName Axelar chain name for host chain
-    /// @param gasServiceAddress Axelar gas service contract address
-    /// @param gatewayAddress Axelar gateway contract address
     struct CrosschainConfig {
-        uint32 hostChainStationDomainId;
-        address mailboxAddress;
-        uint32 hostChainStationEid;
-        address endpointAddress;
-        string hostChainStationChainName;
-        address gasServiceAddress;
-        address gatewayAddress;
+        HyperlaneConfig hyperlane;
+        LayerZeroConfig layerZero;
+        AxelarConfig axelar;
     }
 
     /// @notice Parameters for coordinated host chain address changes across all protocols

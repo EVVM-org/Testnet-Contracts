@@ -19,7 +19,8 @@ import { colors } from "../constants";
  * @returns {Promise<{rpcUrl: string, chainId: number}>} RPC URL and chain ID
  */
 export async function getRPCUrlAndChainId(
-  rpcUrl: string | undefined | null
+  rpcUrl: string | undefined | null,
+  stringPrompt = `${colors.yellow}Please enter the RPC URL for deployment:${colors.reset}`
 ): Promise<{
   rpcUrl: string;
   chainId: number;
@@ -31,7 +32,7 @@ export async function getRPCUrlAndChainId(
       `${colors.orange}RPC URL not found in .env file.${colors.reset}`
     );
     rpcUrl = prompt(
-      `${colors.yellow}Please enter the RPC URL for deployment:${colors.reset}`
+      stringPrompt
     );
     if (!rpcUrl) {
       console.log(

@@ -31,27 +31,54 @@ pragma solidity ^0.8.0;
  * @author Mate labs
  */
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ErrorsLib} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/ErrorsLib.sol";
-import {ExternalChainStationStructs} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/ExternalChainStationStructs.sol";
+import {IERC20} from "@evvm/testnet-contracts/library/primitives/IERC20.sol";
+import {
+    ErrorsLib
+} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/ErrorsLib.sol";
+import {
+    ExternalChainStationStructs
+} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/ExternalChainStationStructs.sol";
 
 import {SafeTransferLib} from "@solady/utils/SafeTransferLib.sol";
 
-import {SignatureUtils} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/SignatureUtils.sol";
-import {PayloadUtils} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/PayloadUtils.sol";
+import {
+    SignatureUtils
+} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/SignatureUtils.sol";
+import {
+    PayloadUtils
+} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/PayloadUtils.sol";
 
 import {IMailbox} from "@hyperlane-xyz/core/contracts/interfaces/IMailbox.sol";
 
-import {MessagingParams, MessagingReceipt} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
-import {OApp, Origin, MessagingFee} from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
-import {OAppOptionsType3} from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
-import {OptionsBuilder} from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
+import {
+    MessagingParams,
+    MessagingReceipt
+} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
+import {
+    OApp,
+    Origin,
+    MessagingFee
+} from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
+import {
+    OAppOptionsType3
+} from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
+import {
+    OptionsBuilder
+} from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-import {AxelarExecutable} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol";
-import {IAxelarGasService} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol";
-import {IInterchainGasEstimation} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IInterchainGasEstimation.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {
+    AxelarExecutable
+} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol";
+import {
+    IAxelarGasService
+} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol";
+import {
+    IInterchainGasEstimation
+} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IInterchainGasEstimation.sol";
+import {
+    AdvancedStrings
+} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
 
 contract TreasuryExternalChainStation is
     ExternalChainStationStructs,
@@ -85,7 +112,9 @@ contract TreasuryExternalChainStation is
 
     /// @notice Unique identifier for the EVVM instance this station belongs to
     /// @dev Immutable value set at deployment for signature verification
-    uint256 immutable EVVM_ID;
+    uint256 evvmID;
+
+    uint256 windowTimeToChangeEvvmID;
 
     /// @notice Tracks the next nonce for Fisher bridge operations per user address
     /// @dev Prevents replay attacks in Fisher bridge transactions
@@ -142,15 +171,13 @@ contract TreasuryExternalChainStation is
     /// @dev Sets up Hyperlane, LayerZero, and Axelar configurations for multi-protocol support
     /// @param _admin Initial admin address with full administrative privileges
     /// @param _crosschainConfig Configuration struct containing all cross-chain protocol settings
-    /// @param _evvmId Unique identifier for the EVVM instance this station serves
     constructor(
         address _admin,
-        CrosschainConfig memory _crosschainConfig,
-        uint256 _evvmId
+        CrosschainConfig memory _crosschainConfig
     )
-        OApp(_crosschainConfig.endpointAddress, _admin)
+        OApp(_crosschainConfig.layerZero.endpointAddress, _admin)
         Ownable(_admin)
-        AxelarExecutable(_crosschainConfig.gatewayAddress)
+        AxelarExecutable(_crosschainConfig.axelar.gatewayAddress)
     {
         admin = AddressTypeProposal({
             current: _admin,
@@ -159,23 +186,26 @@ contract TreasuryExternalChainStation is
         });
         hyperlane = HyperlaneConfig({
             hostChainStationDomainId: _crosschainConfig
+                .hyperlane
                 .hostChainStationDomainId,
             hostChainStationAddress: "",
-            mailboxAddress: _crosschainConfig.mailboxAddress
+            mailboxAddress: _crosschainConfig.hyperlane.mailboxAddress
         });
         layerZero = LayerZeroConfig({
-            hostChainStationEid: _crosschainConfig.hostChainStationEid,
+            hostChainStationEid: _crosschainConfig
+                .layerZero
+                .hostChainStationEid,
             hostChainStationAddress: "",
-            endpointAddress: _crosschainConfig.endpointAddress
+            endpointAddress: _crosschainConfig.layerZero.endpointAddress
         });
         axelar = AxelarConfig({
             hostChainStationChainName: _crosschainConfig
+                .axelar
                 .hostChainStationChainName,
             hostChainStationAddress: "",
-            gasServiceAddress: _crosschainConfig.gasServiceAddress,
-            gatewayAddress: _crosschainConfig.gatewayAddress
+            gasServiceAddress: _crosschainConfig.axelar.gasServiceAddress,
+            gatewayAddress: _crosschainConfig.axelar.gatewayAddress
         });
-        EVVM_ID = _evvmId;
     }
 
     /// @notice One-time setup of host chain station address across all protocols
@@ -201,6 +231,21 @@ contract TreasuryExternalChainStation is
         );
 
         fuseSetHostChainAddress = 0x00;
+    }
+
+    /**
+     * @notice Updates the EVVM ID with a new value, restricted to admin and time-limited
+     * @dev Allows the admin to change the EVVM ID within a 1-day window after deployment
+     */
+    function setEvvmID(uint256 newEvvmID) external onlyAdmin {
+        if (evvmID != 0) {
+            if (block.timestamp > windowTimeToChangeEvvmID)
+                revert ErrorsLib.WindowToChangeEvvmIDExpired();
+        }
+
+        evvmID = newEvvmID;
+
+        windowTimeToChangeEvvmID = block.timestamp + 24 hours;
     }
 
     /// @notice Deposits ERC20 tokens and sends them to host chain via selected protocol
@@ -341,7 +386,7 @@ contract TreasuryExternalChainStation is
     ) external onlyFisherExecutor {
         if (
             !SignatureUtils.verifyMessageSignedForFisherBridge(
-                EVVM_ID,
+                evvmID,
                 from,
                 addressToReceive,
                 nextFisherExecutionNonce[from],
@@ -373,7 +418,7 @@ contract TreasuryExternalChainStation is
     ) external onlyFisherExecutor {
         if (
             !SignatureUtils.verifyMessageSignedForFisherBridge(
-                EVVM_ID,
+                evvmID,
                 from,
                 addressToReceive,
                 nextFisherExecutionNonce[from],
@@ -414,7 +459,7 @@ contract TreasuryExternalChainStation is
     ) external payable onlyFisherExecutor {
         if (
             !SignatureUtils.verifyMessageSignedForFisherBridge(
-                EVVM_ID,
+                evvmID,
                 from,
                 addressToReceive,
                 nextFisherExecutionNonce[from],
@@ -441,7 +486,7 @@ contract TreasuryExternalChainStation is
     }
 
     // Hyperlane Specific Functions //
-    
+
     /// @notice Calculates the fee required for Hyperlane cross-chain message dispatch
     /// @dev Queries the Hyperlane mailbox for accurate fee estimation
     /// @param toAddress Recipient address on the destination chain
@@ -567,16 +612,24 @@ contract TreasuryExternalChainStation is
     /// @param _sourceAddress Source contract address (must match host chain station)
     /// @param _payload Encoded payload containing transfer instructions
     function _execute(
-        bytes32 /*commandId*/,
+        bytes32 commandId,
         string calldata _sourceChain,
         string calldata _sourceAddress,
         bytes calldata _payload
     ) internal override {
-        if (!Strings.equal(_sourceChain, axelar.hostChainStationChainName))
-            revert ErrorsLib.ChainIdNotAuthorized();
+        if (
+            !AdvancedStrings.equal(
+                _sourceChain,
+                axelar.hostChainStationChainName
+            )
+        ) revert ErrorsLib.ChainIdNotAuthorized();
 
-        if (!Strings.equal(_sourceAddress, axelar.hostChainStationAddress))
-            revert ErrorsLib.SenderNotAuthorized();
+        if (
+            !AdvancedStrings.equal(
+                _sourceAddress,
+                axelar.hostChainStationAddress
+            )
+        ) revert ErrorsLib.SenderNotAuthorized();
 
         decodeAndGive(_payload);
     }
@@ -705,7 +758,7 @@ contract TreasuryExternalChainStation is
     }
 
     // Getter functions //
-    
+
     /// @notice Returns the complete admin configuration including proposals and timelock
     /// @return Current admin address, proposed admin, and acceptance timestamp
     function getAdmin() external view returns (AddressTypeProposal memory) {

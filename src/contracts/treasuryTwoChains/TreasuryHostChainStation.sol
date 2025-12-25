@@ -31,26 +31,52 @@ pragma solidity ^0.8.0;
  * @author Mate labs
  */
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
-import {ErrorsLib} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/ErrorsLib.sol";
-import {HostChainStationStructs} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/HostChainStationStructs.sol";
+import {IEvvm} from "@evvm/testnet-contracts/interfaces/IEvvm.sol";
+import {
+    ErrorsLib
+} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/ErrorsLib.sol";
+import {
+    HostChainStationStructs
+} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/HostChainStationStructs.sol";
 
-import {SignatureUtils} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/SignatureUtils.sol";
-import {PayloadUtils} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/PayloadUtils.sol";
+import {
+    SignatureUtils
+} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/SignatureUtils.sol";
+import {
+    PayloadUtils
+} from "@evvm/testnet-contracts/contracts/treasuryTwoChains/lib/PayloadUtils.sol";
 
 import {IMailbox} from "@hyperlane-xyz/core/contracts/interfaces/IMailbox.sol";
 
-import {MessagingParams, MessagingReceipt} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
-import {OApp, Origin, MessagingFee} from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
-import {OAppOptionsType3} from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
-import {OptionsBuilder} from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
+import {
+    MessagingParams,
+    MessagingReceipt
+} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
+import {
+    OApp,
+    Origin,
+    MessagingFee
+} from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
+import {
+    OAppOptionsType3
+} from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
+import {
+    OptionsBuilder
+} from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-import {AxelarExecutable} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol";
-import {IAxelarGasService} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol";
-import {IInterchainGasEstimation} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IInterchainGasEstimation.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {
+    AxelarExecutable
+} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol";
+import {
+    IAxelarGasService
+} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol";
+import {
+    IInterchainGasEstimation
+} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IInterchainGasEstimation.sol";
+import {
+    AdvancedStrings
+} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
 
 contract TreasuryHostChainStation is
     HostChainStationStructs,
@@ -58,9 +84,9 @@ contract TreasuryHostChainStation is
     OAppOptionsType3,
     AxelarExecutable
 {
-    /// @notice Address of the EVVM core contract for balance operations
+    /// @notice EVVM core contract for balance operations
     /// @dev Used to integrate with EVVM's balance management and token operations
-    address evvmAddress;
+    IEvvm evvm;
 
     /// @notice Admin address management with time-delayed proposals
     /// @dev Stores current admin, proposed admin, and acceptance timestamp
@@ -147,11 +173,12 @@ contract TreasuryHostChainStation is
         address _admin,
         CrosschainConfig memory _crosschainConfig
     )
-        OApp(_crosschainConfig.endpointAddress, _admin)
+        OApp(_crosschainConfig.layerZero.endpointAddress, _admin)
         Ownable(_admin)
-        AxelarExecutable(_crosschainConfig.gatewayAddress)
+        AxelarExecutable(_crosschainConfig.axelar.gatewayAddress)
     {
-        evvmAddress = _evvmAddress;
+        evvm = IEvvm(_evvmAddress);
+
         admin = AddressTypeProposal({
             current: _admin,
             proposal: address(0),
@@ -159,21 +186,25 @@ contract TreasuryHostChainStation is
         });
         hyperlane = HyperlaneConfig({
             externalChainStationDomainId: _crosschainConfig
+                .hyperlane
                 .externalChainStationDomainId,
             externalChainStationAddress: "",
-            mailboxAddress: _crosschainConfig.mailboxAddress
+            mailboxAddress: _crosschainConfig.hyperlane.mailboxAddress
         });
         layerZero = LayerZeroConfig({
-            externalChainStationEid: _crosschainConfig.externalChainStationEid,
+            externalChainStationEid: _crosschainConfig
+                .layerZero
+                .externalChainStationEid,
             externalChainStationAddress: "",
-            endpointAddress: _crosschainConfig.endpointAddress
+            endpointAddress: _crosschainConfig.layerZero.endpointAddress
         });
         axelar = AxelarConfig({
             externalChainStationChainName: _crosschainConfig
+                .axelar
                 .externalChainStationChainName,
             externalChainStationAddress: "",
-            gasServiceAddress: _crosschainConfig.gasServiceAddress,
-            gatewayAddress: _crosschainConfig.gatewayAddress
+            gasServiceAddress: _crosschainConfig.axelar.gasServiceAddress,
+            gatewayAddress: _crosschainConfig.axelar.gatewayAddress
         });
     }
 
@@ -214,10 +245,10 @@ contract TreasuryHostChainStation is
         uint256 amount,
         bytes1 protocolToExecute
     ) external payable {
-        if (token == Evvm(evvmAddress).getEvvmMetadata().principalTokenAddress)
+        if (token == evvm.getEvvmMetadata().principalTokenAddress)
             revert ErrorsLib.PrincipalTokenIsNotWithdrawable();
 
-        if (Evvm(evvmAddress).getBalance(msg.sender, token) < amount)
+        if (evvm.getBalance(msg.sender, token) < amount)
             revert ErrorsLib.InsufficientBalance();
 
         executerEVVM(false, msg.sender, token, amount);
@@ -285,7 +316,7 @@ contract TreasuryHostChainStation is
     ) external onlyFisherExecutor {
         if (
             !SignatureUtils.verifyMessageSignedForFisherBridge(
-                Evvm(evvmAddress).getEvvmID(),
+                evvm.getEvvmID(),
                 from,
                 addressToReceive,
                 nextFisherExecutionNonce[from],
@@ -320,17 +351,15 @@ contract TreasuryHostChainStation is
         uint256 amount,
         bytes memory signature
     ) external onlyFisherExecutor {
-        if (
-            tokenAddress ==
-            Evvm(evvmAddress).getEvvmMetadata().principalTokenAddress
-        ) revert ErrorsLib.PrincipalTokenIsNotWithdrawable();
+        if (tokenAddress == evvm.getEvvmMetadata().principalTokenAddress)
+            revert ErrorsLib.PrincipalTokenIsNotWithdrawable();
 
-        if (Evvm(evvmAddress).getBalance(from, tokenAddress) < amount)
+        if (evvm.getBalance(from, tokenAddress) < amount)
             revert ErrorsLib.InsufficientBalance();
 
         if (
             !SignatureUtils.verifyMessageSignedForFisherBridge(
-                Evvm(evvmAddress).getEvvmID(),
+                evvm.getEvvmID(),
                 from,
                 addressToReceive,
                 nextFisherExecutionNonce[from],
@@ -359,7 +388,7 @@ contract TreasuryHostChainStation is
     }
 
     // Hyperlane Specific Functions //
-    
+
     /// @notice Calculates the fee required for Hyperlane cross-chain message dispatch
     /// @dev Queries the Hyperlane mailbox for accurate fee estimation
     /// @param toAddress Recipient address on the destination chain
@@ -485,16 +514,24 @@ contract TreasuryHostChainStation is
     /// @param _sourceAddress Source contract address (must match external chain station)
     /// @param _payload Encoded payload containing deposit instructions
     function _execute(
-        bytes32 /*commandId*/,
+        bytes32 commandId,
         string calldata _sourceChain,
         string calldata _sourceAddress,
         bytes calldata _payload
     ) internal override {
-        if (!Strings.equal(_sourceChain, axelar.externalChainStationChainName))
-            revert ErrorsLib.ChainIdNotAuthorized();
+        if (
+            !AdvancedStrings.equal(
+                _sourceChain,
+                axelar.externalChainStationChainName
+            )
+        ) revert ErrorsLib.ChainIdNotAuthorized();
 
-        if (!Strings.equal(_sourceAddress, axelar.externalChainStationAddress))
-            revert ErrorsLib.SenderNotAuthorized();
+        if (
+            !AdvancedStrings.equal(
+                _sourceAddress,
+                axelar.externalChainStationAddress
+            )
+        ) revert ErrorsLib.SenderNotAuthorized();
 
         decodeAndDeposit(_payload);
     }
@@ -624,7 +661,7 @@ contract TreasuryHostChainStation is
     }
 
     // Getter functions //
-    
+
     /// @notice Returns the complete admin configuration including proposals and timelock
     /// @return Current admin address, proposed admin, and acceptance timestamp
     function getAdmin() external view returns (AddressTypeProposal memory) {
@@ -654,7 +691,7 @@ contract TreasuryHostChainStation is
     /// @notice Returns the EVVM core contract address
     /// @return Address of the EVVM contract used for balance operations
     function getEvvmAddress() external view returns (address) {
-        return evvmAddress;
+        return address(evvm);
     }
 
     /// @notice Returns the complete Hyperlane protocol configuration
@@ -714,14 +751,10 @@ contract TreasuryHostChainStation is
     ) internal {
         if (typeOfExecution) {
             // true = add
-            Evvm(evvmAddress).addAmountToUser(userToExecute, token, amount);
+            evvm.addAmountToUser(userToExecute, token, amount);
         } else {
             // false = remove
-            Evvm(evvmAddress).removeAmountFromUser(
-                userToExecute,
-                token,
-                amount
-            );
+            evvm.removeAmountFromUser(userToExecute, token, amount);
         }
     }
 

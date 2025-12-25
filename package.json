@@ -36,11 +36,11 @@
     "access": "public"
   },
   "scripts": {
+    "publish-package": "bun run copy-files && bun publish && bun run clean",
+    "prepare-publish": "bun run copy-files && bun run pack",
     "build": "bun run copy-files",
     "copy-files": "cp -r src/contracts . && cp -r src/interfaces . && cp -r src/library .",
     "clean": "rm -rf contracts interfaces library",
-    "prepare-publish": "bun run copy-files && bun run pack",
-    "publish-package": "bun run copy-files && bun publish && bun run clean",
     "evvm": "bun run cli/index.ts",
     "buildCli": "bun build cli/index.ts --compile --outfile evvm",
     "build-all": "bun run build-linux && bun run build-windows && bun run build-macos",
@@ -57,7 +57,7 @@
     "dotenv": "^16.4.5",
     "execa": "^8.0.1",
     "prompts": "^2.4.2",
-    "viem": "^2.39.0"
+    "viem": "^2.43.3"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

@@ -69,13 +69,9 @@ abstract contract HostChainStationStructs {
     /// @param gasServiceAddress Axelar gas service contract address
     /// @param gatewayAddress Axelar gateway contract address
     struct CrosschainConfig {
-        uint32 externalChainStationDomainId;
-        address mailboxAddress;
-        uint32 externalChainStationEid;
-        address endpointAddress;
-        string externalChainStationChainName;
-        address gasServiceAddress;
-        address gatewayAddress;
+        HyperlaneConfig hyperlane;
+        LayerZeroConfig layerZero;
+        AxelarConfig axelar;
     }
 
     /// @notice Parameters for coordinated external chain address changes across all protocols

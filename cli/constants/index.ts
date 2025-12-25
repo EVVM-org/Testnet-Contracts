@@ -7,6 +7,9 @@
  * @module cli/constants
  */
 
+import type { ChainDataType } from "../types";
+import ChainDataJSON from "./ChainData.json";
+
 /**
  * ANSI color codes for terminal output formatting
  * 
@@ -38,3 +41,13 @@ export const RegisteryEvvmAddress = "0x389dC8fb09211bbDA841D59f4a51160dA2377832"
  * Used for registry contract interactions when custom RPC is not specified.
  */
 export const EthSepoliaPublicRpc = "https://gateway.tenderly.co/public/sepolia" as const;
+
+/**
+ * Chain configuration data including Hyperlane, LayerZero, and Axelar addresses
+ * 
+ * Indexed by chain ID, provides cross-chain messaging protocol addresses
+ * and explorer URLs for each supported testnet.
+ */
+export const ChainData = ChainDataJSON as ChainDataType;
+
+//https://docs.hyperlane.xyz/docs/reference/addresses/deployments/mailbox#testnet

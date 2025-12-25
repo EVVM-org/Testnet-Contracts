@@ -11,9 +11,9 @@ import {
 import {Treasury} from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
 import {EvvmStructs} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
 import {P2PSwap} from "@evvm/testnet-contracts/contracts/p2pSwap/P2PSwap.sol";
-import {Inputs} from "../input/Inputs.sol";
+import {BaseInputs} from "../input/BaseInputs.sol";
 
-contract DeployScript is Script, Inputs {
+contract DeployScript is Script, BaseInputs {
     Staking staking;
     Evvm evvm;
     Estimator estimator;

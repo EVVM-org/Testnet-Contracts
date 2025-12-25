@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.4;
+// SPDX-License-Identifier: EVVM-NONCOMMERCIAL-1.0
+// Full license terms available at: https://www.evvm.info/docs/EVVMNoncommercialLicense
+pragma solidity ^0.8.0;
 
 library HostChainStationStructs {
     struct AddressTypeProposal {
@@ -16,13 +17,9 @@ library HostChainStationStructs {
     }
 
     struct CrosschainConfig {
-        uint32 externalChainStationDomainId;
-        address mailboxAddress;
-        uint32 externalChainStationEid;
-        address endpointAddress;
-        string externalChainStationChainName;
-        address gasServiceAddress;
-        address gatewayAddress;
+        HyperlaneConfig hyperlane;
+        LayerZeroConfig layerZero;
+        AxelarConfig axelar;
     }
 
     struct HyperlaneConfig {
@@ -38,7 +35,7 @@ library HostChainStationStructs {
     }
 }
 
-interface TreasuryHostChainStation {
+interface ITreasuryHostChainStation {
     struct EnforcedOptionParam {
         uint32 eid;
         uint16 msgType;

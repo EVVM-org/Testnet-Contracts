@@ -1,9 +1,9 @@
 /**
  * Explorer Verification Utilities
- * 
+ *
  * Handles block explorer verification configuration for deployed contracts.
  * Supports multiple verification providers including Etherscan, Blockscout, and Sourcify.
- * 
+ *
  * @module cli/utils/explorerVerification
  */
 
@@ -11,27 +11,26 @@ import { promptSecret, promptSelect, promptString } from "./prompts";
 
 /**
  * Prompts user to select and configure block explorer verification
- * 
+ *
  * Provides options for various verification methods:
  * - Etherscan v2: Requires API key
  * - Blockscout: Requires homepage URL
  * - Sourcify: Uses public Sourcify server
  * - Custom: Allows custom verification flags
  * - Skip: Proceeds without verification (not recommended)
- * 
+ *
  * @returns {Promise<string | undefined>} Verification flags for forge script, or undefined if setup fails
  */
-export async function explorerVerification(): Promise<string | undefined> {
-  const verification = await promptSelect(
-    "Select block explorer verification:",
-    [
-      "Etherscan v2",
-      "Blockscout",
-      "Sourcify",
-      "Custom",
-      "Skip verification (not recommended)",
-    ]
-  );
+export async function explorerVerification(
+  prompt = "Select block explorer verification:"
+): Promise<string | undefined> {
+  const verification = await promptSelect(prompt, [
+    "Etherscan v2",
+    "Blockscout",
+    "Sourcify",
+    "Custom",
+    "Skip verification (not recommended)",
+  ]);
 
   let verificationflag: string = "";
 
