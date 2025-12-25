@@ -9,9 +9,7 @@
 
 import { $ } from "bun";
 import { ChainData, colors } from "../../constants";
-import {
-  promptYesNo,
-} from "../../utils/prompts";
+import { promptYesNo } from "../../utils/prompts";
 import { showError } from "../../utils/validators";
 import {
   isChainIdRegistered,
@@ -66,7 +64,7 @@ export async function deploySingle(args: string[], options: any) {
       `${colors.yellow}⚡ Skipping input configuration (using from ./input/BaseInputs.sol)...${colors.reset}\n`
     );
   } else {
-    if (!await configurationBasic()) return;
+    if (!(await configurationBasic())) return;
   }
 
   if (
@@ -88,32 +86,30 @@ export async function deploySingle(args: string[], options: any) {
       `${colors.darkGray}   Skipping host chain verification for local development${colors.reset}\n`
     );
   } else {
-    const isSupported = await isChainIdRegistered(chainId);
-
-    if (isSupported === undefined) {
-      showError(
-        `Chain ID ${chainId} is not supported.`,
-        `Please try again or if the issue persists, make an issue on GitHub.`
-      );
-      return;
-    }
-
-    if (!isSupported) {
-      showError(
-        `Host Chain ID ${chainId} is not supported.`,
-        `\n${colors.yellow}Possible solutions:${colors.reset}
-  ${colors.bright}• Testnet chains:${colors.reset}
+    
+    switch (await isChainIdRegistered(chainId)) {
+      case undefined:
+        showError(
+          `Chain ID ${chainId} is not supported.`,
+          `Please try again or if the issue persists, make an issue on GitHub.`
+        );
+        return;
+      case false:
+        showError(
+          `Host Chain ID ${chainId} is not supported.`,
+          `\n${colors.yellow}Possible solutions:${colors.reset}
+    ${colors.bright}• Testnet chains:${colors.reset}
     Request support by creating an issue at:
     ${colors.blue}https://github.com/EVVM-org/evvm-registry-contracts${colors.reset}
     
-  ${colors.bright}• Mainnet chains:${colors.reset}
+    ${colors.bright}• Mainnet chains:${colors.reset}
     EVVM currently does not support mainnet deployments, do it manually at you own risk.
     
-  ${colors.bright}• Local blockchains (Anvil/Hardhat):${colors.reset}
+    ${colors.bright}• Local blockchains (Anvil/Hardhat):${colors.reset}
     Use an unregistered chain ID.
     ${colors.darkGray}Example: Chain ID 31337 is registered, use 1337 instead.${colors.reset}`
-      );
-      return;
+        );
+        return;
     }
 
     verificationflag = await explorerVerification();
