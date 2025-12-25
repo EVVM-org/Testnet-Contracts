@@ -236,10 +236,32 @@ forge install hyperlane-xyz/hyperlane-monorepo  # For cross-chain functionality
 ## Repository Structure
 - `evvm` — CLI executable - Main entry point for all EVVM commands
 - `cli/` — CLI source code (TypeScript)
+  - `index.ts` — Main entry point and CLI initialization
   - `commands/` — Command implementations
-  - `utils/` — Utility functions (prompts, validation, Foundry integration)
+    - `deploy/` — Deployment command modules
+      - `deploySingle.ts` — Single-chain deployment
+      - `deployCross.ts` — Cross-chain deployment
+    - `register/` — Registration command modules
+      - `registerSingle.ts` — Single-chain registration
+      - `registerCross.ts` — Cross-chain registration
+    - `developer.ts` — Developer utilities
+    - `help.ts` — Help documentation
+    - `version.ts` — Version information
+    - `registerEvvm.ts` — EVVM registration logic
+    - `setUpCrossChainTreasuries.ts` — Cross-chain treasury setup
+  - `utils/` — Utility functions
+    - `configurationInputs.ts` — Configuration input handling
+    - `crossChain.ts` — Cross-chain utilities
+    - `explorerVerification.ts` — Block explorer contract verification
+    - `foundry.ts` — Foundry integration and scripts
+    - `prompts.ts` — Interactive CLI prompts
+    - `rpc.ts` — RPC endpoint management and fallback
+    - `validators.ts` — Input validation functions
   - `constants/` — CLI constants and configuration
+    - `ChainData.json` — Network and chain configuration data
+    - `index.ts` — Constants exports
   - `types/` — TypeScript type definitions
+    - `index.ts` — Type definitions
 - `src/contracts/evvm/` — Core EVVM contracts and storage
 - `src/contracts/nameService/` — NameService contracts for domain management
 - `src/contracts/staking/` — Staking and Estimator contracts
@@ -300,7 +322,7 @@ Want to create your own virtual blockchain? Follow these steps to deploy a compl
 
 ### 1. Clone and Install
 ```bash
-git clone https://github.com/EVVM-org/Testnet-Contracts
+git clone --recursive https://github.com/EVVM-org/Testnet-Contracts
 cd Testnet-Contracts
 make install
 ```
@@ -337,16 +359,30 @@ cp .env.example .env
 cast wallet import defaultKey --interactive
 ```
 
-### 5. Interactive Setup & Deploy
+### 5. Deploy Using the CLI
 
-Using the global CLI:
+The **recommended way** to deploy is using the EVVM CLI. You have two options:
+
+**Option A: Using Global CLI (Recommended - if you completed step 2)**
 ```bash
 evvm deploy
 ```
 
-Alternatively, using npm:
+**Option B: Using NPM from the repository directory**
 ```bash
 npm run wizard
+```
+
+**Option C: Using CLI with custom options**
+```bash
+# Skip interactive setup and use existing configuration
+evvm deploy --skipInputConfig
+
+# Deploy with a specific wallet
+evvm deploy --walletName myWallet
+
+# Combine options for quick deployment
+evvm deploy -s -w myWallet
 ```
 
 The interactive deployment wizard will guide you through:
