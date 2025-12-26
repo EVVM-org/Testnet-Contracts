@@ -49,7 +49,7 @@ export async function registerSingle(_args: string[], options: any) {
       )
     : EthSepoliaPublicRpc;
 
-  if (!(await verifyFoundryInstalledAndAccountSetup(walletName))) {
+  if (!(await verifyFoundryInstalledAndAccountSetup([walletName]))) {
     return;
   }
 
