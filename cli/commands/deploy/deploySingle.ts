@@ -87,7 +87,6 @@ export async function deploySingle(args: string[], options: any) {
       `${colors.darkGray}   Skipping host chain verification for local development${colors.reset}\n`
     );
   } else {
-    
     switch (await isChainIdRegistered(chainId)) {
       case undefined:
         showError(
@@ -131,62 +130,20 @@ export async function deploySingle(args: string[], options: any) {
     `${colors.bright}═══════════════════════════════════════${colors.reset}\n`
   );
 
-  const chainData = ChainData[chainId];
+  console.log(
+    ChainData[chainId]?.Chain
+      ? `${colors.blue} Deploying on ${ChainData[chainId].Chain} (${colors.darkGray}${chainId})${colors.reset}`
+      : `${colors.blue} Deploying on Chain ID:${colors.reset} ${chainId}`
+  );
 
-  // si encuentra el dato solo muestra deploying on ${ChainData.Chain} si no solo ${colors.blue} Chain ID:${colors.reset} ${chainId}
-  if (chainData)
-    console.log(
-      `${colors.blue} Deploying on ${chainData.Chain}  (${colors.darkGray}${chainId})${colors.reset}`
-    );
-  else
-    console.log(
-      `${colors.blue} Deploying on Chain ID:${colors.reset} ${chainId}`
-    );
-  
-  const verificationArgs = verificationflag
-      ? verificationflag.split(" ")
-      : [];
-
-  /*console.log(`${colors.evvmGreen}Starting deployment...${colors.reset}\n`);
-  try {
-    await $`forge clean`.quiet();
-
-    // Split verification flags into array to avoid treating them as a single argument
-    
-    const command = [
-      "forge",
-      "script",
+  if (
+    !(await forgeScript(
       "script/Deploy.s.sol:DeployScript",
-      "--via-ir",
-      "--optimize",
-      "true",
-      "--rpc-url",
       rpcUrl,
-      "--account",
-      "defaultKey",
-      ...verificationArgs,
-      "--broadcast",
-      "-vvvv",
-    ];
-
-    await $`${command}`;
-    console.log(
-      `\n${colors.green}✓ Deployment completed successfully!${colors.reset}`
-    );
-  } catch (error) {
-    showError(
-      "Deployment process encountered an error.",
-      "Please check the error message above for details."
-    );
-    return;
-  }*/
-
-  if (!await forgeScript(
-    "script/Deploy.s.sol:DeployScript",
-    rpcUrl,
-    walletName,
-    verificationArgs
-  )) {
+      walletName,
+      verificationflag ? verificationflag.split(" ") : []
+    ))
+  ) {
     return;
   }
 
