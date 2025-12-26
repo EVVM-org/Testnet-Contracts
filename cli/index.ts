@@ -62,13 +62,12 @@ async function main() {
       // general options
       help: { type: "boolean", short: "h" },
       version: { type: "boolean", short: "v" },
-      name: { type: "string", short: "n" },
       verbose: { type: "boolean" },
       crossChain: { type: "boolean", short: "c" },
       
       // general deploy command options
       skipInputConfig: { type: "boolean", short: "s" },
-      walletName: { type: "string", short: "w" },
+      walletName: { type: "string", short: "n" },
 
       // setUpCrossChainTreasuries command specific
       treasuryHostStationAddress: { type: "string"},
