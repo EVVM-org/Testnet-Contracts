@@ -71,8 +71,6 @@ export async function callRegisterEvvm(
     const result =
       await $`cast call ${RegisteryEvvmAddress} --rpc-url ${ethRpcUrl} "registerEvvm(uint256,address)(uint256)" ${hostChainId} ${evvmAddress} --account ${walletName}`.quiet();
 
-    //await $`cast send ${RegisteryEvvmAddress} --rpc-url ${ethRpcUrl} "registerEvvm(uint256,address)(uint256)" ${hostChainId} ${evvmAddress} --account  ${walletName}`;
-
     await castSend(
       RegisteryEvvmAddress as `0x${string}`,
       ethRpcUrl,
@@ -106,15 +104,6 @@ export async function callSetEvvmID(
   hostChainRpcUrl: string,
   walletName: string = "defaultKey"
 ): Promise<boolean> {
-  /*try {
-    await $`cast send ${contractAddress} --rpc-url ${hostChainRpcUrl} "setEvvmID(uint256)" ${evvmID} --account ${walletName} `;
-    console.log(
-      `${colors.evvmGreen}EVVM ID set successfully on the EVVM contract.${colors.reset}`
-    );
-    return true;
-  } catch (error) {
-    return false;
-  }*/
   return await castSend(
     contractAddress as `0x${string}`,
     hostChainRpcUrl,
@@ -142,36 +131,9 @@ export async function callConnectStations(
   externalWalletName: string = "defaultKey"
 ): Promise<boolean> {
   try {
-    /*const commandHost = [
-      "cast",
-      "send",
-      treasuryHostChainStationAddress,
-      "--rpc-url",
-      hostChainRpcUrl,
-      "_setExternalChainAddress(address,string)",
-      treasuryExternalChainAddress,
-      `"${getAddress(treasuryExternalChainAddress)}"`,
-      "--account",
-      hostWalletName,
-    ];
-
-    const commandExternal = [
-      "cast",
-      "send",
-      treasuryExternalChainAddress,
-      "--rpc-url",
-      externalChainRpcUrl,
-      "_setHostChainAddress(address,string)",
-      treasuryHostChainStationAddress,
-      `"${getAddress(treasuryHostChainStationAddress)}"`,
-      "--account",
-      externalWalletName,
-    ];*/
     console.log(
       `${colors.bright}→ Establishing connection: Host Station → External Station...${colors.reset}`
     );
-
-    //await $`${commandHost}`;
 
     await castSend(
       treasuryHostChainStationAddress as `0x${string}`,
@@ -191,8 +153,6 @@ export async function callConnectStations(
     console.log(
       `${colors.bright}→ Establishing connection: External Station → Host Station...${colors.reset}`
     );
-
-    //await $`${commandExternal}`;
 
     await castSend(
       treasuryExternalChainAddress as `0x${string}`,
