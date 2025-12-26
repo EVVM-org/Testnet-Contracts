@@ -70,7 +70,16 @@ export async function callRegisterEvvm(
   try {
     const result =
       await $`cast call ${RegisteryEvvmAddress} --rpc-url ${ethRpcUrl} "registerEvvm(uint256,address)(uint256)" ${hostChainId} ${evvmAddress} --account ${walletName}`.quiet();
-    await $`cast send ${RegisteryEvvmAddress} --rpc-url ${ethRpcUrl} "registerEvvm(uint256,address)(uint256)" ${hostChainId} ${evvmAddress} --account  ${walletName}`;
+
+    //await $`cast send ${RegisteryEvvmAddress} --rpc-url ${ethRpcUrl} "registerEvvm(uint256,address)(uint256)" ${hostChainId} ${evvmAddress} --account  ${walletName}`;
+
+    await castSend(
+      RegisteryEvvmAddress as `0x${string}`,
+      ethRpcUrl,
+      "registerEvvm(uint256,address)(uint256)",
+      [hostChainId.toString(), evvmAddress],
+      walletName
+    );
 
     const evvmID = result.stdout.toString().trim();
     return Number(evvmID);
@@ -97,7 +106,7 @@ export async function callSetEvvmID(
   hostChainRpcUrl: string,
   walletName: string = "defaultKey"
 ): Promise<boolean> {
-  try {
+  /*try {
     await $`cast send ${contractAddress} --rpc-url ${hostChainRpcUrl} "setEvvmID(uint256)" ${evvmID} --account ${walletName} `;
     console.log(
       `${colors.evvmGreen}EVVM ID set successfully on the EVVM contract.${colors.reset}`
@@ -105,7 +114,14 @@ export async function callSetEvvmID(
     return true;
   } catch (error) {
     return false;
-  }
+  }*/
+  return await castSend(
+    contractAddress as `0x${string}`,
+    hostChainRpcUrl,
+    "setEvvmID(uint256)",
+    [evvmID.toString()],
+    walletName
+  );
 }
 
 /**
@@ -126,7 +142,7 @@ export async function callConnectStations(
   externalWalletName: string = "defaultKey"
 ): Promise<boolean> {
   try {
-    const commandHost = [
+    /*const commandHost = [
       "cast",
       "send",
       treasuryHostChainStationAddress,
@@ -150,12 +166,23 @@ export async function callConnectStations(
       `"${getAddress(treasuryHostChainStationAddress)}"`,
       "--account",
       externalWalletName,
-    ];
+    ];*/
     console.log(
       `${colors.bright}→ Establishing connection: Host Station → External Station...${colors.reset}`
     );
 
-    await $`${commandHost}`;
+    //await $`${commandHost}`;
+
+    await castSend(
+      treasuryHostChainStationAddress as `0x${string}`,
+      hostChainRpcUrl,
+      "_setExternalChainAddress(address,string)",
+      [
+        treasuryExternalChainAddress,
+        `"${getAddress(treasuryExternalChainAddress)}"`,
+      ],
+      hostWalletName
+    );
 
     console.log(
       `${colors.green}✓ Host Station → External Station: Connection established${colors.reset}\n`
@@ -165,13 +192,91 @@ export async function callConnectStations(
       `${colors.bright}→ Establishing connection: External Station → Host Station...${colors.reset}`
     );
 
-    await $`${commandExternal}`;
+    //await $`${commandExternal}`;
+
+    await castSend(
+      treasuryExternalChainAddress as `0x${string}`,
+      externalChainRpcUrl,
+      "_setHostChainAddress(address,string)",
+      [
+        treasuryHostChainStationAddress,
+        `"${getAddress(treasuryHostChainStationAddress)}"`,
+      ],
+      externalWalletName
+    );
 
     console.log(
       `${colors.green}✓ External Station → Host Station: Connection established${colors.reset}\n`
     );
     return true;
   } catch (error) {
+    return false;
+  }
+}
+
+export async function castSend(
+  addressToCall: `0x${string}`,
+  rpcUrl: string,
+  functionSignature: string,
+  args: string[],
+  walletName: string = "defaultKey"
+): Promise<boolean> {
+  try {
+    const command = [
+      "cast",
+      "send",
+      addressToCall,
+      "--rpc-url",
+      rpcUrl,
+      functionSignature,
+      ...args,
+      "--account",
+      walletName,
+    ];
+
+    await $`${command}`;
+
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+export async function forgeScript(
+  scriptPath: string,
+  rpcUrl: string,
+  walletName: string = "defaultKey",
+  verificationArgs: string[] = []
+): Promise<boolean> {
+  try {
+    const command = [
+      "forge",
+      "script",
+      scriptPath,
+      "--via-ir",
+      "--optimize",
+      "true",
+      "--rpc-url",
+      rpcUrl,
+      "--account",
+      walletName,
+      ...verificationArgs,
+      "--broadcast",
+      "-vvvv",
+    ];
+    console.log(`${colors.evvmGreen}Starting deployment...${colors.reset}\n`);
+    await $`forge clean`.quiet();
+
+    await $`${command}`;
+    console.log(
+      `\n${colors.green}✓ Deployment completed successfully!${colors.reset}`
+    );
+    return true;
+  } catch (error) {
+    showError(
+      "Deployment process encountered an error.",
+      "Please check the error message above for details."
+    );
     return false;
   }
 }
