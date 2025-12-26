@@ -12,6 +12,7 @@ import { ChainData, colors } from "../../constants";
 import { promptYesNo } from "../../utils/prompts";
 import { showError } from "../../utils/validators";
 import {
+  forgeScript,
   isChainIdRegistered,
   showDeployContractsAndFindEvvm,
   verifyFoundryInstalledAndAccountSetup,
@@ -141,15 +142,17 @@ export async function deploySingle(args: string[], options: any) {
     console.log(
       `${colors.blue} Deploying on Chain ID:${colors.reset} ${chainId}`
     );
+  
+  const verificationArgs = verificationflag
+      ? verificationflag.split(" ")
+      : [];
 
-  console.log(`${colors.evvmGreen}Starting deployment...${colors.reset}\n`);
+  /*console.log(`${colors.evvmGreen}Starting deployment...${colors.reset}\n`);
   try {
     await $`forge clean`.quiet();
 
     // Split verification flags into array to avoid treating them as a single argument
-    const verificationArgs = verificationflag
-      ? verificationflag.split(" ")
-      : [];
+    
     const command = [
       "forge",
       "script",
@@ -175,6 +178,15 @@ export async function deploySingle(args: string[], options: any) {
       "Deployment process encountered an error.",
       "Please check the error message above for details."
     );
+    return;
+  }*/
+
+  if (!await forgeScript(
+    "script/Deploy.s.sol:DeployScript",
+    rpcUrl,
+    walletName,
+    verificationArgs
+  )) {
     return;
   }
 
