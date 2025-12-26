@@ -37,10 +37,10 @@ import { registerSingle } from "../register/registerSingle";
  * @returns {Promise<void>}
  */
 export async function deploySingle(args: string[], options: any) {
+  // --skipInputConfig -s
   const skipInputConfig = options.skipInputConfig || false;
+  // --walletName -n
   const walletName = options.walletName || "defaultKey";
-
-  let confirmationDone: boolean = false;
 
   let verificationflag: string | undefined = "";
 
@@ -55,7 +55,7 @@ export async function deploySingle(args: string[], options: any) {
   console.log("░▒▓████████▓▒░  ░▒▓██▓▒░     ░▒▓██▓▒░  ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ");
   console.log(`${colors.reset}`);
 
-  if (!(await verifyFoundryInstalledAndAccountSetup(walletName))) {
+  if (!(await verifyFoundryInstalledAndAccountSetup([walletName]))) {
     return;
   }
 
@@ -214,7 +214,11 @@ export async function deploySingle(args: string[], options: any) {
     `   ${colors.darkGray}Otherwise, you can register later using:${colors.reset}`
   );
   console.log(
-    `   ${colors.evvmGreen}evvm register --evvmAddress ${evvmAddress} --walletName ${walletName}${colors.reset}`
+    `   ${colors.evvmGreen}evvm register --evvmAddress ${evvmAddress} --walletName <walletName>${colors.reset}`
+  );
+  console.log("Or if you want to use your custom Ethereum Sepolia RPC:");
+  console.log(
+    `   ${colors.evvmGreen}evvm register --evvmAddress ${evvmAddress} --walletName <walletName> --useCustomEthRpc${colors.reset}`
   );
   console.log();
   console.log(
