@@ -11,20 +11,15 @@
  */
 
 import { $ } from "bun";
-import type {
-  CreatedContract,
-  ContractFileMetadata,
-} from "../types";
+import type { CreatedContract, ContractFileMetadata } from "../types";
 import {
   colors,
   EthSepoliaPublicRpc,
   RegisteryEvvmAddress,
   ChainData,
 } from "../constants";
-import {showError } from "./validators";
+import { showError } from "./validators";
 import { getAddress } from "viem/utils";
-
-
 
 /**
  * Checks if a chain ID is registered in the EVVM Registry
@@ -130,7 +125,6 @@ export async function callConnectStations(
   externalChainRpcUrl: string,
   externalWalletName: string = "defaultKey"
 ): Promise<boolean> {
-
   try {
     const commandHost = [
       "cast",
@@ -193,7 +187,7 @@ export async function callConnectStations(
  * @returns {Promise<boolean>} True if all prerequisites are met, false otherwise
  */
 export async function verifyFoundryInstalledAndAccountSetup(
-  walletName: string = "defaultKey"
+  walletNames: string[] = ["defaultKey"]
 ): Promise<boolean> {
   if (!(await foundryIsInstalled())) {
     showError(
@@ -203,13 +197,17 @@ export async function verifyFoundryInstalledAndAccountSetup(
     return false;
   }
 
-  if (!(await walletIsSetup(walletName))) {
-    showError(
-      `Wallet '${walletName}' is not available.`,
-      `Please import your wallet using:\n   ${colors.evvmGreen}cast wallet import ${walletName} --interactive${colors.reset}\n\n   You'll be prompted to enter your private key securely.`
-    );
-    return false;
+  const walletSetupResults = await walletIsSetup(walletNames);
+  for (let i = 0; i < walletNames.length; i++) {
+    if (!walletSetupResults[i]) {
+      showError(
+        `Wallet '${walletNames[i]}' is not available.`,
+        `Please import your wallet using:\n   ${colors.evvmGreen}cast wallet import ${walletNames[i]} --interactive${colors.reset}\n\n   You'll be prompted to enter your private key securely.`
+      );
+      return false;
+    }
   }
+
   return true;
 }
 
@@ -234,13 +232,17 @@ export async function foundryIsInstalled(): Promise<boolean> {
  * @returns {Promise<boolean>} True if wallet exists in keystore
  */
 export async function walletIsSetup(
-  walletName: string = "defaultKey"
-): Promise<boolean> {
+  walletNames: string[] = ["defaultKey"]
+): Promise<boolean[]> {
   let walletList = await $`cast wallet list`.quiet();
-  if (!walletList.stdout.includes(`${walletName} (Local)`)) {
-    return false;
-  }
-  return true;
+
+  const walletListStr = walletList.stdout.toString();
+
+  const results: boolean[] = walletNames.map((walletName) =>
+    walletListStr.includes(`${walletName} (Local)`)
+  );
+
+  return results;
 }
 
 /**
@@ -422,7 +424,6 @@ export async function showAllCrossChainDeployedContracts(
     treasuryExternalChainStationAddress,
   };
 }
-
 
 /**
  * Generates Solidity interfaces for EVVM contracts

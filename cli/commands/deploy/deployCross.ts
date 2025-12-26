@@ -41,8 +41,13 @@ import { registerCross } from "../register/registerCross";
  * @returns {Promise<void>}
  */
 export async function deployCross(args: string[], options: any) {
+  // --skipInputConfig -s
   const skipInputConfig = options.skipInputConfig || false;
-  const walletName = options.walletName || "defaultKey";
+  // --walletNameHost
+  const walletNameHost = options.walletNameHost || "defaultKey";
+  // --walletNameExternal
+  const walletNameExternal = options.walletNameExternal || "defaultKey";
+
 
   let externalRpcUrl: string | null = null;
   let externalChainId: number | null = null;
@@ -60,7 +65,7 @@ export async function deployCross(args: string[], options: any) {
   console.log("░▒▓████████▓▒░  ░▒▓██▓▒░     ░▒▓██▓▒░  ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ");
   console.log(`${colors.reset}`);
 
-  if (!(await verifyFoundryInstalledAndAccountSetup(walletName))) {
+  if (!(await verifyFoundryInstalledAndAccountSetup([walletNameHost, walletNameExternal]))) {
     return;
   }
 
@@ -272,8 +277,11 @@ export async function deployCross(args: string[], options: any) {
   console.log(`${colors.green}Host Station:     ${treasuryHostChainStationAddress}${colors.reset}`);
   console.log(`${colors.green}External Station: ${treasuryExternalChainStationAddress}${colors.reset}\n`);
 
-  console.log(`${colors.yellow}⚠ Important:${colors.reset} Admin addresses on both chains must match wallet ${colors.bright}'${walletName}'${colors.reset}`);
-  console.log(`${colors.darkGray}   → If not configured or mismatched: Skip setup and run commands manually later${colors.reset}`);
+  console.log(`${colors.yellow}⚠ Important:${colors.reset} Admin addresses on both chains must match each wallet used during deployment${colors.reset}`);
+  console.log(`${colors.yellow}  Host Chain Admin:     ${walletNameHost}${colors.reset}`);
+  console.log(`${colors.yellow}  External Chain Admin: ${walletNameExternal}${colors.reset}\n`);
+  console.log(`${colors.yellow}     → Mismatched admin addresses will prevent successful setup of cross-chain communication${colors.reset}\n`);
+  console.log(`${colors.darkGray}   → If mismatched: Skip setup and run commands manually later${colors.reset}`);
   console.log(`${colors.darkGray}   → If already matching: Proceed with setup now${colors.reset}\n`);
 
   console.log(`${colors.bright}Manual setup commands:${colors.reset}`);
@@ -307,8 +315,8 @@ export async function deployCross(args: string[], options: any) {
       treasuryHostChainStationAddress as `0x${string}`,
     treasuryExternalStationAddress:
       treasuryExternalChainStationAddress as `0x${string}`,
-    walletNameHost: walletName,
-    walletNameExternal: walletName,
+    walletNameHost: walletNameHost,
+    walletNameExternal: walletNameExternal,
   });
 
   console.log();
@@ -332,7 +340,8 @@ export async function deployCross(args: string[], options: any) {
   await registerCross([], {
     evvmAddress: evvmAddress,
     treasuryExternalStationAddress: treasuryExternalChainStationAddress,
-    walletName: walletName,
+    walletNameHost: walletNameHost,
+    walletNameExternal: walletNameExternal,
     useCustomEthRpc: ethRPCAns,
   });
 }

@@ -11,9 +11,8 @@ import { colors } from "../constants";
 import { promptAddress } from "../utils/prompts";
 import {
   callConnectStations,
-  foundryIsInstalled,
   isChainIdRegistered,
-  walletIsSetup,
+  verifyFoundryInstalledAndAccountSetup,
 } from "../utils/foundry";
 import { showError } from "../utils/validators";
 import { getRPCUrlAndChainId } from "../utils/rpc";
@@ -34,28 +33,19 @@ import { getRPCUrlAndChainId } from "../utils/rpc";
 export async function setUpCrossChainTreasuries(_args: string[], options: any) {
   console.log(`${colors.bright}Connecting cross-chain treasury stations...${colors.reset}\n`);
 
-  // Get values from optional flags
+  // --treasuryHostStationAddress
   let treasuryHostStationAddress: `0x${string}` | undefined =
     options.treasuryHostStationAddress;
+  // --treasuryExternalStationAddress
   let treasuryExternalStationAddress: `0x${string}` | undefined =
     options.treasuryExternalStationAddress;
+  // --walletNameHost
   let walletNameHost: string = options.walletNameHost || "defaultKey";
+  // --walletNameExternal
   let walletNameExternal: string = options.walletNameExternal || "defaultKey";
 
-  if (!(await foundryIsInstalled())) {
-    return showError(
-      "Foundry is not installed.",
-      "Please install Foundry to proceed with setup."
-    );
-  }
-
-  for (const walletName of [walletNameHost, walletNameExternal]) {
-    if (!(await walletIsSetup(walletName))) {
-      return showError(
-        `Wallet '${walletName}' is not available.`,
-        `Please import your wallet using:\n   ${colors.evvmGreen}cast wallet import ${walletName} --interactive${colors.reset}\n\n   You'll be prompted to enter your private key securely.`
-      );
-    }
+  if (!(await verifyFoundryInstalledAndAccountSetup([walletNameHost, walletNameExternal]))) {
+      return;
   }
 
   // Validate or prompt for missing values

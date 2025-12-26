@@ -38,7 +38,8 @@ export async function registerCross(_args: string[], options: any) {
   let evvmAddress: `0x${string}` | undefined = options.evvmAddress;
   let treasuryExternalStationAddress: `0x${string}` | undefined =
     options.treasuryExternalStationAddress;
-  let walletName: string = options.walletName || "defaultKey";
+  let walletNameHost: string = options.walletNameHost || "defaultKey";
+  let walletNameExternal: string = options.walletNameExternal || "defaultKey";
   let useCustomEthRpc: boolean = options.useCustomEthRpc || false;
 
   let ethRPC: string | undefined;
@@ -51,7 +52,7 @@ export async function registerCross(_args: string[], options: any) {
       )
     : EthSepoliaPublicRpc;
 
-  if (!(await verifyFoundryInstalledAndAccountSetup(walletName))) {
+  if (!(await verifyFoundryInstalledAndAccountSetup([walletNameHost, walletNameExternal]))) {
     return;
   }
 
@@ -106,7 +107,7 @@ export async function registerCross(_args: string[], options: any) {
   const evvmID: number | undefined = await callRegisterEvvm(
     Number(hostChainId),
     evvmAddress,
-    walletName,
+    walletNameHost,
     ethRPC
   );
   if (!evvmID) {
@@ -122,7 +123,7 @@ export async function registerCross(_args: string[], options: any) {
       evvmAddress as `0x${string}`,
       evvmID,
       hostRpcUrl,
-      walletName
+      walletNameHost
     ))
   ) {
     showError(`Failed to set EVVM ID on host chain.`);
@@ -133,7 +134,7 @@ export async function registerCross(_args: string[], options: any) {
       treasuryExternalStationAddress as `0x${string}`,
       evvmID,
       externalRpcUrl,
-      walletName
+      walletNameExternal
     ))
   ) {
     showError("Failed to set EVVM ID on external chain.");
