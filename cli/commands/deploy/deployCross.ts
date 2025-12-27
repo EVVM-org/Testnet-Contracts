@@ -262,7 +262,7 @@ export async function deployCross(args: string[], options: any) {
   console.log(`   ${colors.evvmGreen}  --walletName <wallet>${colors.reset}\n`);
 
   console.log(
-    `${colors.darkGray}More info: ${colors.blue}https://www.evvm.info/docs/QuickStart#7-register-in-registry-evvm${colors.reset}\n`
+    `${colors.darkGray}More info: ${colors.blue}https://www.evvm.info/docs/QuickStart#6-register-in-registry-evvm${colors.reset}\n`
   );
 
   if (
