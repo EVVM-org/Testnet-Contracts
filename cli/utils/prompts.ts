@@ -8,6 +8,7 @@
  */
 
 import { colors } from "../constants";
+import { isAddress } from "viem";
 
 /**
  * Prompts user for string input with optional default value
@@ -80,7 +81,7 @@ export function promptAddress(
     return defaultValue;
   }
 
-  if (!verifyAddress(input)) {
+  if (!isAddress(input || "")) {
     console.log(
       `${colors.red}Invalid address format. Please enter a valid Ethereum address.${colors.reset}`
     );
@@ -252,15 +253,4 @@ export async function promptSelect(
 
     process.stdin.on("data", onKeyPress);
   });
-}
-
-/**
- * Validates Ethereum address format
- * 
- * @param {string | null} address - Address to validate
- * @returns {boolean} True if address matches Ethereum address format
- */
-function verifyAddress(address: string | null): boolean {
-  if (!address) return false;
-  return /^0x[a-fA-F0-9]{40}$/.test(address);
 }
