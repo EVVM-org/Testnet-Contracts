@@ -25,6 +25,10 @@ import {
   warning,
 } from "./outputMesages";
 import { getAddress } from "viem/utils";
+import {
+  saveCrossChainDeploymentToJson,
+  saveDeploymentToJson,
+} from "./outputJson";
 
 /**
  * Checks if a chain ID is registered in the EVVM Registry
@@ -238,7 +242,10 @@ export async function shouldUseLegacy(rpcUrl: string): Promise<boolean> {
 
     // If baseFeePerGas is missing or 0, the network doesn't support EIP-1559
     if (!block.baseFeePerGas || block.baseFeePerGas === "0x0") {
-      warning("Using legacy transaction type", "Network doesn't support EIP-1559");
+      warning(
+        "Using legacy transaction type",
+        "Network doesn't support EIP-1559"
+      );
       return true;
     }
 
@@ -442,6 +449,13 @@ export async function showDeployContractsAndFindEvvm(
   });
   console.log();
 
+  await saveDeploymentToJson(
+    "evvmDeployment",
+    createdContracts,
+    chainId,
+    chainData?.Chain
+  );
+
   return (
     createdContracts.find(
       (contract: CreatedContract) => contract.contractName === "Evvm"
@@ -520,6 +534,16 @@ export async function showAllCrossChainDeployedContracts(
   });
 
   console.log();
+
+  await saveCrossChainDeploymentToJson(
+    "evvmCrossChainDeployment",
+    createdContractsHost,
+    chainIdHost,
+    chainNameHost,
+    createdContractsExternal,
+    chainIdExternal,
+    chainNameExternal
+  );
 
   if (chainNameExternal) {
     console.log(
