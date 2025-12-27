@@ -22,6 +22,7 @@ import {
   confirmation,
   criticalError,
   criticalErrorCustom,
+  warning,
 } from "./outputMesages";
 import { getAddress } from "viem/utils";
 
@@ -226,9 +227,7 @@ export async function shouldUseLegacy(rpcUrl: string): Promise<boolean> {
     const gasPrice = gasPriceResult.stdout.toString().trim();
 
     if (gasPrice === "0") {
-      console.log(
-        `${colors.yellow}⚠  Gas price is 0 - using legacy transaction type${colors.reset}`
-      );
+      warning("Using legacy transaction type", "Gas price is 0");
       return true;
     }
 
@@ -239,9 +238,7 @@ export async function shouldUseLegacy(rpcUrl: string): Promise<boolean> {
 
     // If baseFeePerGas is missing or 0, the network doesn't support EIP-1559
     if (!block.baseFeePerGas || block.baseFeePerGas === "0x0") {
-      console.log(
-        `${colors.yellow}⚠  Network doesn't support EIP-1559 - using legacy transaction type${colors.reset}`
-      );
+      warning("Using legacy transaction type", "Network doesn't support EIP-1559");
       return true;
     }
 
@@ -276,8 +273,9 @@ export async function detectEvmVersion(rpcUrl: string): Promise<string | null> {
     }
 
     // If no baseFeePerGas, likely pre-London
-    console.log(
-      `${colors.yellow}⚠  Network appears to be pre-London - using 'london' EVM version${colors.reset}`
+    warning(
+      "Network appears to be pre-London EVM version (no EIP-1559 support).",
+      "Using 'london' for compatibility"
     );
     return "london";
   } catch (error) {
