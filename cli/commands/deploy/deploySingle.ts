@@ -7,10 +7,8 @@
  * @module cli/commands/deploy
  */
 
-import { $ } from "bun";
 import { ChainData, colors } from "../../constants";
 import { promptYesNo } from "../../utils/prompts";
-import { showError } from "../../utils/validators";
 import {
   forgeScript,
   isChainIdRegistered,
@@ -21,6 +19,11 @@ import { getRPCUrlAndChainId } from "../../utils/rpc";
 import { explorerVerification } from "../../utils/explorerVerification";
 import { configurationBasic } from "../../utils/configurationInputs";
 import { registerSingle } from "../register/registerSingle";
+import {
+  chainIdNotSupported,
+  criticalError,
+  showEvvmLogo,
+} from "../../utils/outputMesages";
 
 /**
  * Deploys a complete EVVM instance with interactive configuration
@@ -46,35 +49,25 @@ export async function deploySingle(args: string[], options: any) {
   let verificationflag: string | undefined = "";
 
   // Banner
-  console.log(`${colors.evvmGreen}`);
-  console.log("░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓██████████████▓▒░  ");
-  console.log("░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ");
-  console.log("░▒▓█▓▒░       ░▒▓█▓▒▒▓█▓▒░ ░▒▓█▓▒▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ");
-  console.log("░▒▓██████▓▒░  ░▒▓█▓▒▒▓█▓▒░ ░▒▓█▓▒▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ");
-  console.log("░▒▓█▓▒░        ░▒▓█▓▓█▓▒░   ░▒▓█▓▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ");
-  console.log("░▒▓█▓▒░        ░▒▓█▓▓█▓▒░   ░▒▓█▓▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ");
-  console.log("░▒▓████████▓▒░  ░▒▓██▓▒░     ░▒▓██▓▒░  ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ");
-  console.log(`${colors.reset}`);
+  showEvvmLogo();
 
-  if (!(await verifyFoundryInstalledAndAccountSetup([walletName]))) {
-    return;
-  }
+  await verifyFoundryInstalledAndAccountSetup([walletName]);
 
   if (skipInputConfig) {
     console.log(
       `${colors.yellow}⚡ Skipping input configuration (using from ./input/BaseInputs.sol)...${colors.reset}\n`
     );
   } else {
-    if (!(await configurationBasic())) return;
-  }
+    await configurationBasic();
 
-  if (
-    promptYesNo(
-      `${colors.yellow}Proceed with deployment? (y/n):${colors.reset}`
-    ).toLowerCase() !== "y"
-  ) {
-    console.log(`\n${colors.red}✗ Deployment cancelled${colors.reset}`);
-    return;
+    if (
+      promptYesNo(
+        `${colors.yellow}Proceed with deployment? (y/n):${colors.reset}`
+      ).toLowerCase() !== "y"
+    ) {
+      console.log(`\n${colors.red}Deployment cancelled${colors.reset}`);
+      return;
+    }
   }
 
   const { rpcUrl, chainId } = await getRPCUrlAndChainId(process.env.RPC_URL);
@@ -87,39 +80,13 @@ export async function deploySingle(args: string[], options: any) {
       `${colors.darkGray}   Skipping host chain verification for local development${colors.reset}\n`
     );
   } else {
-    switch (await isChainIdRegistered(chainId)) {
-      case undefined:
-        showError(
-          `Chain ID ${chainId} is not supported.`,
-          `Please try again or if the issue persists, make an issue on GitHub.`
-        );
-        return;
-      case false:
-        showError(
-          `Host Chain ID ${chainId} is not supported.`,
-          `\n${colors.yellow}Possible solutions:${colors.reset}
-    ${colors.bright}• Testnet chains:${colors.reset}
-    Request support by creating an issue at:
-    ${colors.blue}https://github.com/EVVM-org/evvm-registry-contracts${colors.reset}
     
-    ${colors.bright}• Mainnet chains:${colors.reset}
-    EVVM currently does not support mainnet deployments, do it manually at you own risk.
-    
-    ${colors.bright}• Local blockchains (Anvil/Hardhat):${colors.reset}
-    Use an unregistered chain ID.
-    ${colors.darkGray}Example: Chain ID 31337 is registered, use 1337 instead.${colors.reset}`
-        );
-        return;
-    }
+    if (!(await isChainIdRegistered(chainId))) chainIdNotSupported(chainId);
 
     verificationflag = await explorerVerification();
-    if (verificationflag === undefined) {
-      showError(
-        `Explorer verification setup failed.`,
-        `Please try again or if the issue persists, make an issue on GitHub.`
-      );
-      return;
-    }
+
+    if (verificationflag === undefined)
+      criticalError(`Explorer verification setup failed.`);
   }
 
   console.log(
@@ -136,16 +103,12 @@ export async function deploySingle(args: string[], options: any) {
       : `${colors.blue} Deploying on Chain ID:${colors.reset} ${chainId}`
   );
 
-  if (
-    !(await forgeScript(
-      "script/Deploy.s.sol:DeployScript",
-      rpcUrl,
-      walletName,
-      verificationflag ? verificationflag.split(" ") : []
-    ))
-  ) {
-    return;
-  }
+  await forgeScript(
+    "script/Deploy.s.sol:DeployScript",
+    rpcUrl,
+    walletName,
+    verificationflag ? verificationflag.split(" ") : []
+  );
 
   const evvmAddress: `0x${string}` | null =
     await showDeployContractsAndFindEvvm(chainId);

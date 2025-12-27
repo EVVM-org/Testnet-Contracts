@@ -15,7 +15,7 @@ import {
   isChainIdRegistered,
   verifyFoundryInstalledAndAccountSetup,
 } from "../../utils/foundry";
-import { showError } from "../../utils/validators";
+import { chainIdNotSupported, criticalError } from "../../utils/outputMesages";
 import { getRPCUrlAndChainId } from "../../utils/rpc";
 
 /**
@@ -52,9 +52,10 @@ export async function registerCross(_args: string[], options: any) {
       )
     : EthSepoliaPublicRpc;
 
-  if (!(await verifyFoundryInstalledAndAccountSetup([walletNameHost, walletNameExternal]))) {
-    return;
-  }
+  await verifyFoundryInstalledAndAccountSetup([
+    walletNameHost,
+    walletNameExternal,
+  ]);
 
   // Validate or prompt for missing values
   evvmAddress ||= promptAddress(
@@ -78,31 +79,10 @@ export async function registerCross(_args: string[], options: any) {
     return;
   }
 
-  const isSupported = await isChainIdRegistered(hostChainId);
-  if (isSupported === undefined) {
-    showError(
-      `EVVM registration failed.`,
-      `Please try again or if the issue persists, make an issue on GitHub.`
-    );
-    return;
-  }
-  if (!isSupported) {
-    showError(
-      `Host Chain ID ${hostChainId} is not supported.`,
-      `\n${colors.yellow}Possible solutions:${colors.reset}
-  ${colors.bright}• Testnet chains:${colors.reset}
-    Request support by creating an issue at:
-    ${colors.blue}https://github.com/EVVM-org/evvm-registry-contracts${colors.reset}
-    
-  ${colors.bright}• Mainnet chains:${colors.reset}
-    EVVM currently does not support mainnet deployments.
-    
-  ${colors.bright}• Local blockchains (Anvil/Hardhat):${colors.reset}
-    Use an unregistered chain ID.
-    ${colors.darkGray}Example: Chain ID 31337 is registered, use 1337 instead.${colors.reset}`
-    );
-    return;
-  }
+  if (!(await isChainIdRegistered(hostChainId)))
+    chainIdNotSupported(hostChainId);
+  if (!(await isChainIdRegistered(externalChainId)))
+    chainIdNotSupported(externalChainId);
 
   const evvmID: number | undefined = await callRegisterEvvm(
     Number(hostChainId),
@@ -110,40 +90,33 @@ export async function registerCross(_args: string[], options: any) {
     walletNameHost,
     ethRPC
   );
-  if (!evvmID) {
-    showError("EVVM registration failed.");
-    return;
+
+  if (evvmID === undefined) {
+    criticalError(
+      `Failed to obtain EVVM ID for contract ${evvmAddress}.`
+    );
   }
   console.log(
     `${colors.green}Generated EVVM ID: ${colors.bright}${evvmID}${colors.reset}\n`
   );
 
-  if (
-    !(await callSetEvvmID(
-      evvmAddress as `0x${string}`,
-      evvmID,
-      hostRpcUrl,
-      walletNameHost
-    ))
-  ) {
-    showError(`Failed to set EVVM ID on host chain.`);
-  }
+  await callSetEvvmID(
+    evvmAddress as `0x${string}`,
+    evvmID!,
+    hostRpcUrl,
+    walletNameHost
+  );
 
-  if (
-    !(await callSetEvvmID(
-      treasuryExternalStationAddress as `0x${string}`,
-      evvmID,
-      externalRpcUrl,
-      walletNameExternal
-    ))
-  ) {
-    showError("Failed to set EVVM ID on external chain.");
-    return;
-  }
+  await callSetEvvmID(
+    treasuryExternalStationAddress as `0x${string}`,
+    evvmID!,
+    externalRpcUrl,
+    walletNameExternal
+  );
 
   console.log(`\n${colors.bright}Registration complete${colors.reset}\n`);
   console.log(
-    `${colors.green}EVVM ID:  ${colors.bright}${evvmID}${colors.reset}`
+    `${colors.green}EVVM ID:  ${colors.bright}${evvmID!}${colors.reset}`
   );
   console.log(`${colors.green}Contract: ${evvmAddress}${colors.reset}`);
   console.log(

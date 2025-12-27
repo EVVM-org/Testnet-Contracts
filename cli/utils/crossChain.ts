@@ -1,67 +1,43 @@
 import { ChainData as ChainDataConstant, colors } from "../constants";
 import type { ChainData } from "../types";
 import { isChainIdRegistered } from "./foundry";
-import { promptAddress, promptNumber, promptYesNo } from "./prompts";
-import { showError } from "./validators";
+import {
+  chainIdNotSupported,
+  criticalError,
+  criticalErrorCustom,
+  warningCrossChainSuportNotAvailable,
+} from "./outputMesages";
+import {
+  promptAddress,
+  promptNumber,
+  promptString,
+  promptYesNo,
+} from "./prompts";
 
 export async function checkCrossChainSupport(
   chainId: number
-): Promise<ChainData | undefined> {
+): Promise<ChainData> {
   if (chainId === 31337 || chainId === 1337) {
-    showError(
+    criticalErrorCustom(
       `Local blockchain detected (Chain ID: ${chainId}).`,
       `Please use a testnet host chain for cross-chain deployments.`
     );
-    return undefined;
-  } else {
-    const isSupported = await isChainIdRegistered(chainId);
-
-    if (isSupported === undefined) {
-      showError(
-        `Chain ID ${chainId} is not supported.`,
-        `Please try again or if the issue persists, make an issue on GitHub.`
-      );
-      return undefined;
-    }
-
-    if (!isSupported) {
-      showError(
-        `Host Chain ID ${chainId} is not supported.`,
-        `\n${colors.yellow}Possible solutions:${colors.reset}
-    ${colors.bright}• Testnet chains:${colors.reset}
-      Request support by creating an issue at:
-      ${colors.blue}https://github.com/EVVM-org/evvm-registry-contracts${colors.reset}
-      
-    ${colors.bright}• Mainnet chains:${colors.reset}
-      EVVM currently does not support mainnet deployments.
-      
-    ${colors.bright}• Local blockchains (Anvil/Hardhat):${colors.reset}
-      Use an unregistered chain ID.
-      ${colors.darkGray}Example: Chain ID 31337 is registered, use 1337 instead.${colors.reset}`
-      );
-      return undefined;
-    }
   }
+  if (!(await isChainIdRegistered(chainId))) chainIdNotSupported(chainId);
 
-  const chainData = ChainDataConstant[chainId];
+  if (!ChainDataConstant[chainId])
+    criticalError(`Chain ID ${chainId} data not found in ChainData.json`);
 
-  if (!chainData) {
-    showError(
-      `No chain data found for Chain ID ${chainId}.`,
-      `Please ensure the chain is supported and try again.`
-    );
-    return undefined;
-  }
+  const chainData: ChainData = ChainDataConstant[chainId]!;
 
   let auxChainData = chainData;
 
   if (chainData.Hyperlane.MailboxAddress == "") {
-    console.log(
-      `\n${colors.red}✗ Hyperlane support not available${colors.reset} on ${colors.blue}${chainData.Chain}${colors.reset} ${colors.darkGray}(${chainId})${colors.reset}`
-    );
-    console.log(`  ${colors.darkGray}Check availability at:${colors.reset}`);
-    console.log(
-      `  ${colors.darkGray}→ ${colors.blue}https://docs.hyperlane.xyz/docs/reference/addresses/deployments/mailbox#testnet${colors.reset}\n`
+    warningCrossChainSuportNotAvailable(
+      chainData.Chain,
+      chainId,
+      "Hyperlane",
+      "https://docs.hyperlane.xyz/docs/reference/addresses/deployments/mailbox#testnet"
     );
 
     if (
@@ -70,10 +46,14 @@ export async function checkCrossChainSupport(
       ) === "y"
     ) {
       auxChainData.Hyperlane.DomainId = promptNumber(
-        `${colors.yellow}Enter Hyperlane Domain ID for ${chainData.Chain} (${chainId}):${colors.reset} `
+        `${colors.yellow}Enter Hyperlane Domain ID for ${
+          chainData!.Chain
+        } (${chainId}):${colors.reset} `
       );
       auxChainData.Hyperlane.MailboxAddress = promptAddress(
-        `${colors.yellow}Enter Hyperlane Mailbox Address for ${chainData.Chain} (${chainId}):${colors.reset} `
+        `${colors.yellow}Enter Hyperlane Mailbox Address for ${
+          chainData!.Chain
+        } (${chainId}):${colors.reset} `
       );
     } else {
       if (
@@ -81,28 +61,35 @@ export async function checkCrossChainSupport(
           `${colors.yellow}Do you want to continue without adding Hyperlane data? (y/n):${colors.reset}`
         ) === "n"
       ) {
-        return undefined;
+        criticalErrorCustom(
+          `User opted to not add Hyperlane data.`,
+          `Cross-chain deployment cannot proceed without it.`
+        );
       }
     }
   }
-  if (chainData.LayerZero.EndpointAddress == "") {
-    console.log(
-      `\n${colors.red}✗ LayerZero support not available${colors.reset} on ${colors.blue}${chainData.Chain}${colors.reset} ${colors.darkGray}(${chainId})${colors.reset}`
+  if (chainData!.LayerZero.EndpointAddress == "") {
+    warningCrossChainSuportNotAvailable(
+      chainData!.Chain,
+      chainId,
+      "LayerZero",
+      "https://docs.layerzero.network/v2/deployments/deployed-contracts?stages=testnet"
     );
-    console.log(`  ${colors.darkGray}Check availability at:${colors.reset}`);
-    console.log(
-      `  ${colors.darkGray}→ ${colors.blue}https://docs.layerzero.network/v2/deployments/deployed-contracts?stages=testnet${colors.reset}\n`
-    );
+
     if (
       promptYesNo(
         `${colors.yellow}Do you want to add LayerZero data? (y/n):${colors.reset}`
       ) === "y"
     ) {
       auxChainData.LayerZero.EId = promptNumber(
-        `${colors.yellow}Enter LayerZero EId for ${chainData.Chain} (${chainId}):${colors.reset} `
+        `${colors.yellow}Enter LayerZero EId for ${
+          chainData!.Chain
+        } (${chainId}):${colors.reset} `
       );
       auxChainData.LayerZero.EndpointAddress = promptAddress(
-        `${colors.yellow}Enter LayerZero Endpoint Address for ${chainData.Chain} (${chainId}):${colors.reset} `
+        `${colors.yellow}Enter LayerZero Endpoint Address for ${
+          chainData!.Chain
+        } (${chainId}):${colors.reset} `
       );
     } else {
       if (
@@ -110,31 +97,40 @@ export async function checkCrossChainSupport(
           `${colors.yellow}Do you want to continue without adding LayerZero data? (y/n):${colors.reset}`
         ) === "n"
       ) {
-        return undefined;
+        criticalErrorCustom(
+          `User opted to not add LayerZero data.`,
+          `Cross-chain deployment cannot proceed without it.`
+        );
       }
     }
   }
-  if (chainData.Axelar.Gateway == "") {
-    console.log(
-      `\n${colors.red}✗ Axelar support not available${colors.reset} on ${colors.blue}${chainData.Chain}${colors.reset} ${colors.darkGray}(${chainId})${colors.reset}`
+  if (chainData!.Axelar.Gateway == "") {
+    warningCrossChainSuportNotAvailable(
+      chainData!.Chain,
+      chainId,
+      "Axelar",
+      "https://axelarscan.io/resources/chains?type=evm"
     );
-    console.log(`  ${colors.darkGray}Check availability at:${colors.reset}`);
-    console.log(
-      `  ${colors.darkGray}→ ${colors.blue}https://axelarscan.io/resources/chains?type=evm${colors.reset}\n`
-    );
+
     if (
       promptYesNo(
         `${colors.yellow}Do you want to add Axelar data? (y/n):${colors.reset}`
       ) === "y"
     ) {
-      auxChainData.Axelar.ChainName = promptAddress(
-        `${colors.yellow}Enter Axelar Chain Name for ${chainData.Chain} (${chainId}):${colors.reset} `
+      auxChainData.Axelar.ChainName = promptString(
+        `${colors.yellow}Enter Axelar Chain Name for ${
+          chainData!.Chain
+        } (${chainId}):${colors.reset} `
       );
       auxChainData.Axelar.Gateway = promptAddress(
-        `${colors.yellow}Enter Axelar Gateway Address for ${chainData.Chain} (${chainId}):${colors.reset} `
+        `${colors.yellow}Enter Axelar Gateway Address for ${
+          chainData!.Chain
+        } (${chainId}):${colors.reset} `
       );
       auxChainData.Axelar.GasService = promptAddress(
-        `${colors.yellow}Enter Axelar Gas Service Address for ${chainData.Chain} (${chainId}):${colors.reset} `
+        `${colors.yellow}Enter Axelar Gas Service Address for ${
+          chainData!.Chain
+        } (${chainId}):${colors.reset} `
       );
     } else {
       if (
@@ -142,7 +138,10 @@ export async function checkCrossChainSupport(
           `${colors.yellow}Do you want to continue without adding Axelar data? (y/n):${colors.reset}`
         ) === "n"
       ) {
-        return undefined;
+        criticalErrorCustom(
+          `User opted to not add Axelar data.`,
+          `Cross-chain deployment cannot proceed without it.`
+        );
       }
     }
   }
@@ -178,7 +177,9 @@ export async function checkCrossChainSupport(
         `${colors.yellow}Proceed with this configuration? (y/n):${colors.reset}`
       ) === "n"
     ) {
-      return undefined;
+      criticalError(
+        `User cancelled due to incomplete cross-chain configuration.`
+      );
     }
   }
 
