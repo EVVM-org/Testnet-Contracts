@@ -57,11 +57,30 @@ export async function getRPCUrlAndChainId(
  * @throws {Error} If RPC request fails
  */
 export async function getChainId(rpcUrl: string): Promise<number> {
+  // Prepare headers, supporting Basic Auth if the URL contains username:password
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  try {
+    const parsed = new URL(rpcUrl);
+    if (parsed.username) {
+      const user = decodeURIComponent(parsed.username);
+      const pass = decodeURIComponent(parsed.password);
+      // eliminar credenciales de la URL para la petición
+      parsed.username = "";
+      parsed.password = "";
+      rpcUrl = parsed.toString();
+
+      const basic = typeof Buffer !== "undefined"
+        ? Buffer.from(`${user}:${pass}`).toString("base64")
+        : btoa(`${user}:${pass}`);
+      headers["Authorization"] = `Basic ${basic}`;
+    }
+  } catch (err) {
+    // si rpcUrl no es una URL válida, seguimos intentando usarla tal cual
+  }
+
   const response = await fetch(rpcUrl, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
     body: JSON.stringify({
       jsonrpc: "2.0",
       method: "eth_chainId",
