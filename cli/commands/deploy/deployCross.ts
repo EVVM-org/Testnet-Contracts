@@ -1,10 +1,11 @@
 /**
- * EVVM Deployment Command
+ * Cross-Chain EVVM Deployment Command
  *
- * Comprehensive deployment wizard for EVVM ecosystem contracts.
- * Handles configuration, validation, deployment, verification, and registration.
+ * Comprehensive deployment wizard for EVVM ecosystem with cross-chain treasury support.
+ * Handles dual-chain deployment, configuration validation, cross-chain protocol setup
+ * (Hyperlane, LayerZero, Axelar), verification, and registration.
  *
- * @module cli/commands/deploy
+ * @module cli/commands/deploy/deployCross
  */
 
 import { $ } from "bun";
@@ -27,19 +28,35 @@ import { registerCross } from "../register/registerCross";
 import { criticalError, showEvvmLogo } from "../../utils/outputMesages";
 
 /**
- * Deploys a complete EVVM instance with interactive configuration for
- * cross-chain treasury support.
+ * Deploys a cross-chain EVVM instance with interactive configuration
  *
- * Deployment process:
- * 1. Validates prerequisites (Foundry, wallet)
- * 2. Collects deployment configuration (addresses, metadata)
- * 3. Validates target chain support
- * 4. Configures block explorer verification
- * 5. Deploys all EVVM contracts
- * 6. Optionally registers EVVM in registry
+ * Executes a dual-chain deployment workflow:
+ * 
+ * External Chain Deployment (TreasuryExternalChainStation.sol):
+ * - Cross-chain messaging endpoints for asset bridging
+ * 
+ * Host Chain Deployment:
+ * - TreasuryHostChainStation.sol (cross-chain treasury coordinator)
+ * - Evvm.sol (core protocol with cross-chain support)
+ * - Staking.sol (validator staking)
+ * - Estimator.sol (gas estimation)
+ * - NameService.sol (domain name resolution)
+ * - P2PSwap.sol (peer-to-peer token swaps)
+ * 
+ * Process:
+ * 1. Validates Foundry installation and both wallet accounts
+ * 2. Collects base configuration (addresses, metadata)
+ * 3. Collects cross-chain configuration (Hyperlane, LayerZero, Axelar)
+ * 4. Deploys external chain station contract
+ * 5. Deploys host chain contracts with cross-chain support
+ * 6. Optionally connects treasury stations for bidirectional communication
+ * 7. Optionally registers EVVM in registry with custom RPC support
  *
- * @param {string[]} args - Command arguments (unused)
- * @param {any} options - Command options including skipInputConfig, walletName
+ * @param {string[]} args - Command arguments (unused, reserved for future use)
+ * @param {any} options - Command options:
+ *   - skipInputConfig: Skip interactive config, use input files (default: false)
+ *   - walletNameHost: Foundry wallet for host chain (default: "defaultKey")
+ *   - walletNameExternal: Foundry wallet for external chain (default: "defaultKey")
  * @returns {Promise<void>}
  */
 export async function deployCross(args: string[], options: any) {

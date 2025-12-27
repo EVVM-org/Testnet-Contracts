@@ -1,10 +1,11 @@
 /**
- * EVVM Deployment Command
+ * Single-Chain EVVM Deployment Command
  *
- * Comprehensive deployment wizard for EVVM ecosystem contracts.
- * Handles configuration, validation, deployment, verification, and registration.
+ * Comprehensive deployment wizard for EVVM ecosystem contracts on a single blockchain.
+ * Handles configuration, validation, deployment, block explorer verification, and
+ * optional registration in the EVVM Registry.
  *
- * @module cli/commands/deploy
+ * @module cli/commands/deploy/deploySingle
  */
 
 import { ChainData, colors } from "../../constants";
@@ -28,16 +29,25 @@ import {
 /**
  * Deploys a complete EVVM instance with interactive configuration
  *
- * Deployment process:
- * 1. Validates prerequisites (Foundry, wallet)
- * 2. Collects deployment configuration (addresses, metadata)
- * 3. Validates target chain support
- * 4. Configures block explorer verification
- * 5. Deploys all EVVM contracts
- * 6. Optionally registers EVVM in registry
+ * Executes the full deployment workflow including:
+ * 1. Prerequisite validation (Foundry installation, wallet setup)
+ * 2. Interactive configuration collection (addresses, metadata) or skip with flag
+ * 3. Target chain support validation (skips for local chains 31337/1337)
+ * 4. Block explorer verification setup (disabled for local chains)
+ * 5. Forge script deployment of all EVVM contracts
+ * 6. Optional registration in EVVM Registry with custom RPC support
  *
- * @param {string[]} args - Command arguments (unused)
- * @param {any} options - Command options including skipInputConfig, walletName
+ * Deployed contracts:
+ * - Evvm.sol (core protocol)
+ * - Staking.sol (validator staking)
+ * - Estimator.sol (gas estimation)
+ * - NameService.sol (domain name resolution)
+ * - P2PSwap.sol (peer-to-peer token swaps)
+ *
+ * @param {string[]} args - Command arguments (unused, reserved for future use)
+ * @param {any} options - Command options:
+ *   - skipInputConfig: Skip interactive config, use BaseInputs.sol file (default: false)
+ *   - walletName: Foundry wallet account name to use (default: "defaultKey")
  * @returns {Promise<void>}
  */
 export async function deploySingle(args: string[], options: any) {

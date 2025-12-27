@@ -1,6 +1,24 @@
+/**
+ * Output formatting utilities for the EVVM CLI
+ * 
+ * Provides standardized error, warning, and confirmation message formatting
+ * with color support for enhanced terminal output readability.
+ * 
+ * @module cli/utils/outputMesages
+ */
+
 import { colors } from "../constants";
 import type { BaseInputAddresses, ChainData, CrossChainInputs, EvvmMetadata } from "../types";
 
+/**
+ * Displays a critical error message and exits the process
+ * 
+ * Prints a formatted error message with GitHub issue link for support,
+ * then terminates the CLI with exit code 1.
+ * 
+ * @param {string} message - Error description to display
+ * @returns {never} - Function never returns (process exits)
+ */
 export function criticalError(message: string) {
   console.error(`${colors.red}🯀   Critical Error ${message}${colors.reset}`);
   console.log(
@@ -13,6 +31,16 @@ export function criticalError(message: string) {
   process.exit(1);
 }
 
+/**
+ * Displays a critical error with custom message and exits the process
+ * 
+ * Similar to criticalError but allows an additional custom message
+ * to be displayed before terminating the CLI.
+ * 
+ * @param {string} message - Main error description
+ * @param {string} extraMessage - Additional context or instructions
+ * @returns {never} - Function never returns (process exits)
+ */
 export function criticalErrorCustom(message: string, extraMessage: string) {
   console.error(`${colors.red}🯀   Critical Error: ${message}${colors.reset}`);
   if (extraMessage) {
@@ -21,6 +49,16 @@ export function criticalErrorCustom(message: string, extraMessage: string) {
   process.exit(1);
 }
 
+/**
+ * Displays a non-fatal error message
+ * 
+ * Prints a formatted error message without terminating the CLI process,
+ * allowing recovery or continuation with user intervention.
+ * 
+ * @param {string} message - Error description
+ * @param {string} [extraMessage=""] - Optional additional context
+ * @returns {void}
+ */
 export function error(message: string, extraMessage: string = "") {
   console.error(`${colors.red}🯀   Error: ${message}${colors.reset}`);
   if (extraMessage) {
@@ -28,6 +66,16 @@ export function error(message: string, extraMessage: string = "") {
   }
 }
 
+/**
+ * Displays a warning message
+ * 
+ * Prints a formatted warning message to indicate potential issues
+ * or important information that doesn't require termination.
+ * 
+ * @param {string} message - Warning description
+ * @param {string} [extraMessage=""] - Optional additional context
+ * @returns {void}
+ */
 export function warning(message: string, extraMessage: string = "") {
   console.warn(`${colors.yellow}⚠   Warning: ${message}${colors.reset}`);
   if (extraMessage) {
@@ -35,10 +83,32 @@ export function warning(message: string, extraMessage: string = "") {
   }
 }
 
+/**
+ * Displays a success confirmation message
+ * 
+ * Prints a formatted confirmation message with a checkmark symbol
+ * to indicate successful completion of an operation.
+ * 
+ * @param {string} message - Confirmation message to display
+ * @returns {void}
+ */
 export function confirmation(message: string) {
   console.log(`${colors.evvmGreen}✓  ${message}${colors.reset}`);
 }
 
+/**
+ * Displays a warning about cross-chain protocol unavailability
+ * 
+ * Prints a formatted warning when a specific cross-chain protocol
+ * (Hyperlane, LayerZero, or Axelar) is not available on a target chain.
+ * Optionally includes a URL for checking protocol availability.
+ * 
+ * @param {string} chainName - Name of the blockchain network
+ * @param {number} chainId - Chain ID of the network
+ * @param {string} [crossChainProtocol="Cross-chain protocol"] - Name of the protocol
+ * @param {string} [url=""] - Optional URL for availability information
+ * @returns {void}
+ */
 export function warningCrossChainSuportNotAvailable(
   chainName: string,
   chainId: number,
@@ -56,6 +126,20 @@ export function warningCrossChainSuportNotAvailable(
   }
 }
 
+/**
+ * Displays a chain ID not supported error and exits
+ * 
+ * Shows a detailed error message when attempting to deploy on an unsupported
+ * chain ID, including guidance for:
+ * - Testnet chains: Request support via GitHub issue
+ * - Mainnet chains: EVVM mainnet limitations warning
+ * - Local blockchains: Use alternative unregistered chain IDs
+ * 
+ * Terminates the CLI with exit code 406 (Not Acceptable).
+ * 
+ * @param {number} chainId - Unsupported chain ID
+ * @returns {never} - Function never returns (process exits)
+ */
 export function chainIdNotSupported(chainId: number) {
   console.error(
     `${colors.red}Host Chain ID ${chainId} is not supported.,${colors.reset}`
@@ -76,6 +160,14 @@ export function chainIdNotSupported(chainId: number) {
   process.exit(406);
 }
 
+/**
+ * Displays the EVVM ASCII logo
+ * 
+ * Prints the EVVM branded ASCII art logo in green color
+ * to the console as a banner for CLI startup or major operations.
+ * 
+ * @returns {void}
+ */
 export function showEvvmLogo() {
   console.log(`${colors.evvmGreen}`);
   console.log("░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓██████████████▓▒░  ");
@@ -89,6 +181,19 @@ export function showEvvmLogo() {
 }
 
 
+/**
+ * Displays a formatted summary of base configuration settings
+ * 
+ * Prints a comprehensive overview of:
+ * - All configured contract addresses (Admin, Validator, Router, etc.)
+ * - EVVM metadata (name, symbol, swap fee, decimals, etc.)
+ * 
+ * Uses formatted table-like output with colored labels for readability.
+ * 
+ * @param {BaseInputAddresses} addresses - Contract addresses configuration
+ * @param {EvvmMetadata} evvmMetadata - EVVM token and protocol metadata
+ * @returns {void}
+ */
 export function baseConfigurationSummary(
   addresses: BaseInputAddresses,
   evvmMetadata: EvvmMetadata 
@@ -124,6 +229,22 @@ export function baseConfigurationSummary(
 }
 
 
+/**
+ * Displays a formatted summary of cross-chain configuration settings
+ * 
+ * Prints a comprehensive overview of cross-chain protocol configurations for:
+ * - External chain admin address
+ * - Host Chain Station: Hyperlane, LayerZero, and Axelar settings
+ * - External Chain Station: Hyperlane, LayerZero, and Axelar settings
+ * 
+ * Includes domain IDs, endpoint addresses, chain names, and gateway configurations
+ * for all supported cross-chain messaging protocols.
+ * 
+ * @param {ChainData} externalChainData - Metadata for external blockchain
+ * @param {ChainData} hostChainData - Metadata for host blockchain
+ * @param {CrossChainInputs} crossChainInputs - Cross-chain protocol configurations
+ * @returns {void}
+ */
 export function crossChainConfigurationSummary(
   externalChainData: ChainData,
   hostChainData: ChainData,

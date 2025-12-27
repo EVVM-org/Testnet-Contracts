@@ -1,10 +1,10 @@
 /**
- * EVVM Registration Command
+ * Cross-Chain Treasury Connection Command
  *
- * Handles registration of deployed EVVM instances in the EVVM Registry.
- * Performs chain validation, generates EVVM ID, and updates the contract.
+ * Establishes bidirectional communication between host and external chain
+ * treasury stations for cross-chain asset management in EVVM deployments.
  *
- * @module cli/commands/registerEvvm
+ * @module cli/commands/setUpCrossChainTreasuries
  */
 
 import { colors } from "../constants";
@@ -18,16 +18,24 @@ import { chainIdNotSupported } from "../utils/outputMesages";
 import { getRPCUrlAndChainId } from "../utils/rpc";
 
 /**
- * Registers an EVVM instance in the registry contract
+ * Connects host and external chain treasury stations for cross-chain operations
  *
+ * This command establishes the communication link between TreasuryHostChainStation
+ * and TreasuryExternalChainStation contracts, enabling cross-chain asset transfers
+ * and liquidity management across the EVVM deployment.
+ * 
  * Process:
- * 1. Validates Foundry installation and wallet setup
- * 2. Verifies EVVM address and host chain support
- * 3. Calls registry contract to obtain EVVM ID
- * 4. Updates EVVM contract with assigned ID
+ * 1. Validates Foundry installation and both wallet accounts
+ * 2. Prompts for treasury station addresses if not provided
+ * 3. Validates both host and external chain IDs are supported
+ * 4. Calls connectStations on both contracts to establish bidirectional link
  *
  * @param {string[]} _args - Command arguments (unused)
- * @param {any} options - Command options including evvmAddress, walletName, useCustomEthRpc
+ * @param {any} options - Command options including:
+ *   - treasuryHostStationAddress: Address of host chain station contract
+ *   - treasuryExternalStationAddress: Address of external chain station contract
+ *   - walletNameHost: Wallet name for host chain (default: "defaultKey")
+ *   - walletNameExternal: Wallet name for external chain (default: "defaultKey")
  * @returns {Promise<void>}
  */
 export async function setUpCrossChainTreasuries(_args: string[], options: any) {
