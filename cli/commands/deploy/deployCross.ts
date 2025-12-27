@@ -10,10 +10,11 @@
 import { $ } from "bun";
 import { ChainData, colors } from "../../constants";
 import { promptYesNo } from "../../utils/prompts";
-import { showError } from "../../utils/validators";
+
 import {
   verifyFoundryInstalledAndAccountSetup,
   showAllCrossChainDeployedContracts,
+  forgeScript,
 } from "../../utils/foundry";
 import { getRPCUrlAndChainId } from "../../utils/rpc";
 import { explorerVerification } from "../../utils/explorerVerification";
@@ -23,6 +24,7 @@ import {
   configurationCrossChain,
 } from "../../utils/configurationInputs";
 import { registerCross } from "../register/registerCross";
+import { criticalError, showEvvmLogo } from "../../utils/outputMesages";
 
 /**
  * Deploys a complete EVVM instance with interactive configuration for
@@ -48,26 +50,18 @@ export async function deployCross(args: string[], options: any) {
   // --walletNameExternal
   const walletNameExternal = options.walletNameExternal || "defaultKey";
 
-
   let externalRpcUrl: string | null = null;
   let externalChainId: number | null = null;
   let hostRpcUrl: string | null = null;
   let hostChainId: number | null = null;
 
   // Banner
-  console.log(`${colors.evvmGreen}`);
-  console.log("░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓██████████████▓▒░  ");
-  console.log("░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ");
-  console.log("░▒▓█▓▒░       ░▒▓█▓▒▒▓█▓▒░ ░▒▓█▓▒▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ");
-  console.log("░▒▓██████▓▒░  ░▒▓█▓▒▒▓█▓▒░ ░▒▓█▓▒▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ");
-  console.log("░▒▓█▓▒░        ░▒▓█▓▓█▓▒░   ░▒▓█▓▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ");
-  console.log("░▒▓█▓▒░        ░▒▓█▓▓█▓▒░   ░▒▓█▓▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ");
-  console.log("░▒▓████████▓▒░  ░▒▓██▓▒░     ░▒▓██▓▒░  ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ");
-  console.log(`${colors.reset}`);
+  showEvvmLogo();
 
-  if (!(await verifyFoundryInstalledAndAccountSetup([walletNameHost, walletNameExternal]))) {
-    return;
-  }
+  await verifyFoundryInstalledAndAccountSetup([
+    walletNameHost,
+    walletNameExternal,
+  ]);
 
   if (skipInputConfig) {
     console.log(
@@ -87,7 +81,9 @@ export async function deployCross(args: string[], options: any) {
     ));
   } else {
     console.log(`\n${colors.bright}Base Configuration:${colors.reset}\n`);
-    if (!(await configurationBasic())) return;
+
+    await configurationBasic();
+
     console.log(
       `\n${colors.bright}Cross-Chain Configuration:${colors.reset}\n`
     );
@@ -101,13 +97,8 @@ export async function deployCross(args: string[], options: any) {
     hostChainId = ccConfig.hostChainId;
   }
 
-  if (!externalRpcUrl && !externalChainId && !hostRpcUrl && !hostChainId) {
-    showError(
-      "Failed to write inputs file.",
-      `Please try again. If the issue persists, create an issue on GitHub:\n${colors.blue}https://github.com/EVVM-org/Playgrounnd-Contracts/issues${colors.reset}`
-    );
-    return;
-  }
+  if (!externalRpcUrl && !externalChainId && !hostRpcUrl && !hostChainId)
+    criticalError("RPC URLs and Chain IDs must be provided.");
 
   if (
     promptYesNo(
@@ -119,18 +110,15 @@ export async function deployCross(args: string[], options: any) {
   }
 
   const verificationflagHost = await explorerVerification("Host Chain:");
-  if (verificationflagHost === undefined) {
-    showError("Explorer verification setup failed.");
-    return;
-  }
+  if (verificationflagHost === undefined)
+    criticalError("Explorer verification setup failed.");
 
   const verificationflagExternal = await explorerVerification(
     "External Chain:"
   );
-  if (verificationflagExternal === undefined) {
-    showError("Explorer verification setup failed.");
-    return;
-  }
+
+  if (verificationflagExternal === undefined)
+    criticalError("Explorer verification setup failed.");
 
   console.log(
     `\n${colors.bright}═══════════════════════════════════════${colors.reset}`
@@ -154,39 +142,12 @@ export async function deployCross(args: string[], options: any) {
     `  ${colors.green}•${colors.reset} Treasury cross-chain contract  ${colors.darkGray}(TreasuryExternalChainStation.sol)${colors.reset}\n`
   );
 
-  try {
-    await $`forge clean`.quiet();
-
-    // Split verification flags into array to avoid treating them as a single argument
-    const verificationExternalArgs = verificationflagExternal
-      ? verificationflagExternal.split(" ")
-      : [];
-    const commandExternal = [
-      "forge",
-      "script",
-      "script/DeployCrossChainExternal.s.sol:DeployCrossChainExternalScript",
-      "--via-ir",
-      "--optimize",
-      "true",
-      "--rpc-url",
-      externalRpcUrl,
-      "--account",
-      walletNameExternal,
-      ...verificationExternalArgs,
-      "--broadcast",
-      "-vvvv",
-    ];
-    await $`${commandExternal}`;
-    console.log(
-      `\n${colors.green}✓ Deployment on external chain completed successfully!${colors.reset}`
-    );
-  } catch (error) {
-    showError(
-      "Deployment process encountered an error.",
-      "Please check the error message above for details."
-    );
-    return;
-  }
+  forgeScript(
+    "script/DeployCrossChainExternal.s.sol:DeployCrossChainExternalScript",
+    externalRpcUrl!,
+    walletNameExternal,
+    verificationflagExternal ? verificationflagExternal.split(" ") : []
+  );
 
   const chainDataHost = ChainData[hostChainId!];
   if (chainDataHost)
@@ -217,39 +178,12 @@ export async function deployCross(args: string[], options: any) {
     `  ${colors.green}•${colors.reset} P2P Swap service ${colors.darkGray}(P2PSwap.sol)${colors.reset}\n`
   );
 
-  try {
-    await $`forge clean`.quiet();
-
-    // Split verification flags into array to avoid treating them as a single argument
-    const verificationHostArgs = verificationflagHost
-      ? verificationflagHost.split(" ")
-      : [];
-    const commandHost = [
-      "forge",
-      "script",
-      "script/DeployCrossChainHost.s.sol:DeployCrossChainHostScript",
-      "--via-ir",
-      "--optimize",
-      "true",
-      "--rpc-url",
-      hostRpcUrl,
-      "--account",
-      walletNameHost,
-      ...verificationHostArgs,
-      "--broadcast",
-      "-vvvv",
-    ];
-    await $`${commandHost}`;
-    console.log(
-      `\n${colors.green}✓ Deployment on host chain completed successfully!${colors.reset}`
-    );
-  } catch (error) {
-    showError(
-      "Deployment process encountered an error.",
-      "Please check the error message above for details."
-    );
-    return;
-  }
+  forgeScript(
+    "script/DeployCrossChainHost.s.sol:DeployCrossChainHostScript",
+    hostRpcUrl!,
+    walletNameHost,
+    verificationflagHost ? verificationflagHost.split(" ") : []
+  );
 
   const {
     evvmAddress,
@@ -266,39 +200,69 @@ export async function deployCross(args: string[], options: any) {
   console.log(
     `\n${colors.bright}═══════════════════════════════════════${colors.reset}`
   );
-  console.log(
-    `${colors.bright}          Deployment Complete${colors.reset}`
-  );
+  console.log(`${colors.bright}          Deployment Complete${colors.reset}`);
   console.log(
     `${colors.bright}═══════════════════════════════════════${colors.reset}\n`
   );
 
   console.log(`${colors.green}EVVM:             ${evvmAddress}${colors.reset}`);
-  console.log(`${colors.green}Host Station:     ${treasuryHostChainStationAddress}${colors.reset}`);
-  console.log(`${colors.green}External Station: ${treasuryExternalChainStationAddress}${colors.reset}\n`);
+  console.log(
+    `${colors.green}Host Station:     ${treasuryHostChainStationAddress}${colors.reset}`
+  );
+  console.log(
+    `${colors.green}External Station: ${treasuryExternalChainStationAddress}${colors.reset}\n`
+  );
 
-  console.log(`${colors.yellow}⚠ Important:${colors.reset} Admin addresses on both chains must match each wallet used during deployment${colors.reset}`);
-  console.log(`${colors.yellow}  Host Chain Admin:     ${walletNameHost}${colors.reset}`);
-  console.log(`${colors.yellow}  External Chain Admin: ${walletNameExternal}${colors.reset}\n`);
-  console.log(`${colors.yellow}     → Mismatched admin addresses will prevent successful setup of cross-chain communication${colors.reset}\n`);
-  console.log(`${colors.darkGray}   → If mismatched: Skip setup and run commands manually later${colors.reset}`);
-  console.log(`${colors.darkGray}   → If already matching: Proceed with setup now${colors.reset}\n`);
+  console.log(
+    `${colors.yellow}⚠ Important:${colors.reset} Admin addresses on both chains must match each wallet used during deployment${colors.reset}`
+  );
+  console.log(
+    `${colors.yellow}  Host Chain Admin:     ${walletNameHost}${colors.reset}`
+  );
+  console.log(
+    `${colors.yellow}  External Chain Admin: ${walletNameExternal}${colors.reset}\n`
+  );
+  console.log(
+    `${colors.yellow}     → Mismatched admin addresses will prevent successful setup of cross-chain communication${colors.reset}\n`
+  );
+  console.log(
+    `${colors.darkGray}   → If mismatched: Skip setup and run commands manually later${colors.reset}`
+  );
+  console.log(
+    `${colors.darkGray}   → If already matching: Proceed with setup now${colors.reset}\n`
+  );
 
   console.log(`${colors.bright}Manual setup commands:${colors.reset}`);
   console.log(`${colors.darkGray}1. Cross-chain communication:${colors.reset}`);
-  console.log(`   ${colors.evvmGreen}evvm setUpCrossChainTreasuries \\${colors.reset}`);
-  console.log(`   ${colors.evvmGreen}  --treasuryHostStationAddress ${treasuryHostChainStationAddress} \\${colors.reset}`);
-  console.log(`   ${colors.evvmGreen}  --treasuryExternalStationAddress ${treasuryExternalChainStationAddress} \\${colors.reset}`);
-  console.log(`   ${colors.evvmGreen}  --walletNameHost <wallet> --walletNameExternal <wallet>${colors.reset}\n`);
+  console.log(
+    `   ${colors.evvmGreen}evvm setUpCrossChainTreasuries \\${colors.reset}`
+  );
+  console.log(
+    `   ${colors.evvmGreen}  --treasuryHostStationAddress ${treasuryHostChainStationAddress} \\${colors.reset}`
+  );
+  console.log(
+    `   ${colors.evvmGreen}  --treasuryExternalStationAddress ${treasuryExternalChainStationAddress} \\${colors.reset}`
+  );
+  console.log(
+    `   ${colors.evvmGreen}  --walletNameHost <wallet> --walletNameExternal <wallet>${colors.reset}\n`
+  );
 
   console.log(`${colors.darkGray}2. EVVM registration:${colors.reset}`);
-  console.log(`   ${colors.evvmGreen}evvm registerCrossChain \\${colors.reset}`);
-  console.log(`   ${colors.evvmGreen}  --evvmAddress ${evvmAddress} \\${colors.reset}`);
-  console.log(`   ${colors.evvmGreen}  --treasuryExternalStationAddress ${treasuryExternalChainStationAddress} \\${colors.reset}`);
+  console.log(
+    `   ${colors.evvmGreen}evvm registerCrossChain \\${colors.reset}`
+  );
+  console.log(
+    `   ${colors.evvmGreen}  --evvmAddress ${evvmAddress} \\${colors.reset}`
+  );
+  console.log(
+    `   ${colors.evvmGreen}  --treasuryExternalStationAddress ${treasuryExternalChainStationAddress} \\${colors.reset}`
+  );
   console.log(`   ${colors.evvmGreen}  --walletName <wallet>${colors.reset}\n`);
 
-  console.log(`${colors.darkGray}More info: ${colors.blue}https://www.evvm.info/docs/QuickStart#7-register-in-registry-evvm${colors.reset}\n`);
-  
+  console.log(
+    `${colors.darkGray}More info: ${colors.blue}https://www.evvm.info/docs/QuickStart#7-register-in-registry-evvm${colors.reset}\n`
+  );
+
   if (
     promptYesNo(
       `${colors.yellow}Do you want to set up cross-chain communication now? (y/n):${colors.reset}`

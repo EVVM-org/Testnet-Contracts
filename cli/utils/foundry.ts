@@ -18,7 +18,11 @@ import {
   RegisteryEvvmAddress,
   ChainData,
 } from "../constants";
-import { showError } from "./validators";
+import {
+  confirmation,
+  criticalError,
+  criticalErrorCustom,
+} from "./outputMesages";
 import { getAddress } from "viem/utils";
 
 /**
@@ -30,23 +34,18 @@ import { getAddress } from "viem/utils";
  * @param {number} chainId - The chain ID to check
  * @returns {Promise<boolean | undefined>} True if registered, false if not, undefined on error
  */
-export async function isChainIdRegistered(
-  chainId: number
-): Promise<boolean | undefined> {
+export async function isChainIdRegistered(chainId: number): Promise<boolean> {
+  let isSupported: boolean = false;
   const ethRpcUrl =
     process.env.EVVM_REGISTRATION_RPC_URL?.trim() || EthSepoliaPublicRpc;
   try {
     const result =
       await $`cast call ${RegisteryEvvmAddress} --rpc-url ${ethRpcUrl} "isChainIdRegistered(uint256)(bool)" ${chainId}`.quiet();
-    const isSupported = result.stdout.toString().trim() === "true";
-    return isSupported;
+    isSupported = result.stdout.toString().trim() === "true";
   } catch (error) {
-    console.error(
-      `${colors.red}Error checking chain ID support:${colors.reset}`,
-      error
-    );
-    return undefined;
+    criticalError(`Failed to check chain ID ${chainId} registration status.`);
   }
+  return isSupported;
 }
 
 /**
@@ -67,6 +66,7 @@ export async function callRegisterEvvm(
   walletName: string = "defaultKey",
   ethRpcUrl: string = EthSepoliaPublicRpc
 ): Promise<number | undefined> {
+  let evvmID: string = "";
   try {
     const result =
       await $`cast call ${RegisteryEvvmAddress} --rpc-url ${ethRpcUrl} "registerEvvm(uint256,address)(uint256)" ${hostChainId} ${evvmAddress} --account ${walletName}`.quiet();
@@ -79,10 +79,11 @@ export async function callRegisterEvvm(
       walletName
     );
 
-    const evvmID = result.stdout.toString().trim();
+    evvmID = result.stdout.toString().trim();
+
     return Number(evvmID);
   } catch (error) {
-    return undefined;
+    criticalError(`Failed to register EVVM on chain ID ${hostChainId}.`);
   }
 }
 
@@ -103,14 +104,21 @@ export async function callSetEvvmID(
   evvmID: number,
   hostChainRpcUrl: string,
   walletName: string = "defaultKey"
-): Promise<boolean> {
-  return await castSend(
-    contractAddress as `0x${string}`,
-    hostChainRpcUrl,
-    "setEvvmID(uint256)",
-    [evvmID.toString()],
-    walletName
-  );
+) {
+  try {
+    await castSend(
+      contractAddress as `0x${string}`,
+      hostChainRpcUrl,
+      "setEvvmID(uint256)",
+      [evvmID.toString()],
+      walletName
+    );
+  } catch (error) {
+    criticalErrorCustom(
+      `EVVM ID setting failed.`,
+      `\n${colors.yellow}You can try manually with:${colors.reset}\n${colors.blue}cast send ${contractAddress} \\\n  --rpc-url <rpc-url> \\\n  "setEvvmID(uint256)" ${evvmID} \\\n  --account ${walletName}${colors.reset}`
+    );
+  }
 }
 
 /**
@@ -129,7 +137,7 @@ export async function callConnectStations(
   treasuryExternalChainAddress: string,
   externalChainRpcUrl: string,
   externalWalletName: string = "defaultKey"
-): Promise<boolean> {
+) {
   try {
     console.log(
       `${colors.bright}→ Establishing connection: Host Station → External Station...${colors.reset}`
@@ -146,9 +154,7 @@ export async function callConnectStations(
       hostWalletName
     );
 
-    console.log(
-      `${colors.green}✓ Host Station → External Station: Connection established${colors.reset}\n`
-    );
+    confirmation("Host Station → External Station connection established.");
 
     console.log(
       `${colors.bright}→ Establishing connection: External Station → Host Station...${colors.reset}`
@@ -165,12 +171,9 @@ export async function callConnectStations(
       externalWalletName
     );
 
-    console.log(
-      `${colors.green}✓ External Station → Host Station: Connection established${colors.reset}\n`
-    );
-    return true;
+    confirmation("External Station → Host Station connection established.");
   } catch (error) {
-    return false;
+    criticalError(`Failed to connect treasury stations.`);
   }
 }
 
@@ -207,7 +210,7 @@ export async function forgeScript(
   rpcUrl: string,
   walletName: string = "defaultKey",
   verificationArgs: string[] = []
-): Promise<boolean> {
+) {
   try {
     const command = [
       "forge",
@@ -228,16 +231,10 @@ export async function forgeScript(
     await $`forge clean`.quiet();
 
     await $`${command}`;
-    console.log(
-      `\n${colors.green}✓ Deployment completed successfully!${colors.reset}`
-    );
-    return true;
+
+    confirmation("Deployment script executed successfully.");
   } catch (error) {
-    showError(
-      "Deployment process encountered an error.",
-      "Please check the error message above for details."
-    );
-    return false;
+    criticalError(`Deployment failed.`);
   }
 }
 
@@ -253,27 +250,22 @@ export async function forgeScript(
  */
 export async function verifyFoundryInstalledAndAccountSetup(
   walletNames: string[] = ["defaultKey"]
-): Promise<boolean> {
-  if (!(await foundryIsInstalled())) {
-    showError(
-      "Foundry is not installed.",
-      "Please install Foundry to proceed with deployment."
+) {
+  if (!(await foundryIsInstalled()))
+    criticalErrorCustom(
+      "Foundry installation not detected.",
+      "Visit https://getfoundry.sh/ for installation instructions."
     );
-    return false;
-  }
 
   const walletSetupResults = await walletIsSetup(walletNames);
   for (let i = 0; i < walletNames.length; i++) {
     if (!walletSetupResults[i]) {
-      showError(
+      criticalErrorCustom(
         `Wallet '${walletNames[i]}' is not available.`,
         `Please import your wallet using:\n   ${colors.evvmGreen}cast wallet import ${walletNames[i]} --interactive${colors.reset}\n\n   You'll be prompted to enter your private key securely.`
       );
-      return false;
     }
   }
-
-  return true;
 }
 
 /**

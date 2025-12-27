@@ -6,7 +6,8 @@ import {
   promptAddress,
   promptYesNo,
 } from "./prompts";
-import { formatNumber, showError } from "./validators";
+import { formatNumber } from "./validators";
+
 import type {
   BaseInputAddresses,
   CrossChainInputs,
@@ -15,6 +16,13 @@ import type {
 import { getRPCUrlAndChainId } from "../utils/rpc";
 import { checkCrossChainSupport } from "../utils/crossChain";
 import { getAddress } from "viem/utils";
+import {
+  baseConfigurationSummary,
+  confirmation,
+  criticalError,
+  crossChainConfigurationSummary,
+  error,
+} from "./outputMesages";
 
 /**
  * Interactive configuration wizard for EVVM deployment.
@@ -22,9 +30,7 @@ import { getAddress } from "viem/utils";
  *
  * @returns {Promise<boolean>} - Returns true if configuration is confirmed and saved, false otherwise.
  */
-export async function configurationBasic(): Promise<boolean> {
-  let confirmationDone = false;
-
+export async function configurationBasic() {
   let evvmMetadata: EvvmMetadata = {
     EvvmName: "EVVM",
     EvvmID: 0,
@@ -91,53 +97,18 @@ export async function configurationBasic(): Promise<boolean> {
       );
     }
 
-    console.log(
-      `\n${colors.bright}═══════════════════════════════════════${colors.reset}`
-    );
-    console.log(
-      `${colors.bright}          Configuration Summary${colors.reset}`
-    );
-    console.log(
-      `${colors.bright}═══════════════════════════════════════${colors.reset}\n`
-    );
-
-    console.log(`${colors.bright}Addresses:${colors.reset}`);
-    for (const key of Object.keys(addresses) as (keyof BaseInputAddresses)[]) {
-      console.log(`  ${colors.blue}${key}:${colors.reset} ${addresses[key]}`);
-    }
-
-    console.log(`\n${colors.bright}EVVM Metadata:${colors.reset}`);
-    for (const [metaKey, metaValue] of Object.entries(evvmMetadata)) {
-      if (metaKey === "EvvmID") continue;
-
-      let displayValue = metaValue;
-      if (typeof metaValue === "number" && metaValue > 1e15) {
-        displayValue = metaValue.toLocaleString("fullwide", {
-          useGrouping: false,
-        });
-      }
-      console.log(`  ${colors.blue}${metaKey}:${colors.reset} ${displayValue}`);
-    }
-    console.log();
+    baseConfigurationSummary(addresses, evvmMetadata);
   } while (
     promptYesNo(
       `${colors.yellow}Confirm configuration? (y/n):${colors.reset}`
     ).toLowerCase() === "n"
   );
 
-  if (!(await writeBaseInputsFile(addresses, evvmMetadata))) {
-    showError(
-      "Failed to write inputs file.",
-      `Please try again. If the issue persists, create an issue on GitHub:\n${colors.blue}https://github.com/EVVM-org/Testnet-Contracts/issues${colors.reset}`
-    );
-    return false;
-  }
+  await writeBaseInputsFile(addresses, evvmMetadata);
 
-  console.log(
-    `\n${colors.green}✓${colors.reset} Input configuration saved to ${colors.darkGray}./input/BaseInputs.sol${colors.reset}`
+  confirmation(
+    `${colors.reset}Input configuration saved to ${colors.darkGray}./input/BaseInputs.sol${colors.reset}`
   );
-
-  return true;
 }
 
 /**
@@ -147,12 +118,11 @@ export async function configurationBasic(): Promise<boolean> {
  * @returns {Promise<{externalRpcUrl: string | null; externalChainId: number | null; hostRpcUrl: string | null; hostChainId: number | null}>} - Returns external and host RPC URLs and chain IDs if configuration is confirmed and saved, nulls otherwise.
  */
 export async function configurationCrossChain(): Promise<{
-  externalRpcUrl: string | null;
-  externalChainId: number | null;
-  hostRpcUrl: string | null;
-  hostChainId: number | null;
+  externalRpcUrl: string;
+  externalChainId: number;
+  hostRpcUrl: string;
+  hostChainId: number;
 }> {
-  let confirmationCrossChainDone = false;
   let crossChainInputs: CrossChainInputs = {
     adminExternal: "0x0000000000000000000000000000000000000000",
     crosschainConfigHost: {
@@ -187,10 +157,10 @@ export async function configurationCrossChain(): Promise<{
     },
   };
 
-  let externalRpcUrl: string | null = null;
-  let externalChainId: number | null = null;
-  let hostRpcUrl: string | null = null;
-  let hostChainId: number | null = null;
+  let externalRpcUrl: string = "";
+  let externalChainId: number = 0;
+  let hostRpcUrl: string = "";
+  let hostChainId: number = 0;
 
   do {
     ({ rpcUrl: externalRpcUrl, chainId: externalChainId } =
@@ -199,28 +169,12 @@ export async function configurationCrossChain(): Promise<{
 
     let externalChainData = await checkCrossChainSupport(externalChainId!);
 
-    if (!externalChainData)
-      return {
-        externalRpcUrl: null,
-        externalChainId: null,
-        hostRpcUrl: null,
-        hostChainId: null,
-      };
-
     ({ rpcUrl: hostRpcUrl, chainId: hostChainId } = await getRPCUrlAndChainId(
       process.env.HOST_RPC_URL,
       `${colors.yellow}Please enter the Host Chain RPC URL:${colors.reset}`
     ));
 
     let hostChainData = await checkCrossChainSupport(hostChainId!);
-
-    if (!hostChainData)
-      return {
-        externalRpcUrl: null,
-        externalChainId: null,
-        hostRpcUrl: null,
-        hostChainId: null,
-      };
 
     let addressAdminExternal = promptAddress(
       `${colors.yellow}Enter the external admin address:${colors.reset}`
@@ -265,93 +219,23 @@ export async function configurationCrossChain(): Promise<{
       },
     };
 
-    console.log(
-      `\n${colors.bright}═══════════════════════════════════════${colors.reset}`
+    crossChainConfigurationSummary(
+      externalChainData,
+      hostChainData,
+      crossChainInputs
     );
-    console.log(
-      `${colors.bright}      Cross-Chain Configuration Summary${colors.reset}`
-    );
-    console.log(
-      `${colors.bright}═══════════════════════════════════════${colors.reset}\n`
-    );
-
-    console.log(`${colors.bright}External Admin:${colors.reset}`);
-    console.log(
-      `  ${colors.blue}${crossChainInputs.adminExternal}${colors.reset}`
-    );
-
-    console.log(
-      `\n${colors.bright}Host Chain Station (${hostChainData.Chain}):${colors.reset}`
-    );
-    console.log(
-      `  ${colors.darkGray}→${colors.reset} Hyperlane External Domain ID: ${colors.blue}${crossChainInputs.crosschainConfigHost.hyperlane.externalChainStationDomainId}${colors.reset}`
-    );
-    console.log(
-      `  ${colors.darkGray}→${colors.reset} Hyperlane Mailbox: ${colors.blue}${crossChainInputs.crosschainConfigHost.hyperlane.mailboxAddress}${colors.reset}`
-    );
-    console.log(
-      `  ${colors.darkGray}→${colors.reset} LayerZero External EId: ${colors.blue}${crossChainInputs.crosschainConfigHost.layerZero.externalChainStationEid}${colors.reset}`
-    );
-    console.log(
-      `  ${colors.darkGray}→${colors.reset} LayerZero Endpoint: ${colors.blue}${crossChainInputs.crosschainConfigHost.layerZero.endpointAddress}${colors.reset}`
-    );
-    console.log(
-      `  ${colors.darkGray}→${colors.reset} Axelar External Chain: ${colors.blue}${crossChainInputs.crosschainConfigHost.axelar.externalChainStationChainName}${colors.reset}`
-    );
-    console.log(
-      `  ${colors.darkGray}→${colors.reset} Axelar Gateway: ${colors.blue}${crossChainInputs.crosschainConfigHost.axelar.gatewayAddress}${colors.reset}`
-    );
-    console.log(
-      `  ${colors.darkGray}→${colors.reset} Axelar Gas Service: ${colors.blue}${crossChainInputs.crosschainConfigHost.axelar.gasServiceAddress}${colors.reset}`
-    );
-
-    console.log(
-      `\n${colors.bright}External Chain Station (${externalChainData.Chain}):${colors.reset}`
-    );
-    console.log(
-      `  ${colors.darkGray}→${colors.reset} Hyperlane Host Domain ID: ${colors.blue}${crossChainInputs.crosschainConfigExternal.hyperlane.hostChainStationDomainId}${colors.reset}`
-    );
-    console.log(
-      `  ${colors.darkGray}→${colors.reset} Hyperlane Mailbox: ${colors.blue}${crossChainInputs.crosschainConfigExternal.hyperlane.mailboxAddress}${colors.reset}`
-    );
-    console.log(
-      `  ${colors.darkGray}→${colors.reset} LayerZero Host EId: ${colors.blue}${crossChainInputs.crosschainConfigExternal.layerZero.hostChainStationEid}${colors.reset}`
-    );
-    console.log(
-      `  ${colors.darkGray}→${colors.reset} LayerZero Endpoint: ${colors.blue}${crossChainInputs.crosschainConfigExternal.layerZero.endpointAddress}${colors.reset}`
-    );
-    console.log(
-      `  ${colors.darkGray}→${colors.reset} Axelar Host Chain: ${colors.blue}${crossChainInputs.crosschainConfigExternal.axelar.hostChainStationChainName}${colors.reset}`
-    );
-    console.log(
-      `  ${colors.darkGray}→${colors.reset} Axelar Gateway: ${colors.blue}${crossChainInputs.crosschainConfigExternal.axelar.gatewayAddress}${colors.reset}`
-    );
-    console.log(
-      `  ${colors.darkGray}→${colors.reset} Axelar Gas Service: ${colors.blue}${crossChainInputs.crosschainConfigExternal.axelar.gasServiceAddress}${colors.reset}`
-    );
-    console.log();
   } while (
     promptYesNo(
       `${colors.yellow}Confirm cross-chain configuration? (y/n):${colors.reset}`
     ).toLowerCase() === "n"
   );
 
-  if (!(await writeCrossChainInputsFile(crossChainInputs))) {
-    showError(
-      "Failed to write cross-chain inputs file.",
-      `Please try again. If the issue persists, create an issue on GitHub:\n${colors.blue}https://github.com/EVVM-org/Playgrounnd-Contracts/issues${colors.reset}`
-    );
-    return {
-      externalRpcUrl: null,
-      externalChainId: null,
-      hostRpcUrl: null,
-      hostChainId: null,
-    };
-  }
-
-  console.log(
-    `${colors.green}✓${colors.reset} Cross-chain input configuration saved to ${colors.darkGray}./input/CrossChainInputs.sol${colors.reset}\n`
+  await writeCrossChainInputsFile(crossChainInputs);
+  
+  confirmation(
+    `${colors.reset}Cross-chain input configuration saved to ${colors.darkGray}./input/CrossChainInputs.sol${colors.reset}`
   );
+  
 
   return {
     externalRpcUrl: externalRpcUrl!,
@@ -374,7 +258,7 @@ export async function configurationCrossChain(): Promise<{
 export async function writeBaseInputsFile(
   addresses: BaseInputAddresses,
   evvmMetadata: EvvmMetadata
-): Promise<boolean> {
+) {
   const inputDir = "./input";
   const inputFile = `${inputDir}/BaseInputs.sol`;
 
@@ -383,14 +267,14 @@ export async function writeBaseInputsFile(
     addresses.goldenFisher == undefined ||
     addresses.activator == undefined
   )
-    return false;
+    criticalError(`Invalid addresses provided to write BaseInputs file.`);
 
   try {
     await Bun.file(inputFile).text();
   } catch {
     await $`mkdir -p ${inputDir}`.quiet();
     await Bun.write(inputFile, "");
-    console.log(`${colors.blue}Created ${inputFile}${colors.reset}`);
+    confirmation(`${colors.blue}Created ${inputFile}${colors.reset}`);
   }
 
   const inputFileContent = `// SPDX-License-Identifier: UNLICENSED
@@ -398,9 +282,9 @@ pragma solidity ^0.8.0;
 import {EvvmStructs} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
 
 abstract contract BaseInputs {
-    address admin = ${getAddress(addresses.admin)};
-    address goldenFisher = ${getAddress(addresses.goldenFisher)};
-    address activator = ${getAddress(addresses.activator)};
+    address admin = ${getAddress(addresses.admin!)};
+    address goldenFisher = ${getAddress(addresses.goldenFisher!)};
+    address activator = ${getAddress(addresses.activator!)};
 
     EvvmStructs.EvvmMetadata inputMetadata =
         EvvmStructs.EvvmMetadata({
@@ -418,7 +302,6 @@ abstract contract BaseInputs {
 `;
 
   await Bun.write(inputFile, inputFileContent);
-  return true;
 }
 
 /**
@@ -432,7 +315,7 @@ abstract contract BaseInputs {
  */
 export async function writeCrossChainInputsFile(
   crossChainInputs: CrossChainInputs
-): Promise<boolean> {
+) {
   const inputDir = "./input";
   const inputFile = `${inputDir}/CrossChainInputs.sol`;
 
@@ -441,7 +324,7 @@ export async function writeCrossChainInputsFile(
   } catch {
     await $`mkdir -p ${inputDir}`.quiet();
     await Bun.write(inputFile, "");
-    console.log(`${colors.blue}Created ${inputFile}${colors.reset}`);
+    confirmation(`${colors.blue}Created ${inputFile}${colors.reset}`);
   }
 
   const inputFileContent = `// SPDX-License-Identifier: UNLICENSED
@@ -537,5 +420,4 @@ abstract contract CrossChainInputs {
 `;
 
   await Bun.write(inputFile, inputFileContent);
-  return true;
 }

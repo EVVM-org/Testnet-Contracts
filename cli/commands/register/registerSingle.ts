@@ -15,7 +15,7 @@ import {
   isChainIdRegistered,
   verifyFoundryInstalledAndAccountSetup,
 } from "../../utils/foundry";
-import { showError } from "../../utils/validators";
+import { chainIdNotSupported, criticalError } from "../../utils/outputMesages";
 import { getRPCUrlAndChainId } from "../../utils/rpc";
 
 /**
@@ -49,9 +49,7 @@ export async function registerSingle(_args: string[], options: any) {
       )
     : EthSepoliaPublicRpc;
 
-  if (!(await verifyFoundryInstalledAndAccountSetup([walletName]))) {
-    return;
-  }
+  await verifyFoundryInstalledAndAccountSetup([walletName]);
 
   // Validate or prompt for missing values
   evvmAddress ||= promptAddress(
@@ -68,31 +66,7 @@ export async function registerSingle(_args: string[], options: any) {
     return;
   }
 
-  const isSupported = await isChainIdRegistered(chainId);
-  if (isSupported === undefined) {
-    showError(
-      `EVVM registration failed.`,
-      `Please try again or if the issue persists, make an issue on GitHub.`
-    );
-    return;
-  }
-  if (!isSupported) {
-    showError(
-      `Host Chain ID ${chainId} is not supported.`,
-      `\n${colors.yellow}Possible solutions:${colors.reset}
-  ${colors.bright}• Testnet chains:${colors.reset}
-    Request support by creating an issue at:
-    ${colors.blue}https://github.com/EVVM-org/evvm-registry-contracts${colors.reset}
-    
-  ${colors.bright}• Mainnet chains:${colors.reset}
-    EVVM currently does not support mainnet deployments.
-    
-  ${colors.bright}• Local blockchains (Anvil/Hardhat):${colors.reset}
-    Use an unregistered chain ID.
-    ${colors.darkGray}Example: Chain ID 31337 is registered, use 1337 instead.${colors.reset}`
-    );
-    return;
-  }
+  if (!(await isChainIdRegistered(chainId))) chainIdNotSupported(chainId);
 
   console.log(
     `${colors.blue}Setting EVVM ID directly on contract...${colors.reset}\n`
@@ -105,26 +79,14 @@ export async function registerSingle(_args: string[], options: any) {
     ethRPC
   );
   if (!evvmID) {
-    showError(
-      `EVVM registration failed.`,
-      `Please try again or if the issue persists, make an issue on GitHub.`
-    );
-    return;
+    criticalError(`Failed to obtain EVVM ID for contract ${evvmAddress}.`);
   }
   console.log(
     `${colors.green}EVVM ID generated: ${colors.bright}${evvmID}${colors.reset}`
   );
   console.log(`${colors.blue}Setting EVVM ID on contract...${colors.reset}\n`);
 
-  const isSet = await callSetEvvmID(evvmAddress, evvmID, rpcUrl, walletName);
-
-  if (!isSet) {
-    showError(
-      `EVVM ID setting failed.`,
-      `\n${colors.yellow}You can try manually with:${colors.reset}\n${colors.blue}cast send ${evvmAddress} \\\n  --rpc-url ${rpcUrl} \\\n  "setEvvmID(uint256)" ${evvmID} \\\n  --account ${walletName}${colors.reset}`
-    );
-    return;
-  }
+  await callSetEvvmID(evvmAddress, evvmID!, rpcUrl, walletName);
 
   console.log(
     `\n${colors.bright}═══════════════════════════════════════${colors.reset}`

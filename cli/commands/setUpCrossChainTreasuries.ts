@@ -14,7 +14,7 @@ import {
   isChainIdRegistered,
   verifyFoundryInstalledAndAccountSetup,
 } from "../utils/foundry";
-import { showError } from "../utils/validators";
+import { chainIdNotSupported } from "../utils/outputMesages";
 import { getRPCUrlAndChainId } from "../utils/rpc";
 
 /**
@@ -31,7 +31,9 @@ import { getRPCUrlAndChainId } from "../utils/rpc";
  * @returns {Promise<void>}
  */
 export async function setUpCrossChainTreasuries(_args: string[], options: any) {
-  console.log(`${colors.bright}Connecting cross-chain treasury stations...${colors.reset}\n`);
+  console.log(
+    `${colors.bright}Connecting cross-chain treasury stations...${colors.reset}\n`
+  );
 
   // --treasuryHostStationAddress
   let treasuryHostStationAddress: `0x${string}` | undefined =
@@ -44,9 +46,10 @@ export async function setUpCrossChainTreasuries(_args: string[], options: any) {
   // --walletNameExternal
   let walletNameExternal: string = options.walletNameExternal || "defaultKey";
 
-  if (!(await verifyFoundryInstalledAndAccountSetup([walletNameHost, walletNameExternal]))) {
-      return;
-  }
+  await verifyFoundryInstalledAndAccountSetup([
+    walletNameHost,
+    walletNameExternal,
+  ]);
 
   // Validate or prompt for missing values
   treasuryHostStationAddress ||= promptAddress(
@@ -63,47 +66,15 @@ export async function setUpCrossChainTreasuries(_args: string[], options: any) {
   const { rpcUrl: externalRPC, chainId: externalChainId } =
     await getRPCUrlAndChainId(process.env.EXTERNAL_RPC_URL);
 
-  for (const [chainId, chainType] of [
-    [hostChainId, "Host"],
-    [externalChainId, "External"],
-  ]) {
-    if (chainId === undefined) {
-      showError(
-        `Invalid chain ID.`,
-        `The chain ID for ${chainType} is undefined. Please check your RPC URL or configuration.`
-      );
-      return;
-    }
-    const isSupported = await isChainIdRegistered(Number(chainId));
-    if (isSupported === undefined) {
-      showError(
-        `EVVM registration failed.`,
-        `Please try again or if the issue persists, make an issue on GitHub.`
-      );
-      return;
-    }
-    if (!isSupported) {
-      showError(
-        `${chainType} Chain ID ${chainId} is not supported.`,
-        `\n${colors.yellow}Possible solutions:${colors.reset}
-  ${colors.bright}• Testnet chains:${colors.reset}
-    Request support by creating an issue at:
-    ${colors.blue}https://github.com/EVVM-org/evvm-registry-contracts${colors.reset}
-    
-  ${colors.bright}• Mainnet chains:${colors.reset}
-    EVVM currently does not support mainnet deployments.
-    
-  ${colors.bright}• Local blockchains (Anvil/Hardhat):${colors.reset}
-    Use an unregistered chain ID.
-    ${colors.darkGray}Example: Chain ID 31337 is registered, use 1337 instead.${colors.reset}`
-      );
-      return;
-    }
-  }
+  if (!(await isChainIdRegistered(Number(hostChainId))))
+    chainIdNotSupported(Number(hostChainId));
+
+  if (!(await isChainIdRegistered(Number(externalChainId))))
+    chainIdNotSupported(Number(externalChainId));
 
   console.log(`${colors.blue}Setting conections...${colors.reset}\n`);
 
-  const isSetOnHost = await callConnectStations(
+  await callConnectStations(
     treasuryHostStationAddress as string,
     hostRPC,
     walletNameHost,
@@ -112,13 +83,6 @@ export async function setUpCrossChainTreasuries(_args: string[], options: any) {
     walletNameExternal
   );
 
-  if (!isSetOnHost) {
-    showError(
-      `EVVM registration failed.`,
-      `Please try again or if the issue persists, make an issue on GitHub.`
-    );
-    return;
-  }
   console.log(
     `${colors.darkGray}\nYour Treasury contracts are now connected!${colors.reset}\n`
   );
