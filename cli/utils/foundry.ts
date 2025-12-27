@@ -197,11 +197,92 @@ export async function castSend(
       walletName,
     ];
 
+    if (await shouldUseLegacy(rpcUrl)) {
+      command.push("--legacy");
+      command.push("--gas-limit", "500000");
+    }
+
     await $`${command}`;
 
     return true;
   } catch (error) {
     return false;
+  }
+}
+
+/**
+ * Detects if the network requires legacy transaction type
+ *
+ * Checks if the RPC endpoint supports EIP-1559 or requires legacy transactions.
+ * Returns true if gas price is 0 or if the network doesn't support EIP-1559.
+ *
+ * @param {string} rpcUrl - RPC endpoint URL to check
+ * @returns {Promise<boolean>} True if legacy transactions should be used
+ */
+export async function shouldUseLegacy(rpcUrl: string): Promise<boolean> {
+  try {
+    // Check gas price - if it's 0, use legacy transactions
+    const gasPriceResult = await $`cast gas-price --rpc-url ${rpcUrl}`.quiet();
+    const gasPrice = gasPriceResult.stdout.toString().trim();
+
+    if (gasPrice === "0") {
+      console.log(
+        `${colors.yellow}⚠  Gas price is 0 - using legacy transaction type${colors.reset}`
+      );
+      return true;
+    }
+
+    // Try to get the latest block's baseFeePerGas
+    const blockResult =
+      await $`cast block latest --rpc-url ${rpcUrl} --json`.quiet();
+    const block = JSON.parse(blockResult.stdout.toString());
+
+    // If baseFeePerGas is missing or 0, the network doesn't support EIP-1559
+    if (!block.baseFeePerGas || block.baseFeePerGas === "0x0") {
+      console.log(
+        `${colors.yellow}⚠  Network doesn't support EIP-1559 - using legacy transaction type${colors.reset}`
+      );
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    // If we can't determine, default to not using legacy
+    console.log(
+      `${colors.darkGray}ℹ  Unable to detect transaction type - using default${colors.reset}`
+    );
+    return false;
+  }
+}
+
+/**
+ * Detects the optimal EVM version for the target network
+ *
+ * Attempts to determine the best EVM version to use for compilation
+ * based on network characteristics and capabilities.
+ *
+ * @param {string} rpcUrl - RPC endpoint URL to check
+ * @returns {Promise<string | null>} EVM version to use, or null for default
+ */
+export async function detectEvmVersion(rpcUrl: string): Promise<string | null> {
+  try {
+    const blockResult =
+      await $`cast block latest --rpc-url ${rpcUrl} --json`.quiet();
+    const block = JSON.parse(blockResult.stdout.toString());
+
+    // Check for EIP-1559 support (London and later)
+    if (block.baseFeePerGas && block.baseFeePerGas !== "0x0") {
+      return null; // Use default (latest)
+    }
+
+    // If no baseFeePerGas, likely pre-London
+    console.log(
+      `${colors.yellow}⚠  Network appears to be pre-London - using 'london' EVM version${colors.reset}`
+    );
+    return "london";
+  } catch (error) {
+    // If detection fails, return null to use default
+    return null;
   }
 }
 
@@ -227,6 +308,16 @@ export async function forgeScript(
       "--broadcast",
       "-vvvv",
     ];
+
+    if (await shouldUseLegacy(rpcUrl)) {
+      command.push("--legacy");
+    }
+
+    const evmVersion = await detectEvmVersion(rpcUrl);
+    if (evmVersion) {
+      command.push("--evm-version", evmVersion);
+    }
+
     console.log(`${colors.evvmGreen}Starting deployment...${colors.reset}\n`);
     await $`forge clean`.quiet();
 
