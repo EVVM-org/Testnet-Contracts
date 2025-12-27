@@ -450,7 +450,6 @@ export async function showDeployContractsAndFindEvvm(
   console.log();
 
   await saveDeploymentToJson(
-    "evvmDeployment",
     createdContracts,
     chainId,
     chainData?.Chain
@@ -536,7 +535,6 @@ export async function showAllCrossChainDeployedContracts(
   console.log();
 
   await saveCrossChainDeploymentToJson(
-    "evvmCrossChainDeployment",
     createdContractsHost,
     chainIdHost,
     chainNameHost,
