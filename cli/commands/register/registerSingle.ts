@@ -8,19 +8,20 @@
  * @module cli/commands/register/registerSingle
  */
 
-import { ChainData, colors, EthSepoliaPublicRpc } from "../../constants";
-import { promptAddress, promptString } from "../../utils/prompts";
+import {
+  chainIdNotSupported,
+  confirmation,
+  criticalError,
+  warning,
+} from "../../utils/outputMesages";
 import {
   callRegisterEvvm,
   callSetEvvmID,
   isChainIdRegistered,
   verifyFoundryInstalledAndAccountSetup,
 } from "../../utils/foundry";
-import {
-  chainIdNotSupported,
-  confirmation,
-  criticalError,
-} from "../../utils/outputMesages";
+import { ChainData, colors, EthSepoliaPublicRpc } from "../../constants";
+import { promptAddress, promptString } from "../../utils/prompts";
 import { getRPCUrlAndChainId } from "../../utils/rpc";
 import { saveEvvmRegistrationToJson } from "../../utils/outputJson";
 
@@ -74,10 +75,7 @@ export async function registerSingle(_args: string[], options: any) {
   let { rpcUrl, chainId } = await getRPCUrlAndChainId(process.env.RPC_URL);
 
   if (chainId === 31337 || chainId === 1337) {
-    console.log(`\n${colors.orange}Local Blockchain Detected${colors.reset}`);
-    console.log(
-      `${colors.darkGray}Skipping registry contract registration for local development${colors.reset}`
-    );
+    warning("Local blockchain detected", "Skipping registry registration")
     return;
   }
 

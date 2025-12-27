@@ -9,8 +9,6 @@
  * @module cli/commands/register/registerCross
  */
 
-import { ChainData, colors, EthSepoliaPublicRpc } from "../../constants";
-import { promptAddress, promptString } from "../../utils/prompts";
 import {
   callRegisterEvvm,
   callSetEvvmID,
@@ -21,7 +19,10 @@ import {
   chainIdNotSupported,
   confirmation,
   criticalError,
+  warning,
 } from "../../utils/outputMesages";
+import { ChainData, colors, EthSepoliaPublicRpc } from "../../constants";
+import { promptAddress, promptString } from "../../utils/prompts";
 import { getRPCUrlAndChainId } from "../../utils/rpc";
 import { saveEvvmCrossChainRegistrationToJson } from "../../utils/outputJson";
 
@@ -92,9 +93,7 @@ export async function registerCross(_args: string[], options: any) {
     await getRPCUrlAndChainId(process.env.EXTERNAL_RPC_URL);
 
   if (hostChainId === 31337 || hostChainId === 1337) {
-    console.log(
-      `${colors.orange}Local blockchain detected - skipping registry registration${colors.reset}`
-    );
+    warning("Local blockchain detected", "Skipping registry registration")
     return;
   }
 

@@ -7,6 +7,7 @@
  *
  * @module cli/commands/deploy/deploySingle
  */
+
 import {
   forgeScript,
   isChainIdRegistered,

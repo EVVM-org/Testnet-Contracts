@@ -6,15 +6,14 @@
  *
  * @module cli/commands/setUpCrossChainTreasuries
  */
-
-import { colors } from "../constants";
-import { promptAddress } from "../utils/prompts";
 import {
   callConnectStations,
   isChainIdRegistered,
   verifyFoundryInstalledAndAccountSetup,
 } from "../utils/foundry";
-import { chainIdNotSupported } from "../utils/outputMesages";
+import { colors } from "../constants";
+import { promptAddress } from "../utils/prompts";
+import { chainIdNotSupported, confirmation } from "../utils/outputMesages";
 import { getRPCUrlAndChainId } from "../utils/rpc";
 
 /**
@@ -90,8 +89,5 @@ export async function setUpCrossChainTreasuries(_args: string[], options: any) {
     externalRPC,
     walletNameExternal
   );
-
-  console.log(
-    `${colors.darkGray}\nYour Treasury contracts are now connected!${colors.reset}\n`
-  );
+  confirmation("Treasury contracts are now connected")
 }
