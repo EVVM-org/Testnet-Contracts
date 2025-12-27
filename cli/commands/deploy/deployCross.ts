@@ -8,33 +8,36 @@
  * @module cli/commands/deploy/deployCross
  */
 
-import { $ } from "bun";
-import { ChainData, colors } from "../../constants";
-import { promptYesNo } from "../../utils/prompts";
-
+import {
+  confirmation,
+  criticalError,
+  showEvvmLogo,
+  warning,
+} from "../../utils/outputMesages";
 import {
   verifyFoundryInstalledAndAccountSetup,
   showAllCrossChainDeployedContracts,
   forgeScript,
 } from "../../utils/foundry";
-import { getRPCUrlAndChainId } from "../../utils/rpc";
-import { explorerVerification } from "../../utils/explorerVerification";
-import { setUpCrossChainTreasuries } from "../setUpCrossChainTreasuries";
 import {
   configurationBasic,
   configurationCrossChain,
 } from "../../utils/configurationInputs";
+import { ChainData, colors } from "../../constants";
+import { promptYesNo } from "../../utils/prompts";
+import { getRPCUrlAndChainId } from "../../utils/rpc";
+import { explorerVerification } from "../../utils/explorerVerification";
+import { setUpCrossChainTreasuries } from "../setUpCrossChainTreasuries";
 import { registerCross } from "../register/registerCross";
-import { criticalError, showEvvmLogo } from "../../utils/outputMesages";
 
 /**
  * Deploys a cross-chain EVVM instance with interactive configuration
  *
  * Executes a dual-chain deployment workflow:
- * 
+ *
  * External Chain Deployment (TreasuryExternalChainStation.sol):
  * - Cross-chain messaging endpoints for asset bridging
- * 
+ *
  * Host Chain Deployment:
  * - TreasuryHostChainStation.sol (cross-chain treasury coordinator)
  * - Evvm.sol (core protocol with cross-chain support)
@@ -42,7 +45,7 @@ import { criticalError, showEvvmLogo } from "../../utils/outputMesages";
  * - Estimator.sol (gas estimation)
  * - NameService.sol (domain name resolution)
  * - P2PSwap.sol (peer-to-peer token swaps)
- * 
+ *
  * Process:
  * 1. Validates Foundry installation and both wallet accounts
  * 2. Collects base configuration (addresses, metadata)
@@ -81,14 +84,9 @@ export async function deployCross(args: string[], options: any) {
   ]);
 
   if (skipInputConfig) {
-    console.log(
-      `\n${colors.bright}Using Existing Configuration:${colors.reset}`
-    );
-    console.log(
-      `  ${colors.green}✓${colors.reset} Base inputs ${colors.darkGray}→ ./input/BaseInputs.sol${colors.reset}`
-    );
-    console.log(
-      `  ${colors.green}✓${colors.reset} Cross-chain inputs ${colors.darkGray}→ ./input/CrossChainInputs.sol${colors.reset}\n`
+    warning(
+      `Skipping input configuration`,
+      `  ${colors.green}✓${colors.reset} Base inputs ${colors.darkGray}→ ./input/BaseInputs.sol${colors.reset}\n  ${colors.green}✓${colors.reset} Cross-chain inputs ${colors.darkGray}→ ./input/CrossChainInputs.sol${colors.reset}`
     );
 
     ({ rpcUrl: externalRpcUrl, chainId: externalChainId } =
@@ -136,14 +134,6 @@ export async function deployCross(args: string[], options: any) {
 
   if (verificationflagExternal === undefined)
     criticalError("Explorer verification setup failed.");
-
-  console.log(
-    `\n${colors.bright}═══════════════════════════════════════${colors.reset}`
-  );
-  console.log(`${colors.bright}             Deployment${colors.reset}`);
-  console.log(
-    `${colors.bright}═══════════════════════════════════════${colors.reset}\n`
-  );
 
   const chainDataExternal = ChainData[externalChainId!];
 
@@ -214,13 +204,8 @@ export async function deployCross(args: string[], options: any) {
       ? chainDataExternal.Chain
       : undefined
   );
-  console.log(
-    `\n${colors.bright}═══════════════════════════════════════${colors.reset}`
-  );
-  console.log(`${colors.bright}          Deployment Complete${colors.reset}`);
-  console.log(
-    `${colors.bright}═══════════════════════════════════════${colors.reset}\n`
-  );
+
+  confirmation(`Cross-chain EVVM deployed successfully!`);
 
   console.log(`${colors.green}EVVM:             ${evvmAddress}${colors.reset}`);
   console.log(
@@ -285,8 +270,9 @@ export async function deployCross(args: string[], options: any) {
       `${colors.yellow}Do you want to set up cross-chain communication now? (y/n):${colors.reset}`
     ).toLowerCase() !== "y"
   ) {
-    console.log(
-      `${colors.red}Setup skipped. You can complete setup later using the commands above.${colors.reset}`
+    warning(
+      `Cross-chain communication skipped by user choice`,
+      `${colors.darkGray}You can complete setup later using the commands above.${colors.reset}`
     );
     return;
   }
@@ -306,8 +292,9 @@ export async function deployCross(args: string[], options: any) {
       `${colors.yellow}Do you want to register the EVVM instance now? (y/n):${colors.reset}`
     ).toLowerCase() !== "y"
   ) {
-    console.log(
-      `${colors.red}Registration skipped. You can register later using the command above.${colors.reset}`
+    warning(
+      `Registration skipped by user choice`,
+      `${colors.darkGray}You can register later using the commands above.${colors.reset}`
     );
     return;
   }

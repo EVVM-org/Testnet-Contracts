@@ -7,24 +7,25 @@
  *
  * @module cli/commands/deploy/deploySingle
  */
-
-import { ChainData, colors } from "../../constants";
-import { promptYesNo } from "../../utils/prompts";
 import {
   forgeScript,
   isChainIdRegistered,
   showDeployContractsAndFindEvvm,
   verifyFoundryInstalledAndAccountSetup,
 } from "../../utils/foundry";
+import {
+  chainIdNotSupported,
+  confirmation,
+  criticalError,
+  showEvvmLogo,
+  warning,
+} from "../../utils/outputMesages";
+import { ChainData, colors } from "../../constants";
+import { promptYesNo } from "../../utils/prompts";
 import { getRPCUrlAndChainId } from "../../utils/rpc";
 import { explorerVerification } from "../../utils/explorerVerification";
 import { configurationBasic } from "../../utils/configurationInputs";
 import { registerSingle } from "../register/registerSingle";
-import {
-  chainIdNotSupported,
-  criticalError,
-  showEvvmLogo,
-} from "../../utils/outputMesages";
 
 /**
  * Deploys a complete EVVM instance with interactive configuration
@@ -64,8 +65,8 @@ export async function deploySingle(args: string[], options: any) {
   await verifyFoundryInstalledAndAccountSetup([walletName]);
 
   if (skipInputConfig) {
-    console.log(
-      `${colors.yellow}⚡ Skipping input configuration (using from ./input/BaseInputs.sol)...${colors.reset}\n`
+    warning(`Skipping input configuration`,
+      `  ${colors.green}✓${colors.reset} Base inputs ${colors.darkGray}→ ./input/BaseInputs.sol${colors.reset}`
     );
   } else {
     await configurationBasic();
@@ -83,14 +84,11 @@ export async function deploySingle(args: string[], options: any) {
   const { rpcUrl, chainId } = await getRPCUrlAndChainId(process.env.RPC_URL);
 
   if (chainId === 31337 || chainId === 1337) {
-    console.log(
-      `\n${colors.orange}Local blockchain detected (Chain ID: ${chainId})${colors.reset}`
-    );
-    console.log(
-      `${colors.darkGray}   Skipping host chain verification for local development${colors.reset}\n`
+    warning(
+      `Local blockchain detected (Chain ID: ${chainId})`,
+      `${colors.darkGray}Skipping host chain verification for local development${colors.reset}`
     );
   } else {
-    
     if (!(await isChainIdRegistered(chainId))) chainIdNotSupported(chainId);
 
     verificationflag = await explorerVerification();
@@ -98,14 +96,6 @@ export async function deploySingle(args: string[], options: any) {
     if (verificationflag === undefined)
       criticalError(`Explorer verification setup failed.`);
   }
-
-  console.log(
-    `\n${colors.bright}═══════════════════════════════════════${colors.reset}`
-  );
-  console.log(`${colors.bright}             Deployment${colors.reset}`);
-  console.log(
-    `${colors.bright}═══════════════════════════════════════${colors.reset}\n`
-  );
 
   console.log(
     ChainData[chainId]?.Chain
@@ -120,30 +110,11 @@ export async function deploySingle(args: string[], options: any) {
     verificationflag ? verificationflag.split(" ") : []
   );
 
+  confirmation(`EVVM deployed successfully!`);
   const evvmAddress: `0x${string}` | null =
     await showDeployContractsAndFindEvvm(chainId);
 
-  console.log(
-    `\n${colors.bright}═══════════════════════════════════════${colors.reset}`
-  );
-  console.log(`${colors.bright}            Deployment Success${colors.reset}`);
-  console.log(
-    `${colors.bright}═══════════════════════════════════════${colors.reset}\n`
-  );
-
-  console.log(
-    `${colors.green}✓ EVVM deployed successfully at: ${evvmAddress}${colors.reset}\n`
-  );
-
-  console.log(
-    `${colors.bright}═══════════════════════════════════════${colors.reset}`
-  );
-  console.log(
-    `${colors.bright}          Next Step: Registration${colors.reset}`
-  );
-  console.log(
-    `${colors.bright}═══════════════════════════════════════${colors.reset}`
-  );
+  console.log(`${colors.bright}Next Step: Registration${colors.reset}`);
   console.log(
     `${colors.blue}Your EVVM instance is ready to be registered.${colors.reset}`
   );
@@ -167,7 +138,7 @@ export async function deploySingle(args: string[], options: any) {
     `   ${colors.darkGray}📖 For more details, visit:${colors.reset}`
   );
   console.log(
-    `   ${colors.blue}https://www.evvm.info/docs/QuickStart#7-register-in-registry-evvm${colors.reset}`
+    `   ${colors.blue}https://www.evvm.info/docs/QuickStart#6-register-in-registry-evvm${colors.reset}`
   );
   console.log();
 
@@ -176,8 +147,9 @@ export async function deploySingle(args: string[], options: any) {
       `${colors.yellow}Do you want to register the EVVM instance now? (y/n):${colors.reset}`
     ).toLowerCase() !== "y"
   ) {
-    console.log(
-      `${colors.red}Registration skipped. You can register later using the command above.${colors.reset}`
+    warning(
+      `Registration skipped by user choice`,
+      `${colors.darkGray}You can register later using the commands above.${colors.reset}`
     );
     return;
   }
