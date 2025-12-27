@@ -9,7 +9,7 @@
  * @module cli/commands/register/registerCross
  */
 
-import { colors, EthSepoliaPublicRpc } from "../../constants";
+import { ChainData, colors, EthSepoliaPublicRpc } from "../../constants";
 import { promptAddress, promptString } from "../../utils/prompts";
 import {
   callRegisterEvvm,
@@ -17,8 +17,13 @@ import {
   isChainIdRegistered,
   verifyFoundryInstalledAndAccountSetup,
 } from "../../utils/foundry";
-import { chainIdNotSupported, criticalError } from "../../utils/outputMesages";
+import {
+  chainIdNotSupported,
+  confirmation,
+  criticalError,
+} from "../../utils/outputMesages";
 import { getRPCUrlAndChainId } from "../../utils/rpc";
+import { saveEvvmCrossChainRegistrationToJson } from "../../utils/outputJson";
 
 /**
  * Registers a cross-chain EVVM instance in the EVVM Registry
@@ -27,7 +32,7 @@ import { getRPCUrlAndChainId } from "../../utils/rpc";
  * to obtain a globally unique EVVM ID, then updates both the host chain EVVM
  * contract and the external chain treasury station contract with this identifier.
  * This ensures both components of the cross-chain deployment share the same ID.
- * 
+ *
  * Process:
  * 1. Validates Foundry installation and both wallet accounts
  * 2. Prompts for EVVM and treasury station addresses if not provided
@@ -98,6 +103,10 @@ export async function registerCross(_args: string[], options: any) {
   if (!(await isChainIdRegistered(externalChainId)))
     chainIdNotSupported(externalChainId);
 
+  console.log(
+    `${colors.blue}Making registration to EVVM Registry on Ethereum Sepolia...${colors.reset}\n`
+  );
+
   const evvmID: number | undefined = await callRegisterEvvm(
     Number(hostChainId),
     evvmAddress,
@@ -106,12 +115,16 @@ export async function registerCross(_args: string[], options: any) {
   );
 
   if (evvmID === undefined) {
-    criticalError(
-      `Failed to obtain EVVM ID for contract ${evvmAddress}.`
-    );
+    criticalError(`Failed to obtain EVVM ID for contract ${evvmAddress}.`);
   }
   console.log(
     `${colors.green}Generated EVVM ID: ${colors.bright}${evvmID}${colors.reset}\n`
+  );
+
+  console.log(
+    ChainData[hostChainId]?.Chain
+      ? `${colors.blue} Setting EVVM ID on EVVM contract on ${ChainData[hostChainId].Chain} ${colors.darkGray}(${hostChainId})${colors.reset}`
+      : `${colors.blue} Setting EVVM ID on EVVM contract on Chain ID:${colors.reset} ${hostChainId}`
   );
 
   await callSetEvvmID(
@@ -121,6 +134,12 @@ export async function registerCross(_args: string[], options: any) {
     walletNameHost
   );
 
+  console.log(
+    ChainData[externalChainId]?.Chain
+      ? `${colors.blue} Setting EVVM ID on Treasury External Station on ${ChainData[externalChainId].Chain} ${colors.darkGray}(${externalChainId})${colors.reset}`
+      : `${colors.blue} Setting EVVM ID on Treasury External Station on Chain ID:${colors.reset} ${externalChainId}`
+  );
+
   await callSetEvvmID(
     treasuryExternalStationAddress as `0x${string}`,
     evvmID!,
@@ -128,11 +147,25 @@ export async function registerCross(_args: string[], options: any) {
     walletNameExternal
   );
 
-  console.log(`\n${colors.bright}Registration complete${colors.reset}\n`);
+  await saveEvvmCrossChainRegistrationToJson(
+    Number(evvmID),
+    evvmAddress as `0x${string}`,
+    Number(hostChainId),
+    treasuryExternalStationAddress as `0x${string}`,
+    Number(externalChainId),
+
+    ChainData[hostChainId]?.Chain,
+    ChainData[externalChainId]?.Chain
+  );
+
+  confirmation(`EVVM cross-chain registration completed successfully!`);
   console.log(
     `${colors.green}EVVM ID:  ${colors.bright}${evvmID!}${colors.reset}`
   );
   console.log(`${colors.green}Contract: ${evvmAddress}${colors.reset}`);
+  console.log(
+    `${colors.green}Treasury External Station: ${treasuryExternalStationAddress}${colors.reset}`
+  );
   console.log(
     `${colors.darkGray}\nYour EVVM instance is ready to use.${colors.reset}\n`
   );

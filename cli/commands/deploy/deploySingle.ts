@@ -109,7 +109,7 @@ export async function deploySingle(args: string[], options: any) {
 
   console.log(
     ChainData[chainId]?.Chain
-      ? `${colors.blue} Deploying on ${ChainData[chainId].Chain} (${colors.darkGray}${chainId})${colors.reset}`
+      ? `${colors.blue} Deploying on ${ChainData[chainId].Chain} ${colors.darkGray}(${chainId})${colors.reset}`
       : `${colors.blue} Deploying on Chain ID:${colors.reset} ${chainId}`
   );
 
