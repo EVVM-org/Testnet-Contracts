@@ -15,13 +15,59 @@ import { colors } from "../constants";
 import { confirmation, warning } from "./outputMesages";
 
 /**
+ * Base function to write JSON data to the output directory
+ *
+ * Handles the common logic for all JSON output operations:
+ * - Creates output directory if it doesn't exist
+ * - Writes data to specified file with pretty formatting
+ * - Provides confirmation or error messages
+ *
+ * @param {string} fileName - Name of the file (without .json extension)
+ * @param {any} data - Data object to be serialized to JSON
+ * @param {string} operationName - Description of the operation for logging
+ * @returns {Promise<void>} Resolves when file is successfully written
+ */
+async function writeJsonToOutput(
+  fileName: string,
+  data: any,
+  operationName: string
+): Promise<void> {
+  console.log(
+    `${colors.bright}Saving ${operationName} to JSON...${colors.reset}\n`
+  );
+  try {
+    const outputDir = join(process.cwd(), "output");
+
+    // Create output directory if it doesn't exist
+    if (!existsSync(outputDir)) {
+      warning("Output directory not found", "Creating directory...");
+      await mkdir(outputDir, { recursive: true });
+    }
+
+    // Construct file path
+    const filePath = join(outputDir, `${fileName}.json`);
+
+    // Write to file with pretty formatting
+    await writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+
+    confirmation(
+      `${operationName} saved to: ${colors.blue}${filePath}${colors.reset}`
+    );
+  } catch (err) {
+    warning(
+      `Failed to save ${operationName}`,
+      `${err instanceof Error ? err.message : "Unknown error"}`
+    );
+  }
+}
+
+/**
  * Saves deployed contracts to a JSON file in the output directory
  *
  * Creates the output directory if it doesn't exist, then saves all deployed
  * contract information to a JSON file with the specified name. The file
  * includes metadata such as deployment timestamp and chain information.
  *
- * @param {string} fileName - Name for the output file (without .json extension)
  * @param {CreatedContract[]} contracts - Array of deployed contracts with names and addresses
  * @param {number} chainId - Chain ID where contracts were deployed
  * @param {string} [chainName] - Optional human-readable chain name
@@ -38,49 +84,27 @@ import { confirmation, warning } from "./outputMesages";
  * ```
  */
 export async function saveDeploymentToJson(
-  fileName: string,
   contracts: CreatedContract[],
   chainId: number,
   chainName?: string
 ): Promise<void> {
-  console.log(`${colors.bright}Saving deployment information to JSON...${colors.reset}\n`);
-  try {
-    const outputDir = join(process.cwd(), "output");
+  const outputData = {
+    timestamp: new Date().toISOString(),
+    chain: {
+      chainId,
+      chainName: chainName || `Chain ${chainId}`,
+    },
+    contracts: contracts.map((contract) => ({
+      name: contract.contractName,
+      address: contract.contractAddress,
+    })),
+  };
 
-    // Create output directory if it doesn't exist
-    if (!existsSync(outputDir)) {
-      warning("Output directory not found", "Creating directory...");
-      await mkdir(outputDir, { recursive: true });
-    }
-
-    // Prepare the output data
-    const outputData = {
-      deploymentName: fileName,
-      timestamp: new Date().toISOString(),
-      chain: {
-        chainId,
-        chainName: chainName || `Chain ${chainId}`,
-      },
-      contracts: contracts.map((contract) => ({
-        name: contract.contractName,
-        address: contract.contractAddress,
-      })),
-    };
-
-    // Construct file path
-    const filePath = join(outputDir, `${fileName}.json`);
-
-    // Write to file with pretty formatting
-    await writeFile(filePath, JSON.stringify(outputData, null, 2), "utf-8");
-
-    confirmation(
-      `Deployment information saved to: ${colors.blue}${filePath}${colors.reset}`
-    );
-  } catch (err) {
-    warning(
-      "Failed to save deployment information", `${err instanceof Error ? err.message : "Unknown error"}`
-    );
-  }
+  await writeJsonToOutput(
+    "evvmDeployment",
+    outputData,
+    "Deployment information"
+  );
 }
 
 /**
@@ -90,7 +114,6 @@ export async function saveDeploymentToJson(
  * (host and external). Organizes contracts by chain and includes metadata
  * for both chains.
  *
- * @param {string} fileName - Name for the output file (without .json extension)
  * @param {CreatedContract[]} hostContracts - Contracts deployed on host chain
  * @param {number} hostChainId - Host chain ID
  * @param {string} [hostChainName] - Optional host chain name
@@ -110,7 +133,6 @@ export async function saveDeploymentToJson(
  * ```
  */
 export async function saveCrossChainDeploymentToJson(
-  fileName: string,
   hostContracts: CreatedContract[],
   hostChainId: number,
   hostChainName: string | undefined,
@@ -118,51 +140,143 @@ export async function saveCrossChainDeploymentToJson(
   externalChainId: number,
   externalChainName: string | undefined
 ): Promise<void> {
-  console.log(`${colors.bright}Saving cross-chain deployment information to JSON...${colors.reset}\n`);
-  try {
-    const outputDir = join(process.cwd(), "output");
+  const outputData = {
+    deploymentType: "cross-chain",
+    timestamp: new Date().toISOString(),
+    hostChain: {
+      chainId: hostChainId,
+      chainName: hostChainName || `Chain ${hostChainId}`,
+      contracts: hostContracts.map((contract) => ({
+        name: contract.contractName,
+        address: contract.contractAddress,
+      })),
+    },
+    externalChain: {
+      chainId: externalChainId,
+      chainName: externalChainName || `Chain ${externalChainId}`,
+      contracts: externalContracts.map((contract) => ({
+        name: contract.contractName,
+        address: contract.contractAddress,
+      })),
+    },
+  };
 
-    // Create output directory if it doesn't exist
-    if (!existsSync(outputDir)) {
-      warning("Output directory not found", "Creating directory...");
-      await mkdir(outputDir, { recursive: true });
-    }
+  await writeJsonToOutput(
+    "evvmCrossChainDeployment",
+    outputData,
+    "Cross-chain deployment information"
+  );
+}
 
-    // Prepare the output data
-    const outputData = {
-      deploymentName: fileName,
-      deploymentType: "cross-chain",
-      timestamp: new Date().toISOString(),
-      hostChain: {
-        chainId: hostChainId,
-        chainName: hostChainName || `Chain ${hostChainId}`,
-        contracts: hostContracts.map((contract) => ({
-          name: contract.contractName,
-          address: contract.contractAddress,
-        })),
-      },
-      externalChain: {
-        chainId: externalChainId,
-        chainName: externalChainName || `Chain ${externalChainId}`,
-        contracts: externalContracts.map((contract) => ({
-          name: contract.contractName,
-          address: contract.contractAddress,
-        })),
-      },
-    };
+/**
+ * Saves EVVM registration information to a JSON file
+ *
+ * Records the EVVM ID assignment and contract address to a JSON file after
+ * successful registration with the EVVM Registry. Includes chain information
+ * and timestamp for record-keeping.
+ *
+ * @param {number} evvmID - Unique EVVM ID assigned by the registry
+ * @param {`0x${string}`} evvmAddress - Address of the registered EVVM contract
+ * @param {number} chainId - Chain ID where EVVM is deployed
+ * @param {string} [chainName] - Optional human-readable chain name
+ * @returns {Promise<void>} Resolves when file is successfully written
+ *
+ * @example
+ * ```typescript
+ * await saveEvvmRegistrationToJson(
+ *   1234,
+ *   "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+ *   11155111,
+ *   "Sepolia"
+ * );
+ * // Creates: ./output/evvmRegistration.json
+ * ```
+ */
+export async function saveEvvmRegistrationToJson(
+  evvmID: number,
+  evvmAddress: `0x${string}`,
+  chainId: number,
+  chainName?: string
+): Promise<void> {
+  const outputData = {
+    timestamp: new Date().toISOString(),
+    chain: {
+      chainId,
+      chainName: chainName || `Chain ${chainId}`,
+    },
+    evvm: {
+      evvmID,
+      evvmAddress,
+    },
+  };
 
-    // Construct file path
-    const filePath = join(outputDir, `${fileName}.json`);
+  await writeJsonToOutput(
+    "evvmRegistration",
+    outputData,
+    "EVVM registration information"
+  );
+}
 
-    // Write to file with pretty formatting
-    await writeFile(filePath, JSON.stringify(outputData, null, 2), "utf-8");
+/**
+ * Saves cross-chain EVVM registration information to a JSON file
+ *
+ * Records EVVM ID assignment for a cross-chain deployment, including both
+ * the host chain EVVM contract and external chain treasury station addresses.
+ * Both contracts share the same EVVM ID for cross-chain coordination.
+ *
+ * @param {number} evvmID - Unique EVVM ID assigned by the registry
+ * @param {`0x${string}`} evvmAddress - Address of the EVVM contract on host chain
+ * @param {number} hostChainId - Host chain ID
+ * @param {`0x${string}`} treasuryExternalStationAddress - Address of treasury station on external chain
+ * @param {number} externalChainId - External chain ID
+ * @param {string} [hostChainName] - Optional host chain name
+ * @param {string} [externalChainName] - Optional external chain name
+ * @returns {Promise<void>} Resolves when file is successfully written
+ *
+ * @example
+ * ```typescript
+ * await saveEvvmCrossChainRegistrationToJson(
+ *   1234,
+ *   "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+ *   11155111,
+ *   "0x1234567890123456789012345678901234567890",
+ *   421614,
+ *   "Sepolia",
+ *   "Arbitrum Sepolia"
+ * );
+ * // Creates: ./output/evvmCrossChainRegistration.json
+ * ```
+ */
+export async function saveEvvmCrossChainRegistrationToJson(
+  evvmID: number,
+  evvmAddress: `0x${string}`,
+  hostChainId: number,
+  treasuryExternalStationAddress: `0x${string}`,
+  externalChainId: number,
 
-    confirmation(
-      `Cross-chain deployment information saved to: ${colors.blue}${filePath}${colors.reset}`
-    );
-  } catch (err) {
-    warning(
-      "Failed to save cross-chain deployment information", `${err instanceof Error ? err.message : "Unknown error"}`
-    );
-  }
+  hostChainName?: string,
+  externalChainName?: string
+): Promise<void> {
+  const outputData = {
+    timestamp: new Date().toISOString(),
+    hostChain: {
+      chainId: hostChainId,
+      chainName: hostChainName || `Chain ${hostChainId}`,
+    },
+    externalChain: {
+      chainId: externalChainId,
+      chainName: externalChainName || `Chain ${externalChainId}`,
+    },
+    evvm: {
+      evvmID,
+      evvmAddress,
+      treasuryExternalStationAddress,
+    },
+  };
+
+  await writeJsonToOutput(
+    "evvmCrossChainRegistration",
+    outputData,
+    "EVVM cross-chain registration information"
+  );
 }
