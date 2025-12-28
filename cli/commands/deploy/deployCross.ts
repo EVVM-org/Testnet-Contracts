@@ -194,6 +194,8 @@ export async function deployCross(args: string[], options: any) {
     verificationflagHost ? verificationflagHost.split(" ") : []
   );
 
+  confirmation(`Cross-chain EVVM deployed successfully!`);
+
   const {
     evvmAddress,
     treasuryHostChainStationAddress,
@@ -207,77 +209,46 @@ export async function deployCross(args: string[], options: any) {
       : undefined
   );
 
-  confirmation(`Cross-chain EVVM deployed successfully!`);
+  console.log(`
+${colors.evvmGreen}Next step: Cross-chain communication setup and EVVM registration${colors.reset}
 
-  console.log(`${colors.green}EVVM:             ${evvmAddress}${colors.reset}`);
-  console.log(
-    `${colors.green}Host Station:     ${treasuryHostChainStationAddress}${colors.reset}`
-  );
-  console.log(
-    `${colors.green}External Station: ${treasuryExternalChainStationAddress}${colors.reset}\n`
-  );
+${colors.yellow}⚠ Important:${colors.reset} Admin addresses on both chains must match each wallet used during deployment
+${colors.yellow}  Host Chain Admin:     ${walletNameHost}${colors.reset}
+${colors.yellow}  External Chain Admin: ${walletNameExternal}${colors.reset}
 
-  console.log(
-    `${colors.yellow}⚠ Important:${colors.reset} Admin addresses on both chains must match each wallet used during deployment${colors.reset}`
-  );
-  console.log(
-    `${colors.yellow}  Host Chain Admin:     ${walletNameHost}${colors.reset}`
-  );
-  console.log(
-    `${colors.yellow}  External Chain Admin: ${walletNameExternal}${colors.reset}\n`
-  );
-  console.log(
-    `${colors.yellow}     → Mismatched admin addresses will prevent successful setup of cross-chain communication${colors.reset}\n`
-  );
-  console.log(
-    `${colors.darkGray}   → If mismatched: Skip setup and run commands manually later${colors.reset}`
-  );
-  console.log(
-    `${colors.darkGray}   → If already matching: Proceed with setup now${colors.reset}\n`
-  );
+${colors.yellow}     → Mismatched admin addresses will prevent successful setup of cross-chain communication${colors.reset}
 
-  console.log(`${colors.bright}Manual setup commands:${colors.reset}`);
-  console.log(`${colors.darkGray}1. Cross-chain communication:${colors.reset}`);
-  console.log(
-    `   ${colors.evvmGreen}evvm setUpCrossChainTreasuries \\${colors.reset}`
-  );
-  console.log(
-    `   ${colors.evvmGreen}  --treasuryHostStationAddress ${treasuryHostChainStationAddress} \\${colors.reset}`
-  );
-  console.log(
-    `   ${colors.evvmGreen}  --treasuryExternalStationAddress ${treasuryExternalChainStationAddress} \\${colors.reset}`
-  );
-  console.log(
-    `   ${colors.evvmGreen}  --walletNameHost <wallet> --walletNameExternal <wallet>${colors.reset}\n`
-  );
+${colors.darkGray}   → If mismatched: Skip setup and run commands manually later${colors.reset}
+${colors.darkGray}   → If already matching: Proceed with setup now${colors.reset}
 
-  console.log(`${colors.darkGray}2. EVVM registration:${colors.reset}`);
-  console.log(
-    `   ${colors.evvmGreen}evvm registerCrossChain \\${colors.reset}`
-  );
-  console.log(
-    `   ${colors.evvmGreen}  --evvmAddress ${evvmAddress} \\${colors.reset}`
-  );
-  console.log(
-    `   ${colors.evvmGreen}  --treasuryExternalStationAddress ${treasuryExternalChainStationAddress} \\${colors.reset}`
-  );
-  console.log(`   ${colors.evvmGreen}  --walletName <wallet>${colors.reset}\n`);
+${colors.bright}Manual setup commands:${colors.reset}
+${colors.darkGray}1. Cross-chain communication:${colors.reset}
+   ${colors.evvmGreen}evvm setUpCrossChainTreasuries \\${colors.reset}
+   ${colors.evvmGreen}  --treasuryHostStationAddress ${treasuryHostChainStationAddress} \\${colors.reset}
+   ${colors.evvmGreen}  --treasuryExternalStationAddress ${treasuryExternalChainStationAddress} \\${colors.reset}
+   ${colors.evvmGreen}  --walletNameHost <wallet> --walletNameExternal <wallet>${colors.reset}
 
-  console.log(
-    `${colors.darkGray}More info: ${colors.blue}https://www.evvm.info/docs/QuickStart#6-register-in-registry-evvm${colors.reset}\n`
-  );
+${colors.darkGray}2. EVVM registration:${colors.reset}
+   ${colors.evvmGreen}evvm registerCrossChain \\${colors.reset}
+   ${colors.evvmGreen}  --evvmAddress ${evvmAddress} \\${colors.reset}
+   ${colors.evvmGreen}  --treasuryExternalStationAddress ${treasuryExternalChainStationAddress} \\${colors.reset}
+   ${colors.evvmGreen}  --walletName <wallet>${colors.reset}
+
+${colors.darkGray}More info: ${colors.blue}https://www.evvm.info/docs/QuickStart#6-register-in-registry-evvm${colors.reset}
+`);
 
   if (
     promptYesNo(
-      `${colors.yellow}Do you want to set up cross-chain communication now? (y/n):${colors.reset}`
+      `${colors.yellow}Do you want to continue with those steps? (y/n):${colors.reset}`
     )
   ) {
-    warning(
-      `Cross-chain communication skipped by user choice`,
+    customErrorWithExit(
+      `Steps skipped by user choice`,
       `${colors.darkGray}You can complete setup later using the commands above.${colors.reset}`
     );
-    return;
   }
+
+  console.log(`Setting up cross-chain treasury stations...`);
 
   await setUpCrossChainTreasuries([], {
     treasuryHostStationAddress:
@@ -288,18 +259,7 @@ export async function deployCross(args: string[], options: any) {
     walletNameExternal: walletNameExternal,
   });
 
-  console.log();
-  if (
-    promptYesNo(
-      `${colors.yellow}Do you want to register the EVVM instance now? (y/n):${colors.reset}`
-    )
-  ) {
-    warning(
-      `Registration skipped by user choice`,
-      `${colors.darkGray}You can register later using the commands above.${colors.reset}`
-    );
-    return;
-  }
+  console.log(`Setting up EVVM registration...`);
 
   // If user decides, add --useCustomEthRpc flag to the registerEvvm call
   const ethRPCAns = promptYesNo(

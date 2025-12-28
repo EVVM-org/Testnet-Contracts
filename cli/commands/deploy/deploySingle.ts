@@ -115,47 +115,34 @@ export async function deploySingle(args: string[], options: any) {
   );
 
   confirmation(`EVVM deployed successfully!`);
+
   const evvmAddress: `0x${string}` | null =
     await showDeployContractsAndFindEvvm(chainId);
 
-  console.log(`${colors.bright}Next Step: Registration${colors.reset}`);
-  console.log(
-    `${colors.blue}Your EVVM instance is ready to be registered.${colors.reset}`
-  );
-  console.log();
-  console.log(`${colors.yellow}Important:${colors.reset}`);
-  console.log(
-    `   To register now, your Admin address must match the ${walletName} wallet.`
-  );
-  console.log(
-    `   ${colors.darkGray}Otherwise, you can register later using:${colors.reset}`
-  );
-  console.log(
-    `   ${colors.evvmGreen}evvm register --evvmAddress ${evvmAddress} --walletName <walletName>${colors.reset}`
-  );
-  console.log("Or if you want to use your custom Ethereum Sepolia RPC:");
-  console.log(
-    `   ${colors.evvmGreen}evvm register --evvmAddress ${evvmAddress} --walletName <walletName> --useCustomEthRpc${colors.reset}`
-  );
-  console.log();
-  console.log(
-    `   ${colors.darkGray}📖 For more details, visit:${colors.reset}`
-  );
-  console.log(
-    `   ${colors.blue}https://www.evvm.info/docs/QuickStart#6-register-in-registry-evvm${colors.reset}`
-  );
-  console.log();
+  console.log(`
+${colors.bright}Next Step: Registration${colors.reset}
+${colors.blue}Your EVVM instance is ready to be registered.${colors.reset}
+
+${colors.yellow}Important:${colors.reset}
+   To register now, your Admin address must match the ${walletName} wallet.
+   ${colors.darkGray}Otherwise, you can register later using:${colors.reset}
+   ${colors.evvmGreen}evvm register --evvmAddress ${evvmAddress} --walletName <walletName>${colors.reset}
+Or if you want to use your custom Ethereum Sepolia RPC:
+   ${colors.evvmGreen}evvm register --evvmAddress ${evvmAddress} --walletName <walletName> --useCustomEthRpc${colors.reset}
+
+   ${colors.darkGray}📖 For more details, visit:${colors.reset}
+   ${colors.blue}https://www.evvm.info/docs/QuickStart#6-register-in-registry-evvm${colors.reset}
+`);
 
   if (
     promptYesNo(
       `${colors.yellow}Do you want to register the EVVM instance now? (y/n):${colors.reset}`
     )
   ) {
-    warning(
-      `Registration skipped by user choice`,
-      `${colors.darkGray}You can register later using the commands above.${colors.reset}`
+    customErrorWithExit(
+      `Steps skipped by user choice`,
+      `${colors.darkGray}You can complete setup later using the commands above.${colors.reset}`
     );
-    return;
   }
 
   // If user decides, add --useCustomEthRpc flag to the registerEvvm call
