@@ -2,6 +2,9 @@
 cache/
 out/
 
+# cli output files
+/output/
+
 # Ignores development broadcast logs
 /broadcast/
 

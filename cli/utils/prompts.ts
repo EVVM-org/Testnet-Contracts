@@ -1,18 +1,18 @@
 /**
  * User Input Prompt Utilities
- * 
+ *
  * Provides interactive prompting functions for gathering user input with validation.
  * Supports various input types including strings, numbers, addresses, and selections.
- * 
+ *
  * @module cli/utils/prompts
  */
 
 import { colors } from "../constants";
-import { isAddress } from "viem";
+import { isAddress, getAddress } from "viem";
 
 /**
  * Prompts user for string input with optional default value
- * 
+ *
  * @param {string} message - Prompt message to display
  * @param {string} [defaultValue] - Default value if user provides no input
  * @returns {string} User's input or default value
@@ -20,9 +20,7 @@ import { isAddress } from "viem";
 export function promptString(message: string, defaultValue?: string): string {
   const input = prompt(message);
 
-  if (!input && defaultValue !== undefined) {
-    return defaultValue;
-  }
+  if (!input && defaultValue !== undefined) return defaultValue;
 
   if (!input) {
     console.log(
@@ -36,9 +34,9 @@ export function promptString(message: string, defaultValue?: string): string {
 
 /**
  * Prompts user for numeric input with validation
- * 
+ *
  * Validates that input is a valid positive number and recursively re-prompts on invalid input.
- * 
+ *
  * @param {string} message - Prompt message to display
  * @param {number} [defaultValue] - Default value if user provides no input
  * @returns {number} Valid positive number
@@ -46,9 +44,7 @@ export function promptString(message: string, defaultValue?: string): string {
 export function promptNumber(message: string, defaultValue?: number): number {
   const input = prompt(message);
 
-  if (!input && defaultValue !== undefined) {
-    return defaultValue;
-  }
+  if (!input && defaultValue !== undefined) return defaultValue;
 
   const num = Number(input);
   if (isNaN(num) || num < 0) {
@@ -63,10 +59,10 @@ export function promptNumber(message: string, defaultValue?: number): number {
 
 /**
  * Prompts user for Ethereum address with format validation
- * 
+ *
  * Validates address format (0x followed by 40 hex characters) and recursively
  * re-prompts on invalid input.
- * 
+ *
  * @param {string} message - Prompt message to display
  * @param {`0x${string}`} [defaultValue] - Default address if user provides no input
  * @returns {`0x${string}`} Valid Ethereum address
@@ -77,9 +73,7 @@ export function promptAddress(
 ): `0x${string}` {
   const input = prompt(message);
 
-  if (!input && defaultValue !== undefined) {
-    return defaultValue;
-  }
+  if (!input && defaultValue !== undefined) return getAddress(defaultValue);
 
   if (!isAddress(input || "")) {
     console.log(
@@ -88,39 +82,37 @@ export function promptAddress(
     return promptAddress(message, defaultValue);
   }
 
-  return input as `0x${string}`;
+  return getAddress(input as `0x${string}`);
 }
 
 /**
  * Prompts user for yes/no confirmation
- * 
+ *
  * Accepts 'y' or 'n' input (case-insensitive) and validates the response.
- * 
+ *
  * @param {string} message - Prompt message to display
  * @param {string} [defaultValue] - Default value if user provides no input
- * @returns {string} Lowercase 'y' or 'n'
+ * @returns {boolean} True for 'y', False for 'n'
  */
-export function promptYesNo(message: string, defaultValue?: string): string {
+export function promptYesNo(message: string, defaultValue?: string): boolean {
   const input = prompt(message);
+  const val = (input ?? defaultValue)?.trim().toLowerCase();
 
-  if (!input && defaultValue !== undefined) {
-    return defaultValue;
-  }
-
-  if (input?.toLowerCase() !== "y" && input?.toLowerCase() !== "n") {
+  if (!val || (val !== "y" && val !== "n")) {
+    if (!input && defaultValue !== undefined) return defaultValue.toLowerCase() === "y";
     console.log(`${colors.red}Please enter 'y' or 'n'${colors.reset}`);
     return promptYesNo(message, defaultValue);
   }
 
-  return input.toLowerCase();
+  return val === "y";
 }
 
 /**
  * Prompts user for secret input with masked display
- * 
+ *
  * Displays asterisks instead of actual characters while user types.
  * Handles backspace for correction and Enter to submit.
- * 
+ *
  * @param {string} message - Prompt message to display
  * @returns {Promise<string>} The secret input provided by user
  */
@@ -129,9 +121,8 @@ export function promptSecret(message: string): Promise<string> {
 
   let secret = "";
 
-  if (process.stdin.isTTY) {
-    process.stdin.setRawMode(true);
-  }
+  if (process.stdin.isTTY) process.stdin.setRawMode(true);
+
   process.stdin.resume();
   process.stdin.setEncoding("utf8");
 
@@ -160,8 +151,7 @@ export function promptSecret(message: string): Promise<string> {
           secret = secret.slice(0, -1);
           process.stdout.write("\b \b");
         }
-      }
-      else if (key.length === 1 && key !== "\r" && key !== "\n") {
+      } else if (key.length === 1 && key !== "\r" && key !== "\n") {
         secret += key;
         process.stdout.write("*");
       }
@@ -173,10 +163,10 @@ export function promptSecret(message: string): Promise<string> {
 
 /**
  * Prompts user to select from a list of options using arrow keys
- * 
+ *
  * Provides an interactive menu where users can navigate with arrow keys
  * and select with Enter. Selected option is highlighted.
- * 
+ *
  * @param {string} message - Prompt message to display above options
  * @param {string[]} options - Array of options to choose from
  * @returns {Promise<string>} The selected option
@@ -191,9 +181,8 @@ export async function promptSelect(
   let isFirstRender = true;
 
   const renderOptions = () => {
-    if (!isFirstRender) {
-      process.stdout.write(`\x1b[${options.length}A`);
-    }
+    if (!isFirstRender) process.stdout.write(`\x1b[${options.length}A`);
+
     isFirstRender = false;
 
     options.forEach((option, index) => {

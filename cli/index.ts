@@ -3,8 +3,15 @@
 /**
  * EVVM CLI Entry Point
  * 
- * This module serves as the main entry point for the EVVM command-line interface.
- * It handles command parsing, routing, and global error handling for all CLI operations.
+ * Main command-line interface for EVVM contract deployment, registration,
+ * and cross-chain configuration. Provides an interactive wizard-based workflow
+ * with validation, error handling, and integration with Foundry tooling.
+ * 
+ * Supported operations:
+ * - Single-chain and cross-chain EVVM deployment
+ * - EVVM Registry registration on Ethereum Sepolia
+ * - Cross-chain treasury station connection
+ * - Developer utilities (interface generation, testing)
  * 
  * @module cli/index
  */
@@ -22,6 +29,14 @@ import { deploy } from "./commands/deploy";
 
 /**
  * Available CLI commands mapped to their handler functions
+ * 
+ * @constant {Object} commands - Command name to handler function mapping
+ * @property {Function} help - Display CLI help and usage information
+ * @property {Function} version - Display CLI version number
+ * @property {Function} deploy - Deploy EVVM contracts (single or cross-chain)
+ * @property {Function} register - Register EVVM in registry (single or cross-chain)
+ * @property {Function} setUpCrossChainTreasuries - Connect host and external treasury stations
+ * @property {Function} dev - Developer utilities and tooling
  */
 const commands = {
   help: showHelp,
@@ -35,10 +50,21 @@ const commands = {
 /**
  * Main CLI execution function
  * 
- * Parses command-line arguments and routes to the appropriate command handler.
- * Handles global flags like --help and --version before delegating to specific commands.
+ * Orchestrates the CLI workflow:
+ * 1. Parses command-line arguments using Node's util.parseArgs
+ * 2. Handles global flags (--help, --version)
+ * 3. Routes to appropriate command handler
+ * 4. Provides error handling for unknown commands
  * 
- * @throws {Error} When an unknown command is provided
+ * Supported global flags:
+ * - --help, -h: Display comprehensive help information
+ * - --version, -v: Display CLI version number
+ * - --verbose: Enable verbose logging (reserved for future use)
+ * 
+ * Command-specific options are passed through to individual handlers.
+ * 
+ * @returns {Promise<void>}
+ * @throws {Error} When an unknown command is provided (exits with code 1)
  */
 async function main() {
   const args = process.argv.slice(2);
@@ -49,12 +75,27 @@ async function main() {
   }
 
   /**
-   * Parse command-line arguments with supported options:
+   * Parse command-line arguments with comprehensive option definitions
+   * 
+   * Global options:
    * - help, version: Display help or version information
-   * - skipInputConfig: Skip interactive configuration during deployment
-   * - walletName: Specify Foundry wallet name for transactions
-   * - evvmAddress: EVVM contract address for registration
+   * - verbose: Enable verbose output (reserved for future use)
+   * - crossChain: Enable cross-chain deployment/registration mode
+   * 
+   * Deployment options:
+   * - skipInputConfig: Use configuration files instead of interactive prompts
+   * - walletName/walletNameHost/walletNameExternal: Foundry wallet account names
+   * 
+   * Registration options:
+   * - evvmAddress: Address of deployed EVVM contract
    * - useCustomEthRpc: Use custom Ethereum Sepolia RPC for registry calls
+   * 
+   * Cross-chain setup options:
+   * - treasuryHostStationAddress: Host chain treasury station address
+   * - treasuryExternalStationAddress: External chain treasury station address
+   * 
+   * Developer options:
+   * - makeInterface: Generate Solidity interfaces from contracts
    */
   const { values, positionals } = parseArgs({
     args,

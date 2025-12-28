@@ -1,34 +1,51 @@
 /**
- * EVVM Registration Command
+ * Single-Chain EVVM Registration Command
  *
- * Handles registration of deployed EVVM instances in the EVVM Registry.
- * Performs chain validation, generates EVVM ID, and updates the contract.
+ * Handles registration of single-chain EVVM deployments in the EVVM Registry
+ * contract on Ethereum Sepolia. Generates a unique EVVM ID and updates the
+ * deployed contract with its assigned identifier.
  *
- * @module cli/commands/registerEvvm
+ * @module cli/commands/register/registerSingle
  */
 
-import { colors, EthSepoliaPublicRpc } from "../../constants";
-import { promptAddress, promptString } from "../../utils/prompts";
+import {
+  chainIdNotSupported,
+  confirmation,
+  criticalError,
+  infoWithChainData,
+  warning,
+} from "../../utils/outputMesages";
 import {
   callRegisterEvvm,
   callSetEvvmID,
   isChainIdRegistered,
   verifyFoundryInstalledAndAccountSetup,
 } from "../../utils/foundry";
-import { chainIdNotSupported, criticalError } from "../../utils/outputMesages";
+import { ChainData, colors, EthSepoliaPublicRpc } from "../../constants";
+import { promptAddress, promptString } from "../../utils/prompts";
 import { getRPCUrlAndChainId } from "../../utils/rpc";
+import { saveEvvmRegistrationToJson } from "../../utils/outputJson";
 
 /**
- * Registers an EVVM instance in the registry contract
+ * Registers a single-chain EVVM instance in the EVVM Registry
+ *
+ * This command interacts with the EVVM Registry contract on Ethereum Sepolia
+ * to obtain a globally unique EVVM ID, then updates the deployed EVVM contract
+ * with this identifier. The registry maintains a canonical list of all EVVM
+ * instances across supported chains.
  *
  * Process:
  * 1. Validates Foundry installation and wallet setup
- * 2. Verifies EVVM address and host chain support
- * 3. Calls registry contract to obtain EVVM ID
- * 4. Updates EVVM contract with assigned ID
+ * 2. Prompts for EVVM contract address if not provided
+ * 3. Validates host chain is supported (skips for local chains 31337/1337)
+ * 4. Calls EVVM Registry on Ethereum Sepolia to generate EVVM ID
+ * 5. Updates EVVM contract with assigned ID via setEvvmID()
  *
- * @param {string[]} _args - Command arguments (unused)
- * @param {any} options - Command options including evvmAddress, walletName, useCustomEthRpc
+ * @param {string[]} _args - Command arguments (unused, reserved for future use)
+ * @param {any} options - Command options:
+ *   - evvmAddress: Address of deployed EVVM contract
+ *   - walletName: Foundry wallet account name (default: "defaultKey")
+ *   - useCustomEthRpc: Use custom Ethereum Sepolia RPC instead of public (default: false)
  * @returns {Promise<void>}
  */
 export async function registerSingle(_args: string[], options: any) {
@@ -59,17 +76,14 @@ export async function registerSingle(_args: string[], options: any) {
   let { rpcUrl, chainId } = await getRPCUrlAndChainId(process.env.RPC_URL);
 
   if (chainId === 31337 || chainId === 1337) {
-    console.log(`\n${colors.orange}Local Blockchain Detected${colors.reset}`);
-    console.log(
-      `${colors.darkGray}Skipping registry contract registration for local development${colors.reset}`
-    );
+    warning("Local blockchain detected", "Skipping registry registration")
     return;
   }
 
   if (!(await isChainIdRegistered(chainId))) chainIdNotSupported(chainId);
 
   console.log(
-    `${colors.blue}Setting EVVM ID directly on contract...${colors.reset}\n`
+    `${colors.blue}Making registration to EVVM Registry on Ethereum Sepolia...${colors.reset}\n`
   );
 
   const evvmID: number | undefined = await callRegisterEvvm(
@@ -84,17 +98,23 @@ export async function registerSingle(_args: string[], options: any) {
   console.log(
     `${colors.green}EVVM ID generated: ${colors.bright}${evvmID}${colors.reset}`
   );
-  console.log(`${colors.blue}Setting EVVM ID on contract...${colors.reset}\n`);
+  
+  infoWithChainData(
+    `Setting EVVM ID on EVVM contract`,
+    ChainData[chainId]?.Chain || "",
+    chainId
+  );
 
   await callSetEvvmID(evvmAddress, evvmID!, rpcUrl, walletName);
 
-  console.log(
-    `\n${colors.bright}═══════════════════════════════════════${colors.reset}`
+  await saveEvvmRegistrationToJson(
+    Number(evvmID),
+    evvmAddress,
+    chainId,
+    ChainData[chainId]?.Chain
   );
-  console.log(`${colors.bright}        Registration Complete${colors.reset}`);
-  console.log(
-    `${colors.bright}═══════════════════════════════════════${colors.reset}\n`
-  );
+
+  confirmation(`EVVM registration completed successfully!`);
   console.log(
     `${colors.green}EVVM ID: ${colors.bright}${evvmID}${colors.reset}`
   );

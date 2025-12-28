@@ -43,7 +43,7 @@ export async function checkCrossChainSupport(
     if (
       promptYesNo(
         `${colors.yellow}Do you want to add Hyperlane data? (y/n):${colors.reset}`
-      ) === "y"
+      )
     ) {
       auxChainData.Hyperlane.DomainId = promptNumber(
         `${colors.yellow}Enter Hyperlane Domain ID for ${
@@ -57,9 +57,9 @@ export async function checkCrossChainSupport(
       );
     } else {
       if (
-        promptYesNo(
+        !promptYesNo(
           `${colors.yellow}Do you want to continue without adding Hyperlane data? (y/n):${colors.reset}`
-        ) === "n"
+        )
       ) {
         criticalErrorCustom(
           `User opted to not add Hyperlane data.`,
@@ -79,7 +79,7 @@ export async function checkCrossChainSupport(
     if (
       promptYesNo(
         `${colors.yellow}Do you want to add LayerZero data? (y/n):${colors.reset}`
-      ) === "y"
+      )
     ) {
       auxChainData.LayerZero.EId = promptNumber(
         `${colors.yellow}Enter LayerZero EId for ${
@@ -93,9 +93,9 @@ export async function checkCrossChainSupport(
       );
     } else {
       if (
-        promptYesNo(
+        !promptYesNo(
           `${colors.yellow}Do you want to continue without adding LayerZero data? (y/n):${colors.reset}`
-        ) === "n"
+        )
       ) {
         criticalErrorCustom(
           `User opted to not add LayerZero data.`,
@@ -115,7 +115,7 @@ export async function checkCrossChainSupport(
     if (
       promptYesNo(
         `${colors.yellow}Do you want to add Axelar data? (y/n):${colors.reset}`
-      ) === "y"
+      )
     ) {
       auxChainData.Axelar.ChainName = promptString(
         `${colors.yellow}Enter Axelar Chain Name for ${
@@ -134,9 +134,9 @@ export async function checkCrossChainSupport(
       );
     } else {
       if (
-        promptYesNo(
+        !promptYesNo(
           `${colors.yellow}Do you want to continue without adding Axelar data? (y/n):${colors.reset}`
-        ) === "n"
+        )
       ) {
         criticalErrorCustom(
           `User opted to not add Axelar data.`,
@@ -173,9 +173,9 @@ export async function checkCrossChainSupport(
     console.log();
 
     if (
-      promptYesNo(
+      !promptYesNo(
         `${colors.yellow}Proceed with this configuration? (y/n):${colors.reset}`
-      ) === "n"
+      )
     ) {
       criticalError(
         `User cancelled due to incomplete cross-chain configuration.`
