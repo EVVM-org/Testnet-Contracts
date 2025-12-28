@@ -612,7 +612,7 @@ contract TreasuryExternalChainStation is
     /// @param _sourceAddress Source contract address (must match host chain station)
     /// @param _payload Encoded payload containing transfer instructions
     function _execute(
-        bytes32 commandId,
+        bytes32 /*commandId*/,
         string calldata _sourceChain,
         string calldata _sourceAddress,
         bytes calldata _payload

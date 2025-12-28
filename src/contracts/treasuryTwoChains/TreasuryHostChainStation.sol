@@ -31,6 +31,7 @@ pragma solidity ^0.8.0;
  * @author Mate labs
  */
 
+import {IERC20} from "@evvm/testnet-contracts/library/primitives/IERC20.sol";
 import {IEvvm} from "@evvm/testnet-contracts/interfaces/IEvvm.sol";
 import {
     ErrorsLib
@@ -514,7 +515,7 @@ contract TreasuryHostChainStation is
     /// @param _sourceAddress Source contract address (must match external chain station)
     /// @param _payload Encoded payload containing deposit instructions
     function _execute(
-        bytes32 commandId,
+        bytes32 /*commandId*/,
         string calldata _sourceChain,
         string calldata _sourceAddress,
         bytes calldata _payload
