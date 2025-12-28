@@ -67,6 +67,24 @@ export function error(message: string, extraMessage: string = "") {
 }
 
 /**
+ * Displays a non-fatal error message and exits the process
+ * 
+ * Prints a formatted error message and then terminates the CLI process
+ * with exit code 1.
+ * 
+ * @param {string} message - Error description
+ * @param {string} [extraMessage=""] - Optional additional context
+ * @returns {never} - Function never returns (process exits)
+ */
+export function customErrorWithExit(message: string, extraMessage: string = "") {
+  console.error(`${colors.red}🯀   ${message}${colors.reset}`);
+  if (extraMessage) {
+    console.log(`${extraMessage}`);
+  }
+  process.exit(1);
+}
+
+/**
  * Displays a warning message
  * 
  * Prints a formatted warning message to indicate potential issues
