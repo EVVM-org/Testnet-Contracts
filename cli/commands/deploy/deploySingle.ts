@@ -19,6 +19,7 @@ import {
   confirmation,
   criticalError,
   customErrorWithExit,
+  infoWithChainData,
   showEvvmLogo,
   warning,
 } from "../../utils/outputMesages";
@@ -101,10 +102,10 @@ export async function deploySingle(args: string[], options: any) {
       criticalError(`Explorer verification setup failed.`);
   }
 
-  console.log(
-    ChainData[chainId]?.Chain
-      ? `${colors.blue} Deploying on ${ChainData[chainId].Chain} ${colors.darkGray}(${chainId})${colors.reset}`
-      : `${colors.blue} Deploying on Chain ID:${colors.reset} ${chainId}`
+  infoWithChainData(
+    `Deploying EVVM instance`,
+    ChainData[chainId]?.Chain || "",
+    chainId
   );
 
   await forgeScript(
@@ -135,7 +136,7 @@ Or if you want to use your custom Ethereum Sepolia RPC:
 `);
 
   if (
-    promptYesNo(
+    !promptYesNo(
       `${colors.yellow}Do you want to register the EVVM instance now? (y/n):${colors.reset}`
     )
   ) {

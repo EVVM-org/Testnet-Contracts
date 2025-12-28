@@ -19,6 +19,7 @@ import {
   chainIdNotSupported,
   confirmation,
   criticalError,
+  infoWithChainData,
   warning,
 } from "../../utils/outputMesages";
 import { ChainData, colors, EthSepoliaPublicRpc } from "../../constants";
@@ -93,7 +94,7 @@ export async function registerCross(_args: string[], options: any) {
     await getRPCUrlAndChainId(process.env.EXTERNAL_RPC_URL);
 
   if (hostChainId === 31337 || hostChainId === 1337) {
-    warning("Local blockchain detected", "Skipping registry registration")
+    warning("Local blockchain detected", "Skipping registry registration");
     return;
   }
 
@@ -120,10 +121,11 @@ export async function registerCross(_args: string[], options: any) {
     `${colors.green}Generated EVVM ID: ${colors.bright}${evvmID}${colors.reset}\n`
   );
 
-  console.log(
-    ChainData[hostChainId]?.Chain
-      ? `${colors.blue} Setting EVVM ID on EVVM contract on ${ChainData[hostChainId].Chain} ${colors.darkGray}(${hostChainId})${colors.reset}`
-      : `${colors.blue} Setting EVVM ID on EVVM contract on Chain ID:${colors.reset} ${hostChainId}`
+
+  infoWithChainData(
+    `Setting EVVM ID on EVVM contract`,
+    ChainData[hostChainId]?.Chain || "",
+    hostChainId
   );
 
   await callSetEvvmID(
@@ -133,10 +135,10 @@ export async function registerCross(_args: string[], options: any) {
     walletNameHost
   );
 
-  console.log(
-    ChainData[externalChainId]?.Chain
-      ? `${colors.blue} Setting EVVM ID on Treasury External Station on ${ChainData[externalChainId].Chain} ${colors.darkGray}(${externalChainId})${colors.reset}`
-      : `${colors.blue} Setting EVVM ID on Treasury External Station on Chain ID:${colors.reset} ${externalChainId}`
+  infoWithChainData(
+    `Setting EVVM ID on Treasury External Station`,
+    ChainData[externalChainId]?.Chain || "",
+    externalChainId
   );
 
   await callSetEvvmID(

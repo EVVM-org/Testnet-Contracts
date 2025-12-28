@@ -22,6 +22,7 @@ import {
   confirmation,
   criticalError,
   criticalErrorCustom,
+  infoWithChainData,
   warning,
 } from "./outputMesages";
 import { getAddress } from "viem/utils";
@@ -127,13 +128,23 @@ export async function callSetEvvmID(
 }
 
 /**
- * Sets the host chain station address on the external chain station contract
+ * Establishes bidirectional connection between host and external chain treasury stations
  *
- * @param {`0x${string}`} treasuryExternalChainAddress - Address of the External Chain Station contract
- * @param {`0x${string}`} treasuryHostChainStationAddress - Address of the Host Chain Station
+ * Creates the cross-chain link by:
+ * 1. Setting external station address on the host station contract
+ * 2. Setting host station address on the external station contract
+ *
+ * This bidirectional connection enables cross-chain asset transfers and
+ * communication between the two treasury stations.
+ *
+ * @param {string} treasuryHostChainStationAddress - Address of Host Chain Station contract
+ * @param {string} hostChainRpcUrl - RPC URL for the host chain
+ * @param {string} [hostWalletName="defaultKey"] - Foundry wallet for host chain transactions
+ * @param {string} treasuryExternalChainAddress - Address of External Chain Station contract
  * @param {string} externalChainRpcUrl - RPC URL for the external chain
- * @param {string} walletName - Foundry wallet name to use for the transaction
- * @returns {Promise<boolean>} True if successfully set, false on error
+ * @param {string} [externalWalletName="defaultKey"] - Foundry wallet for external chain transactions
+ * @returns {Promise<void>} Resolves when both connections are established
+ * @throws {Error} Exits process if connection fails on either chain
  */
 export async function callConnectStations(
   treasuryHostChainStationAddress: string,
@@ -182,6 +193,34 @@ export async function callConnectStations(
   }
 }
 
+/**
+ * Executes a contract transaction using Foundry's cast send
+ *
+ * Automatically detects network requirements and adds appropriate flags:
+ * - Legacy transaction format for networks with gas price = 0
+ * - Gas limit of 500000 for legacy transactions
+ *
+ * This is a low-level utility function used by other functions to
+ * interact with deployed contracts.
+ *
+ * @param {`0x${string}`} addressToCall - Contract address to interact with
+ * @param {string} rpcUrl - RPC endpoint URL for the target blockchain
+ * @param {string} functionSignature - Solidity function signature (e.g., "transfer(address,uint256)")
+ * @param {string[]} args - Array of function arguments as strings
+ * @param {string} [walletName="defaultKey"] - Foundry wallet name for signing
+ * @returns {Promise<boolean>} True if transaction succeeded, false on error
+ *
+ * @example
+ * ```typescript
+ * await castSend(
+ *   "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+ *   "https://rpc.sepolia.org",
+ *   "setEvvmID(uint256)",
+ *   ["1234"],
+ *   "myWallet"
+ * );
+ * ```
+ */
 export async function castSend(
   addressToCall: `0x${string}`,
   rpcUrl: string,
@@ -291,6 +330,35 @@ export async function detectEvmVersion(rpcUrl: string): Promise<string | null> {
   }
 }
 
+/**
+ * Executes a Foundry deployment script with automatic network optimization
+ *
+ * Runs a Forge script with the following automatic configurations:
+ * - Via-IR compilation for gas optimization
+ * - Legacy transaction detection for networks without EIP-1559
+ * - EVM version detection for compatibility
+ * - Optional block explorer verification
+ *
+ * The function cleans the build cache before execution to ensure
+ * a fresh deployment state.
+ *
+ * @param {string} scriptPath - Path to the Solidity script (e.g., "script/Deploy.s.sol:DeployScript")
+ * @param {string} rpcUrl - RPC endpoint URL for the target blockchain
+ * @param {string} [walletName="defaultKey"] - Foundry wallet name for deployment transactions
+ * @param {string[]} [verificationArgs=[]] - Additional arguments for block explorer verification
+ * @returns {Promise<void>} Resolves when deployment completes successfully
+ * @throws {Error} Exits process if deployment fails
+ *
+ * @example
+ * ```typescript
+ * await forgeScript(
+ *   "script/Deploy.s.sol:DeployScript",
+ *   "https://rpc.sepolia.org",
+ *   "defaultKey",
+ *   ["--verify", "--etherscan-api-key", "YOUR_KEY"]
+ * );
+ * ```
+ */
 export async function forgeScript(
   scriptPath: string,
   rpcUrl: string,
@@ -323,7 +391,6 @@ export async function forgeScript(
       command.push("--evm-version", evmVersion);
     }
 
-    console.log(`${colors.evvmGreen}Starting deployment...${colors.reset}\n`);
     await $`forge clean`.quiet();
 
     await $`${command}`;
@@ -449,11 +516,7 @@ export async function showDeployContractsAndFindEvvm(
   });
   console.log();
 
-  await saveDeploymentToJson(
-    createdContracts,
-    chainId,
-    chainData?.Chain
-  );
+  await saveDeploymentToJson(createdContracts, chainId, chainData?.Chain);
 
   return (
     createdContracts.find(
@@ -462,11 +525,33 @@ export async function showDeployContractsAndFindEvvm(
   );
 }
 
+/**
+ * Displays deployed cross-chain contracts and extracts key addresses
+ *
+ * Reads Foundry broadcast files from both host and external chain deployments
+ * to display all deployed contracts and extract the addresses of:
+ * - EVVM core contract (host chain)
+ * - TreasuryHostChainStation contract (host chain)
+ * - TreasuryExternalChainStation contract (external chain)
+ *
+ * Also saves deployment information to JSON file for record-keeping.
+ *
+ * @param {number} chainIdHost - Chain ID where host contracts were deployed
+ * @param {number} chainIdExternal - Chain ID where external contracts were deployed
+ * @returns {Promise<Object>} Object containing extracted contract addresses:
+ *   - evvmAddress: EVVM core contract address (or null if not found)
+ *   - treasuryHostChainStationAddress: Host station address (or null if not found)
+ *   - treasuryExternalChainStationAddress: External station address (or null if not found)
+ *
+ * @example
+ * ```typescript
+ * const { evvmAddress, treasuryHostChainStationAddress, treasuryExternalChainStationAddress } =
+ *   await showAllCrossChainDeployedContracts(11155111, 421614);
+ * ```
+ */
 export async function showAllCrossChainDeployedContracts(
   chainIdHost: number,
-  chainNameHost: string | undefined,
-  chainIdExternal: number,
-  chainNameExternal: string | undefined
+  chainIdExternal: number
 ): Promise<{
   evvmAddress: `0x${string}` | null;
   treasuryHostChainStationAddress: `0x${string}` | null;
@@ -508,15 +593,12 @@ export async function showAllCrossChainDeployedContracts(
     `${colors.bright}═══════════════════════════════════════${colors.reset}\n`
   );
 
-  if (chainNameHost) {
-    console.log(
-      `${colors.blue}Deployed on ${chainNameHost} (${colors.darkGray}${chainIdHost}${colors.reset})${colors.reset}`
-    );
-  } else {
-    console.log(
-      `${colors.blue}Deployed on Chain ID: ${colors.darkGray}${chainIdHost}${colors.reset}${colors.reset}`
-    );
-  }
+
+  infoWithChainData(
+    `Deployed`,
+    ChainData[chainIdHost]?.Chain || "",
+    chainIdHost
+  );
 
   const chainDataHost = ChainData[chainIdHost];
   const explorerUrlHost = chainDataHost?.ExplorerToAddress;
@@ -537,21 +619,17 @@ export async function showAllCrossChainDeployedContracts(
   await saveCrossChainDeploymentToJson(
     createdContractsHost,
     chainIdHost,
-    chainNameHost,
+    ChainData[chainIdHost]?.Chain || undefined,
     createdContractsExternal,
     chainIdExternal,
-    chainNameExternal
+    ChainData[chainIdExternal]?.Chain || undefined
   );
 
-  if (chainNameExternal) {
-    console.log(
-      `${colors.blue}Deployed on ${chainNameExternal} (${colors.darkGray}${chainIdExternal}${colors.reset})${colors.reset}`
-    );
-  } else {
-    console.log(
-      `${colors.blue}Deployed on Chain ID: ${colors.darkGray}${chainIdExternal}${colors.reset}${colors.reset}`
-    );
-  }
+  infoWithChainData(
+    `Deployed`,
+    ChainData[chainIdExternal]?.Chain || "",
+    chainIdExternal
+  );
 
   const chainDataExternal = ChainData[chainIdExternal];
   const explorerUrlExternal = chainDataExternal?.ExplorerToAddress;

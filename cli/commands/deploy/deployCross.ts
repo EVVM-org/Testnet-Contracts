@@ -12,6 +12,7 @@ import {
   confirmation,
   criticalError,
   customErrorWithExit,
+  infoWithChainData,
   showEvvmLogo,
   warning,
 } from "../../utils/outputMesages";
@@ -137,16 +138,12 @@ export async function deployCross(args: string[], options: any) {
   if (verificationflagExternal === undefined)
     criticalError("Explorer verification setup failed.");
 
-  const chainDataExternal = ChainData[externalChainId!];
+  infoWithChainData(
+    `Deploying`,
+    ChainData[externalChainId]?.Chain || "",
+    externalChainId
+  );
 
-  if (chainDataExternal)
-    console.log(
-      `${colors.blue}Deploying on ${chainDataExternal.Chain}  ${colors.darkGray}(${externalChainId})${colors.reset}`
-    );
-  else
-    console.log(
-      `${colors.blue}Deploying on Chain ID:${colors.reset} ${externalChainId}`
-    );
   console.log(
     `  ${colors.green}•${colors.reset} Treasury cross-chain contract  ${colors.darkGray}(TreasuryExternalChainStation.sol)${colors.reset}\n`
   );
@@ -158,15 +155,11 @@ export async function deployCross(args: string[], options: any) {
     verificationflagExternal ? verificationflagExternal.split(" ") : []
   );
 
-  const chainDataHost = ChainData[hostChainId!];
-  if (chainDataHost)
-    console.log(
-      `\n${colors.blue}Deploying on ${chainDataHost.Chain}  ${colors.darkGray}(${hostChainId})${colors.reset}`
-    );
-  else
-    console.log(
-      `\n${colors.blue}Deploying on Chain ID:${colors.reset} ${hostChainId}`
-    );
+  infoWithChainData(
+    `Deploying`,
+    ChainData[hostChainId]?.Chain || "",
+    hostChainId
+  );
 
   console.log(
     `  ${colors.green}•${colors.reset} Treasury cross-chain contract ${colors.darkGray}(TreasuryHostChainStation.sol)${colors.reset}`
@@ -200,14 +193,7 @@ export async function deployCross(args: string[], options: any) {
     evvmAddress,
     treasuryHostChainStationAddress,
     treasuryExternalChainStationAddress,
-  } = await showAllCrossChainDeployedContracts(
-    hostChainId!,
-    chainDataHost && chainDataHost.Chain ? chainDataHost.Chain : undefined,
-    externalChainId!,
-    chainDataExternal && chainDataExternal.Chain
-      ? chainDataExternal.Chain
-      : undefined
-  );
+  } = await showAllCrossChainDeployedContracts(hostChainId!, externalChainId!);
 
   console.log(`
 ${colors.evvmGreen}Next step: Cross-chain communication setup and EVVM registration${colors.reset}
@@ -238,7 +224,7 @@ ${colors.darkGray}More info: ${colors.blue}https://www.evvm.info/docs/QuickStart
 `);
 
   if (
-    promptYesNo(
+    !promptYesNo(
       `${colors.yellow}Do you want to continue with those steps? (y/n):${colors.reset}`
     )
   ) {

@@ -12,6 +12,7 @@ import {
   chainIdNotSupported,
   confirmation,
   criticalError,
+  infoWithChainData,
   warning,
 } from "../../utils/outputMesages";
 import {
@@ -97,10 +98,11 @@ export async function registerSingle(_args: string[], options: any) {
   console.log(
     `${colors.green}EVVM ID generated: ${colors.bright}${evvmID}${colors.reset}`
   );
-  console.log(
-    ChainData[chainId]?.Chain
-      ? `${colors.blue} Setting EVVM ID on EVVM contract on ${ChainData[chainId].Chain} ${colors.darkGray}(${chainId})${colors.reset}`
-      : `${colors.blue} Setting EVVM ID on EVVM contract on Chain ID:${colors.reset} ${chainId}`
+  
+  infoWithChainData(
+    `Setting EVVM ID on EVVM contract`,
+    ChainData[chainId]?.Chain || "",
+    chainId
   );
 
   await callSetEvvmID(evvmAddress, evvmID!, rpcUrl, walletName);
