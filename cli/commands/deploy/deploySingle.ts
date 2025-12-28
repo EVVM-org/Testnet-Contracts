@@ -18,6 +18,7 @@ import {
   chainIdNotSupported,
   confirmation,
   criticalError,
+  customErrorWithExit,
   showEvvmLogo,
   warning,
 } from "../../utils/outputMesages";
@@ -66,20 +67,22 @@ export async function deploySingle(args: string[], options: any) {
   await verifyFoundryInstalledAndAccountSetup([walletName]);
 
   if (skipInputConfig) {
-    warning(`Skipping input configuration`,
+    warning(
+      `Skipping input configuration`,
       `  ${colors.green}✓${colors.reset} Base inputs ${colors.darkGray}→ ./input/BaseInputs.sol${colors.reset}`
     );
   } else {
     await configurationBasic();
 
     if (
-      promptYesNo(
+      !promptYesNo(
         `${colors.yellow}Proceed with deployment? (y/n):${colors.reset}`
-      ).toLowerCase() !== "y"
-    ) {
-      console.log(`\n${colors.red}Deployment cancelled${colors.reset}`);
-      return;
-    }
+      )
+    )
+      customErrorWithExit(
+        "Deployment cancelled by user",
+        `${colors.darkGray}Exiting deployment process.${colors.reset}`
+      );
   }
 
   const { rpcUrl, chainId } = await getRPCUrlAndChainId(process.env.RPC_URL);
@@ -146,7 +149,7 @@ export async function deploySingle(args: string[], options: any) {
   if (
     promptYesNo(
       `${colors.yellow}Do you want to register the EVVM instance now? (y/n):${colors.reset}`
-    ).toLowerCase() !== "y"
+    )
   ) {
     warning(
       `Registration skipped by user choice`,
@@ -156,10 +159,9 @@ export async function deploySingle(args: string[], options: any) {
   }
 
   // If user decides, add --useCustomEthRpc flag to the registerEvvm call
-  const ethRPCAns =
-    promptYesNo(
-      `${colors.yellow}Use custom Ethereum Sepolia RPC for registry calls? (y/n):${colors.reset}`
-    ).toLowerCase() === "y";
+  const ethRPCAns = promptYesNo(
+    `${colors.yellow}Use custom Ethereum Sepolia RPC for registry calls? (y/n):${colors.reset}`
+  );
 
   await registerSingle([], {
     evvmAddress: evvmAddress,

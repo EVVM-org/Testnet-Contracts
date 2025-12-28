@@ -73,7 +73,7 @@ export async function configurationBasic() {
     if (
       promptYesNo(
         `${colors.yellow}Configure advanced metadata (totalSupply, eraTokens, reward)? (y/n):${colors.reset}`
-      ).toLowerCase() === "y"
+      )
     ) {
       evvmMetadata.totalSupply = promptNumber(
         `${colors.yellow}Total Supply ${colors.darkGray}[${formatNumber(
@@ -99,9 +99,7 @@ export async function configurationBasic() {
 
     baseConfigurationSummary(addresses, evvmMetadata);
   } while (
-    promptYesNo(
-      `${colors.yellow}Confirm configuration? (y/n):${colors.reset}`
-    ).toLowerCase() === "n"
+    !promptYesNo(`${colors.yellow}Confirm configuration? (y/n):${colors.reset}`)
   );
 
   await writeBaseInputsFile(addresses, evvmMetadata);
@@ -225,17 +223,16 @@ export async function configurationCrossChain(): Promise<{
       crossChainInputs
     );
   } while (
-    promptYesNo(
+    !promptYesNo(
       `${colors.yellow}Confirm cross-chain configuration? (y/n):${colors.reset}`
-    ).toLowerCase() === "n"
+    )
   );
 
   await writeCrossChainInputsFile(crossChainInputs);
-  
+
   confirmation(
     `${colors.reset}Cross-chain input configuration saved to ${colors.darkGray}./input/CrossChainInputs.sol${colors.reset}`
   );
-  
 
   return {
     externalRpcUrl: externalRpcUrl!,

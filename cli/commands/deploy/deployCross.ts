@@ -11,6 +11,7 @@
 import {
   confirmation,
   criticalError,
+  customErrorWithExit,
   showEvvmLogo,
   warning,
 } from "../../utils/outputMesages";
@@ -116,13 +117,14 @@ export async function deployCross(args: string[], options: any) {
     criticalError("RPC URLs and Chain IDs must be provided.");
 
   if (
-    promptYesNo(
+    !promptYesNo(
       `${colors.yellow}Proceed with deployment? (y/n):${colors.reset}`
-    ).toLowerCase() !== "y"
-  ) {
-    console.log(`\n${colors.red}✗ Deployment cancelled${colors.reset}`);
-    return;
-  }
+    )
+  )
+    customErrorWithExit(
+      "Deployment cancelled by user",
+      `${colors.darkGray}Exiting deployment process.${colors.reset}`
+    );
 
   const verificationflagHost = await explorerVerification("Host Chain:");
   if (verificationflagHost === undefined)
@@ -268,7 +270,7 @@ export async function deployCross(args: string[], options: any) {
   if (
     promptYesNo(
       `${colors.yellow}Do you want to set up cross-chain communication now? (y/n):${colors.reset}`
-    ).toLowerCase() !== "y"
+    )
   ) {
     warning(
       `Cross-chain communication skipped by user choice`,
@@ -290,7 +292,7 @@ export async function deployCross(args: string[], options: any) {
   if (
     promptYesNo(
       `${colors.yellow}Do you want to register the EVVM instance now? (y/n):${colors.reset}`
-    ).toLowerCase() !== "y"
+    )
   ) {
     warning(
       `Registration skipped by user choice`,
@@ -300,10 +302,9 @@ export async function deployCross(args: string[], options: any) {
   }
 
   // If user decides, add --useCustomEthRpc flag to the registerEvvm call
-  const ethRPCAns =
-    promptYesNo(
-      `${colors.yellow}Use custom Ethereum Sepolia RPC for registry calls? (y/n):${colors.reset}`
-    ).toLowerCase() === "y";
+  const ethRPCAns = promptYesNo(
+    `${colors.yellow}Use custom Ethereum Sepolia RPC for registry calls? (y/n):${colors.reset}`
+  );
 
   await registerCross([], {
     evvmAddress: evvmAddress,
