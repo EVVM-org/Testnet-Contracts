@@ -2,7 +2,7 @@
 // Full license terms available at: https://www.evvm.info/docs/EVVMNoncommercialLicense
 pragma solidity ^0.8.0;
 
-interface IStaking {
+library StakingStructs {
     struct BoolTypeProposal {
         bool flag;
         uint256 timeToAccept;
@@ -14,18 +14,20 @@ interface IStaking {
         uint256 timestamp;
         uint256 totalStaked;
     }
+}
 
+interface IStaking {
     error AddressIsNotAService();
     error AddressMismatch();
     error AddressMustWaitToFullUnstake();
     error AddressMustWaitToStakeAgain();
+    error AsyncNonceAlreadyUsed();
     error InvalidSignatureOnStaking();
     error PresaleStakingDisabled();
     error SenderIsNotAdmin();
     error SenderIsNotGoldenFisher();
     error ServiceDoesNotFulfillCorrectStakingAmount(uint256 requiredAmount);
     error ServiceDoesNotStakeInSameTx();
-    error StakingNonceAlreadyUsed();
     error UserIsNotPresaleStaker();
     error UserPresaleStakerLimitExceeded();
 
@@ -39,20 +41,23 @@ interface IStaking {
     function cancelChangeAllowPresaleStaking() external;
     function cancelChangeAllowPublicStaking() external;
     function cancelSetSecondsToUnllockFullUnstaking() external;
-    function checkIfStakeNonceUsed(address _account, uint256 _nonce) external view returns (bool);
     function confirmChangeAllowPresaleStaking() external;
     function confirmChangeAllowPublicStaking() external;
     function confirmServiceStaking() external;
     function confirmSetSecondsToUnllockFullUnstaking() external;
-    function getAddressHistory(address _account) external view returns (HistoryMetadata[] memory);
-    function getAddressHistoryByIndex(address _account, uint256 _index) external view returns (HistoryMetadata memory);
-    function getAllDataOfAllowPublicStaking() external view returns (BoolTypeProposal memory);
-    function getAllowPresaleStaking() external view returns (BoolTypeProposal memory);
+    function getAddressHistory(address _account) external view returns (StakingStructs.HistoryMetadata[] memory);
+    function getAddressHistoryByIndex(address _account, uint256 _index)
+        external
+        view
+        returns (StakingStructs.HistoryMetadata memory);
+    function getAllDataOfAllowPublicStaking() external view returns (StakingStructs.BoolTypeProposal memory);
+    function getAllowPresaleStaking() external view returns (StakingStructs.BoolTypeProposal memory);
     function getEstimatorAddress() external view returns (address);
     function getEstimatorProposal() external view returns (address);
     function getEvvmAddress() external view returns (address);
     function getGoldenFisher() external view returns (address);
     function getGoldenFisherProposal() external view returns (address);
+    function getIfUsedAsyncNonce(address user, uint256 nonce) external view returns (bool);
     function getMateAddress() external pure returns (address);
     function getOwner() external view returns (address);
     function getPresaleStaker(address _account) external view returns (bool, uint256);

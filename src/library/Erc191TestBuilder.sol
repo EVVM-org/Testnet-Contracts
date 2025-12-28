@@ -11,7 +11,6 @@ pragma solidity ^0.8.0;
  *         https://book.getfoundry.sh/cheatcodes/sign
  */
 
-
 import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
 
 library Erc191TestBuilder {

@@ -2,7 +2,7 @@
 // Full license terms available at: https://www.evvm.info/docs/EVVMNoncommercialLicense
 pragma solidity ^0.8.0;
 
-interface IP2PSwap {
+library P2PSwapStructs {
     struct MarketInformation {
         address tokenA;
         address tokenB;
@@ -54,6 +54,11 @@ interface IP2PSwap {
         uint256 service;
         uint256 mateStaker;
     }
+}
+
+interface IP2PSwap {
+    error AsyncNonceAlreadyUsed();
+    error InvalidServiceSignature();
 
     function acceptFillFixedPercentage() external;
     function acceptFillPropotionalPercentage() external;
@@ -64,16 +69,15 @@ interface IP2PSwap {
     function addBalance(address _token, uint256 _amount) external;
     function cancelOrder(
         address user,
-        MetadataCancelOrder memory metadata,
+        P2PSwapStructs.MetadataCancelOrder memory metadata,
         uint256 _priorityFee_Evvm,
         uint256 _nonce_Evvm,
         bool _priority_Evvm,
         bytes memory _signature_Evvm
     ) external;
-    function checkIfANonceP2PSwapIsUsed(address user, uint256 nonce) external view returns (bool);
     function dispatchOrder_fillFixedFee(
         address user,
-        MetadataDispatchOrder memory metadata,
+        P2PSwapStructs.MetadataDispatchOrder memory metadata,
         uint256 _priorityFee_Evvm,
         uint256 _nonce_Evvm,
         bool _priority_Evvm,
@@ -82,35 +86,36 @@ interface IP2PSwap {
     ) external;
     function dispatchOrder_fillPropotionalFee(
         address user,
-        MetadataDispatchOrder memory metadata,
+        P2PSwapStructs.MetadataDispatchOrder memory metadata,
         uint256 _priorityFee_Evvm,
         uint256 _nonce_Evvm,
         bool _priority_Evvm,
         bytes memory _signature_Evvm
     ) external;
     function findMarket(address tokenA, address tokenB) external view returns (uint256);
-    function getAllMarketOrders(uint256 market) external view returns (OrderForGetter[] memory orders);
-    function getAllMarketsMetadata() external view returns (MarketInformation[] memory);
+    function getAllMarketOrders(uint256 market) external view returns (P2PSwapStructs.OrderForGetter[] memory orders);
+    function getAllMarketsMetadata() external view returns (P2PSwapStructs.MarketInformation[] memory);
     function getBalanceOfContract(address token) external view returns (uint256);
-    function getMarketMetadata(uint256 market) external view returns (MarketInformation memory);
+    function getIfUsedAsyncNonce(address user, uint256 nonce) external view returns (bool);
+    function getMarketMetadata(uint256 market) external view returns (P2PSwapStructs.MarketInformation memory);
     function getMaxLimitFillFixedFee() external view returns (uint256);
     function getMaxLimitFillFixedFeeProposal() external view returns (uint256);
     function getMyOrdersInSpecificMarket(address user, uint256 market)
         external
         view
-        returns (OrderForGetter[] memory orders);
-    function getOrder(uint256 market, uint256 orderId) external view returns (Order memory order);
+        returns (P2PSwapStructs.OrderForGetter[] memory orders);
+    function getOrder(uint256 market, uint256 orderId) external view returns (P2PSwapStructs.Order memory order);
     function getOwner() external view returns (address);
     function getOwnerProposal() external view returns (address);
     function getOwnerTimeToAccept() external view returns (uint256);
     function getPercentageFee() external view returns (uint256);
     function getProposalPercentageFee() external view returns (uint256);
     function getProposedWithdrawal() external view returns (address, uint256, address, uint256);
-    function getRewardPercentage() external view returns (Percentage memory);
-    function getRewardPercentageProposal() external view returns (Percentage memory);
+    function getRewardPercentage() external view returns (P2PSwapStructs.Percentage memory);
+    function getRewardPercentageProposal() external view returns (P2PSwapStructs.Percentage memory);
     function makeOrder(
         address user,
-        MetadataMakeOrder memory metadata,
+        P2PSwapStructs.MetadataMakeOrder memory metadata,
         bytes memory signature,
         uint256 _priorityFee_Evvm,
         uint256 _nonce_Evvm,

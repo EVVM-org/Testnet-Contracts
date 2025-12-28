@@ -2,20 +2,22 @@
 // Full license terms available at: https://www.evvm.info/docs/EVVMNoncommercialLicense
 pragma solidity ^0.8.0;
 
-interface INameService {
+library NameServiceStructs {
     struct OfferMetadata {
         address offerer;
         uint256 expireDate;
         uint256 amount;
     }
+}
 
+interface INameService {
     error AcceptOfferVerificationFailed();
+    error AsyncNonceAlreadyUsed();
     error EmptyCustomMetadata();
     error FlushUsernameVerificationFailed();
     error InvalidKey();
     error InvalidSignatureOnNameService();
-    error InvalidUsername(bytes1);
-    error NonceAlreadyUsed();
+    error InvalidUsername();
     error PreRegistrationNotValid();
     error RenewUsernameVerificationFailed();
     error SenderIsNotAdmin();
@@ -50,7 +52,6 @@ interface INameService {
     function cancelChangeEvvmAddress() external;
     function cancelProposeAdmin() external;
     function cancelWithdrawPrincipalTokens() external;
-    function checkIfNameServiceNonceIsAvailable(address _user, uint256 _nonce) external view returns (bool);
     function claimWithdrawPrincipalTokens() external;
     function flushCustomMetadata(
         address user,
@@ -87,8 +88,12 @@ interface INameService {
     function getExpireDateOfIdentity(string memory _identity) external view returns (uint256);
     function getFullCustomMetadataOfIdentity(string memory _username) external view returns (string[] memory);
     function getIdentityBasicMetadata(string memory _username) external view returns (address, uint256);
+    function getIfUsedAsyncNonce(address user, uint256 nonce) external view returns (bool);
     function getLengthOfOffersUsername(string memory _username) external view returns (uint256 length);
-    function getOffersOfUsername(string memory _username) external view returns (OfferMetadata[] memory offers);
+    function getOffersOfUsername(string memory _username)
+        external
+        view
+        returns (NameServiceStructs.OfferMetadata[] memory offers);
     function getOwnerOfIdentity(string memory _username) external view returns (address);
     function getPriceOfRegistration(string memory username) external view returns (uint256);
     function getPriceToAddCustomMetadata() external view returns (uint256 price);
@@ -106,7 +111,7 @@ interface INameService {
     function getSingleOfferOfUsername(string memory _username, uint256 _offerID)
         external
         view
-        returns (OfferMetadata memory offer);
+        returns (NameServiceStructs.OfferMetadata memory offer);
     function hashUsername(string memory _username, uint256 _randomNumber) external pure returns (bytes32);
     function isUsernameAvailable(string memory _username) external view returns (bool);
     function makeOffer(
