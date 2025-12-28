@@ -25,7 +25,7 @@ import type {
  * @returns {never} - Function never returns (process exits)
  */
 export function criticalError(message: string) {
-  console.error(`${colors.red}🯀   Critical Error ${message}${colors.reset}`);
+  console.error(`${colors.red}🯀 Critical Error ${message}${colors.reset}`);
   console.log(
     "Please try again. If the issue persists, create an issue on GitHub:"
   );
@@ -47,7 +47,7 @@ export function criticalError(message: string) {
  * @returns {never} - Function never returns (process exits)
  */
 export function criticalErrorCustom(message: string, extraMessage: string) {
-  console.error(`${colors.red}🯀   Critical Error: ${message}${colors.reset}`);
+  console.error(`${colors.red}🯀 Critical Error:${colors.reset} ${message}`);
   if (extraMessage) {
     console.log(`${extraMessage}`);
   }
@@ -65,7 +65,7 @@ export function criticalErrorCustom(message: string, extraMessage: string) {
  * @returns {void}
  */
 export function error(message: string, extraMessage: string = "") {
-  console.error(`${colors.red}🯀   Error: ${message}${colors.reset}`);
+  console.error(`${colors.red}🯀 Error:${colors.reset} ${message}`);
   if (extraMessage) {
     console.log(`${extraMessage}`);
   }
@@ -85,7 +85,7 @@ export function customErrorWithExit(
   message: string,
   extraMessage: string = ""
 ) {
-  console.error(`${colors.red}🯀   ${message}${colors.reset}`);
+  console.error(`${colors.red}🯀 ${message}${colors.reset}`);
   if (extraMessage) {
     console.log(`${extraMessage}`);
   }
@@ -103,7 +103,7 @@ export function customErrorWithExit(
  * @returns {void}
  */
 export function warning(message: string, extraMessage: string = "") {
-  console.warn(`${colors.yellow}⚠   Warning: ${message}${colors.reset}`);
+  console.warn(`${colors.yellow}⚠ Warning:${colors.reset} ${message}`);
   if (extraMessage) {
     console.log(`${extraMessage}`);
   }
@@ -119,7 +119,7 @@ export function warning(message: string, extraMessage: string = "") {
  * @returns {void}
  */
 export function confirmation(message: string) {
-  console.log(`${colors.evvmGreen}✓  ${message}${colors.reset}`);
+  console.log(`${colors.evvmGreen}✓${colors.reset}  ${message}`);
 }
 
 /**
@@ -142,12 +142,45 @@ export function warningCrossChainSuportNotAvailable(
   url: string = ""
 ) {
   console.log(
-    `\n${colors.yellow}⚠   Warning: ${crossChainProtocol} support not available on ${chainName}${colors.reset} ${colors.darkGray}(${chainId})${colors.reset}`
+    `\n${colors.yellow}⚠ Warning:${colors.reset} ${crossChainProtocol} support not available on ${chainName} ${colors.darkGray}(${chainId})${colors.reset}`
   );
   if (url !== "") {
     console.log(`  ${colors.darkGray}Check availability at:${colors.reset}`);
     console.log(`  ${colors.darkGray}→ ${colors.blue}${url}${colors.reset}\n`);
   }
+}
+
+/**
+ * Displays an informational message with blockchain network details
+ * 
+ * Prints a formatted informational message that includes both the human-readable
+ * chain name and numeric chain ID. If chain name is not available, displays only
+ * the chain ID. Useful for contextual messages during deployment or operations.
+ * 
+ * @param {string} message - Informational message to display
+ * @param {string} chainName - Human-readable blockchain network name (e.g., "Sepolia")
+ * @param {number} chainId - Numeric chain identifier
+ * @returns {void}
+ * 
+ * @example
+ * ```typescript
+ * infoWithChainData("Deploying", "Sepolia", 11155111);
+ * // Output: "Deploying on Sepolia (11155111)"
+ * 
+ * infoWithChainData("Deploying", "", 280919610);
+ * // Output: "Deploying on Chain ID 280919610"
+ * ```
+ */
+export function infoWithChainData(
+  message: string,
+  chainName: string,
+  chainId: number
+) {
+  console.log(
+    chainName
+      ? `${colors.blue}${message} on ${chainName} ${colors.darkGray}(${chainId})${colors.reset}`
+      : `${colors.blue}${message} on Chain ID ${chainId}${colors.reset}`
+  );
 }
 
 /**
