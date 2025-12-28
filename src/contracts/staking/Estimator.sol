@@ -16,6 +16,7 @@ MMMMMMMMMMMM
  */
 
 import {Staking} from "@evvm/testnet-contracts/contracts/staking/Staking.sol";
+import {StakingStructs} from "@evvm/testnet-contracts/contracts/staking/lib/StakingStructs.sol";
 import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
 
 contract Estimator {
@@ -111,7 +112,7 @@ contract Estimator {
         uint256 sumSmT;
 
         uint256 tLast = epoch.tStart;
-        Staking.HistoryMetadata memory h;
+        StakingStructs.HistoryMetadata memory h;
         uint256 size = Staking(addressStaking.actual).getSizeOfAddressHistory(
             _user
         );
@@ -180,7 +181,7 @@ contract Estimator {
         address _proposal
     ) external onlyActivator {
         activator.proposal = _proposal;
-        activator.timeToAccept = block.timestamp + 1 minutes;
+        activator.timeToAccept = block.timestamp + 1 days;
     }
 
     function cancelActivatorProposal() external onlyActivator {
@@ -200,7 +201,7 @@ contract Estimator {
         address _proposal
     ) external onlyAdmin {
         evvmAddress.proposal = _proposal;
-        evvmAddress.timeToAccept = block.timestamp + 1 minutes;
+        evvmAddress.timeToAccept = block.timestamp + 1 days;
     }
 
     function cancelEvvmAddressProposal() external onlyAdmin {
@@ -220,7 +221,7 @@ contract Estimator {
         address _proposal
     ) external onlyAdmin {
         addressStaking.proposal = _proposal;
-        addressStaking.timeToAccept = block.timestamp + 1 minutes;
+        addressStaking.timeToAccept = block.timestamp + 1 days;
     }
 
     function cancelAddressStakingProposal() external onlyAdmin {
@@ -240,7 +241,7 @@ contract Estimator {
         address _proposal
     ) external onlyAdmin {
         admin.proposal = _proposal;
-        admin.timeToAccept = block.timestamp + 1 minutes;
+        admin.timeToAccept = block.timestamp + 1 days;
     }
 
     function cancelAdminProposal() external onlyAdmin {
@@ -315,7 +316,7 @@ contract Estimator {
         uint256 sumSmT;
 
         uint256 tLast = epoch.tStart;
-        Staking.HistoryMetadata memory h;
+        StakingStructs.HistoryMetadata memory h;
         uint256 size = Staking(addressStaking.actual).getSizeOfAddressHistory(
             _user
         );

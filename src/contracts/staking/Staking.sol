@@ -41,101 +41,14 @@ pragma solidity ^0.8.0;
  * - Estimator integration for yield calculations
  */
 
-import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
-import {SignatureUtil} from "@evvm/testnet-contracts/library/utils/SignatureUtil.sol";
-import {NameService} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
-import {Estimator} from "@evvm/testnet-contracts/contracts/staking/Estimator.sol";
-import {ErrorsLib} from "@evvm/testnet-contracts/contracts/staking/lib/ErrorsLib.sol";
-import {SignatureUtils} from "@evvm/testnet-contracts/contracts/staking/lib/SignatureUtils.sol";
+import {IEvvm} from "@evvm/testnet-contracts/interfaces/IEvvm.sol";
+import {IEstimator} from "@evvm/testnet-contracts/interfaces/IEstimator.sol";
+import {AsyncNonce} from "@evvm/testnet-contracts/library/utils/nonces/AsyncNonce.sol";
+import {StakingStructs} from "@evvm/testnet-contracts/contracts/staking/lib/StakingStructs.sol";
+import {ErrorsLib} from "./lib/ErrorsLib.sol";
+import {SignatureUtils} from "./lib/SignatureUtils.sol";
 
-contract Staking {
-    /**
-     * @dev Metadata for presale stakers
-     * @param isAllow Whether the address is allowed to participate in presale staking
-     * @param stakingAmount Current number of staking tokens staked (max 2 for presale)
-     */
-    struct presaleStakerMetadata {
-        bool isAllow;
-        uint256 stakingAmount;
-    }
-
-    /**
-     * @dev Struct to store the history of the user
-     * @param transactionType Type of transaction:
-     *          - 0x01 for staking
-     *          - 0x02 for unstaking
-     *          - Other values for yield/reward transactions
-     * @param amount Amount of staking staked/unstaked or reward received
-     * @param timestamp Timestamp when the transaction occurred
-     * @param totalStaked Total amount of staking currently staked after this transaction
-     */
-    struct HistoryMetadata {
-        bytes32 transactionType;
-        uint256 amount;
-        uint256 timestamp;
-        uint256 totalStaked;
-    }
-
-    /**
-     * @dev Struct for managing address change proposals with time delay
-     * @param actual Current active address
-     * @param proposal Proposed new address
-     * @param timeToAccept Timestamp when the proposal can be accepted
-     */
-    struct AddressTypeProposal {
-        address actual;
-        address proposal;
-        uint256 timeToAccept;
-    }
-
-    /**
-     * @dev Struct for managing uint256 change proposals with time delay
-     * @param actual Current active value
-     * @param proposal Proposed new value
-     * @param timeToAccept Timestamp when the proposal can be accepted
-     */
-    struct UintTypeProposal {
-        uint256 actual;
-        uint256 proposal;
-        uint256 timeToAccept;
-    }
-
-    /**
-     * @dev Struct for managing boolean flag changes with time delay
-     * @param flag Current boolean state
-     * @param timeToAccept Timestamp when the flag change can be executed
-     */
-    struct BoolTypeProposal {
-        bool flag;
-        uint256 timeToAccept;
-    }
-
-    /**
-     * @dev Struct to store service staking metadata during the staking process
-     * @param service Address of the service or contract account
-     * @param timestamp Timestamp when the prepareServiceStaking was called
-     * @param amountOfStaking Amount of staking tokens to be staked
-     * @param amountServiceBeforeStaking Service's Principal Token balance before staking
-     * @param amountStakingBeforeStaking Staking contract's Principal Token balance before staking
-     */
-    struct ServiceStakingMetadata {
-        address service;
-        uint256 timestamp;
-        uint256 amountOfStaking;
-        uint256 amountServiceBeforeStaking;
-        uint256 amountStakingBeforeStaking;
-    }
-
-    /**
-     * @dev Struct to encapsulate account metadata for staking operations
-     * @param Address Address of the account
-     * @param IsAService Boolean indicating if the account is a smart contract (service) account
-     */
-    struct AccountMetadata {
-        address Address;
-        bool IsAService;
-    }
-
+contract Staking is AsyncNonce, StakingStructs {
     uint256 constant TIME_TO_ACCEPT_PROPOSAL = 1 days;
 
     /// @dev Address of the EVVM core contract
@@ -157,7 +70,7 @@ contract Staking {
     /// @dev Golden Fisher address management with proposal system
     AddressTypeProposal private goldenFisher;
     /// @dev Estimator contract address management with proposal system
-    AddressTypeProposal private estimator;
+    AddressTypeProposal private estimatorAddress;
     /// @dev Time delay for regular staking after unstaking
     UintTypeProposal private secondsToUnlockStaking;
     /// @dev Time delay for full unstaking (21 days default)
@@ -172,14 +85,14 @@ contract Staking {
     /// @dev One-time setup breaker for estimator and EVVM addresses
     bytes1 private breakerSetupEstimatorAndEvvm;
 
-    /// @dev Mapping to track used nonces for staking operations per user
-    mapping(address => mapping(uint256 => bool)) private stakingNonce;
-
     /// @dev Mapping to store presale staker metadata
     mapping(address => presaleStakerMetadata) private userPresaleStaker;
 
     /// @dev Mapping to store complete staking history for each user
     mapping(address => HistoryMetadata[]) private userHistory;
+
+    IEvvm private evvm;
+    IEstimator private estimator;
 
     /// @dev Modifier to verify access to admin functions
     modifier onlyOwner() {
@@ -236,9 +149,11 @@ contract Staking {
     ) external {
         if (breakerSetupEstimatorAndEvvm == 0x00) revert();
 
-        estimator.actual = _estimator;
+        estimatorAddress.actual = _estimator;
         EVVM_ADDRESS = _evvm;
         breakerSetupEstimatorAndEvvm = 0x00;
+        evvm = IEvvm(_evvm);
+        estimator = IEstimator(_estimator);
     }
 
     /**
@@ -261,7 +176,7 @@ contract Staking {
             isStaking,
             amountOfStaking,
             0,
-            Evvm(EVVM_ADDRESS).getNextCurrentSyncNonce(msg.sender),
+            evvm.getNextCurrentSyncNonce(msg.sender),
             false,
             signature_EVVM
         );
@@ -291,7 +206,7 @@ contract Staking {
     ) external {
         if (
             !SignatureUtils.verifyMessageSignedForStake(
-                Evvm(EVVM_ADDRESS).getEvvmID(),
+                evvm.getEvvmID(),
                 user,
                 false,
                 isStaking,
@@ -301,8 +216,7 @@ contract Staking {
             )
         ) revert ErrorsLib.InvalidSignatureOnStaking();
 
-        if (checkIfStakeNonceUsed(user, nonce))
-            revert ErrorsLib.StakingNonceAlreadyUsed();
+        verifyAsyncNonce(user, nonce);
 
         presaleClaims(isStaking, user);
 
@@ -319,7 +233,7 @@ contract Staking {
             signature_EVVM
         );
 
-        stakingNonce[user][nonce] = true;
+        markAsyncNonceAsUsed(user, nonce);
     }
 
     /**
@@ -384,7 +298,7 @@ contract Staking {
 
         if (
             !SignatureUtils.verifyMessageSignedForStake(
-                Evvm(EVVM_ADDRESS).getEvvmID(),
+                evvm.getEvvmID(),
                 user,
                 true,
                 isStaking,
@@ -394,8 +308,7 @@ contract Staking {
             )
         ) revert ErrorsLib.InvalidSignatureOnStaking();
 
-        if (checkIfStakeNonceUsed(user, nonce))
-            revert ErrorsLib.StakingNonceAlreadyUsed();
+        verifyAsyncNonce(user, nonce);
 
         stakingBaseProcess(
             AccountMetadata({Address: user, IsAService: false}),
@@ -407,7 +320,7 @@ contract Staking {
             signature_EVVM
         );
 
-        stakingNonce[user][nonce] = true;
+        markAsyncNonceAsUsed(user, nonce);
     }
 
     /**
@@ -431,11 +344,11 @@ contract Staking {
             service: msg.sender,
             timestamp: block.timestamp,
             amountOfStaking: amountOfStaking,
-            amountServiceBeforeStaking: Evvm(EVVM_ADDRESS).getBalance(
+            amountServiceBeforeStaking: evvm.getBalance(
                 msg.sender,
                 PRINCIPAL_TOKEN_ADDRESS
             ),
-            amountStakingBeforeStaking: Evvm(EVVM_ADDRESS).getBalance(
+            amountStakingBeforeStaking: evvm.getBalance(
                 address(this),
                 PRINCIPAL_TOKEN_ADDRESS
             )
@@ -459,12 +372,12 @@ contract Staking {
         uint256 totalStakingRequired = PRICE_OF_STAKING *
             serviceStakingData.amountOfStaking;
 
-        uint256 actualServiceBalance = Evvm(EVVM_ADDRESS).getBalance(
+        uint256 actualServiceBalance = evvm.getBalance(
             msg.sender,
             PRINCIPAL_TOKEN_ADDRESS
         );
 
-        uint256 actualStakingBalance = Evvm(EVVM_ADDRESS).getBalance(
+        uint256 actualStakingBalance = evvm.getBalance(
             address(this),
             PRINCIPAL_TOKEN_ADDRESS
         );
@@ -559,7 +472,7 @@ contract Staking {
                     signature_EVVM
                 );
 
-            Evvm(EVVM_ADDRESS).pointStaker(account.Address, 0x01);
+            evvm.pointStaker(account.Address, 0x01);
 
             auxSMsteBalance = userHistory[account.Address].length == 0
                 ? amountOfStaking
@@ -573,7 +486,7 @@ contract Staking {
                     block.timestamp
                 ) revert ErrorsLib.AddressMustWaitToFullUnstake();
 
-                Evvm(EVVM_ADDRESS).pointStaker(account.Address, 0x00);
+                evvm.pointStaker(account.Address, 0x00);
             }
 
             if (priorityFee_EVVM != 0 && !account.IsAService)
@@ -611,13 +524,13 @@ contract Staking {
         );
 
         if (
-            Evvm(EVVM_ADDRESS).isAddressStaker(msg.sender) &&
+            evvm.isAddressStaker(msg.sender) &&
             !account.IsAService
         ) {
             makeCaPay(
                 PRINCIPAL_TOKEN_ADDRESS,
                 msg.sender,
-                (Evvm(EVVM_ADDRESS).getRewardAmount() * 2) + priorityFee_EVVM
+                (evvm.getRewardAmount() * 2) + priorityFee_EVVM
             );
         }
     }
@@ -651,7 +564,7 @@ contract Staking {
                 amountTotalToBeRewarded,
                 idToOverwriteUserHistory,
                 timestampToBeOverwritten
-            ) = Estimator(estimator.actual).makeEstimation(user);
+            ) = estimator.makeEstimation(user);
 
             if (amountTotalToBeRewarded > 0) {
                 makeCaPay(tokenToBeRewarded, user, amountTotalToBeRewarded);
@@ -663,11 +576,11 @@ contract Staking {
                 userHistory[user][idToOverwriteUserHistory]
                     .timestamp = timestampToBeOverwritten;
 
-                if (Evvm(EVVM_ADDRESS).isAddressStaker(msg.sender)) {
+                if (evvm.isAddressStaker(msg.sender)) {
                     makeCaPay(
                         PRINCIPAL_TOKEN_ADDRESS,
                         msg.sender,
-                        (Evvm(EVVM_ADDRESS).getRewardAmount() * 1)
+                        (evvm.getRewardAmount() * 1)
                     );
                 }
             }
@@ -696,7 +609,7 @@ contract Staking {
         uint256 nonce,
         bytes memory signature
     ) internal {
-        Evvm(EVVM_ADDRESS).pay(
+        evvm.pay(
             user,
             address(this),
             "",
@@ -722,7 +635,7 @@ contract Staking {
         address user,
         uint256 amount
     ) internal {
-        Evvm(EVVM_ADDRESS).caPay(user, tokenAddress, amount);
+        evvm.caPay(user, tokenAddress, amount);
     }
 
     //▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀
@@ -966,8 +879,8 @@ contract Staking {
      * @param _estimator Address of the proposed new estimator contract
      */
     function proposeEstimator(address _estimator) external onlyOwner {
-        estimator.proposal = _estimator;
-        estimator.timeToAccept = block.timestamp + TIME_TO_ACCEPT_PROPOSAL;
+        estimatorAddress.proposal = _estimator;
+        estimatorAddress.timeToAccept = block.timestamp + TIME_TO_ACCEPT_PROPOSAL;
     }
 
     /**
@@ -975,8 +888,8 @@ contract Staking {
      * @dev Only current admin can reject the pending estimator contract proposal
      */
     function rejectProposalEstimator() external onlyOwner {
-        estimator.proposal = address(0);
-        estimator.timeToAccept = 0;
+        estimatorAddress.proposal = address(0);
+        estimatorAddress.timeToAccept = 0;
     }
 
     /**
@@ -984,12 +897,13 @@ contract Staking {
      * @dev Can only be called by the current admin after the 1-day time delay
      */
     function acceptNewEstimator() external onlyOwner {
-        if (estimator.timeToAccept > block.timestamp) {
+        if (estimatorAddress.timeToAccept > block.timestamp) {
             revert();
         }
-        estimator.actual = estimator.proposal;
-        estimator.proposal = address(0);
-        estimator.timeToAccept = 0;
+        estimatorAddress.actual = estimatorAddress.proposal;
+        estimatorAddress.proposal = address(0);
+        estimatorAddress.timeToAccept = 0;
+        estimator = IEstimator(estimatorAddress.actual);
     }
 
     //▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀
@@ -1125,20 +1039,6 @@ contract Staking {
     }
 
     /**
-     * @notice Checks if a specific nonce has been used for staking by a user
-     * @dev Prevents replay attacks by tracking used nonces
-     * @param _account Address to check the nonce for
-     * @param _nonce Nonce value to check
-     * @return True if the nonce has been used, false otherwise
-     */
-    function checkIfStakeNonceUsed(
-        address _account,
-        uint256 _nonce
-    ) public view returns (bool) {
-        return stakingNonce[_account][_nonce];
-    }
-
-    /**
      * @notice Returns the current golden fisher address
      * @dev The golden fisher has special staking privileges
      * @return Address of the current golden fisher
@@ -1178,7 +1078,7 @@ contract Staking {
      * @return Address of the current estimator contract
      */
     function getEstimatorAddress() external view returns (address) {
-        return estimator.actual;
+        return estimatorAddress.actual;
     }
 
     /**
@@ -1187,7 +1087,7 @@ contract Staking {
      * @return Address of the proposed estimator contract (zero address if none)
      */
     function getEstimatorProposal() external view returns (address) {
-        return estimator.proposal;
+        return estimatorAddress.proposal;
     }
 
     /**
