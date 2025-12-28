@@ -121,11 +121,12 @@ export async function deployCross(args: string[], options: any) {
     !promptYesNo(
       `${colors.yellow}Proceed with deployment? (y/n):${colors.reset}`
     )
-  )
+  ){
     customErrorWithExit(
       "Deployment cancelled by user",
       `${colors.darkGray}Exiting deployment process.${colors.reset}`
     );
+  }
 
   const verificationflagHost = await explorerVerification("Host Chain:");
   if (verificationflagHost === undefined)
@@ -148,7 +149,7 @@ export async function deployCross(args: string[], options: any) {
     `  ${colors.green}•${colors.reset} Treasury cross-chain contract  ${colors.darkGray}(TreasuryExternalChainStation.sol)${colors.reset}\n`
   );
 
-  forgeScript(
+  await forgeScript(
     "script/DeployCrossChainExternal.s.sol:DeployCrossChainExternalScript",
     externalRpcUrl!,
     walletNameExternal,
@@ -180,7 +181,7 @@ export async function deployCross(args: string[], options: any) {
     `  ${colors.green}•${colors.reset} P2P Swap service ${colors.darkGray}(P2PSwap.sol)${colors.reset}\n`
   );
 
-  forgeScript(
+  await forgeScript(
     "script/DeployCrossChainHost.s.sol:DeployCrossChainHostScript",
     hostRpcUrl!,
     walletNameHost,
