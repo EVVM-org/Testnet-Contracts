@@ -28,6 +28,32 @@ abstract contract EvvmStructs {
         bytes signature;
     }
 
+    struct DispersePayData {
+        address from;
+        DispersePayMetadata[] toData;
+        address token;
+        uint256 totalAmount;
+        uint256 priorityFee;
+        uint256 nonce;
+        bool priorityFlag;
+        address executor;
+        bytes signature;
+    }
+
+    struct CaPayData {
+        address from;
+        address to;
+        address token;
+        uint256 amount;
+    }
+
+    struct DisperseCaPayData{
+        address from;
+        DisperseCaPayMetadata[] toData;
+        address token;
+        uint256 amount;
+    }
+
     struct DispersePayMetadata {
         uint256 amount;
         address to_address;
@@ -38,7 +64,7 @@ abstract contract EvvmStructs {
         uint256 amount;
         address toAddress;
     }
-    
+
     struct EvvmMetadata {
         string EvvmName;
         uint256 EvvmID;

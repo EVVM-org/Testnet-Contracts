@@ -146,7 +146,7 @@ contract Evvm is EvvmStorage {
         EvvmMetadata memory _evvmMetadata
     ) {
         evvmMetadata = _evvmMetadata;
-        
+
         stakingContractAddress = _stakingContractAddress;
 
         admin.current = _initialOwner;
@@ -158,8 +158,6 @@ contract Evvm is EvvmStorage {
         stakerList[_stakingContractAddress] = FLAG_IS_STAKER;
 
         breakerSetupNameServiceAddress = FLAG_IS_STAKER;
-
-        
     }
 
     /**
@@ -367,20 +365,23 @@ contract Evvm is EvvmStorage {
                 token,
                 amount,
                 priorityFee,
-                priorityFlag ? nonce : nextSyncUsedNonce[from],
+                nonce,
                 priorityFlag,
                 executor,
                 signature
             )
         ) revert ErrorsLib.InvalidSignature();
 
-        if (executor != address(0)) {
-            if (msg.sender != executor)
-                revert ErrorsLib.SenderIsNotTheExecutor();
-        }
+        if ((executor != address(0)) && (msg.sender != executor))
+            revert ErrorsLib.SenderIsNotTheExecutor();
 
-        if (priorityFlag && asyncUsedNonce[from][nonce])
-            revert ErrorsLib.InvalidAsyncNonce();
+        if (priorityFlag) {
+            if (asyncUsedNonce[from][nonce])
+                revert ErrorsLib.AsyncNonceAlreadyUsed();
+        } else {
+            if (nextSyncUsedNonce[from] != nonce)
+                revert ErrorsLib.SyncNonceMismatch();
+        }
 
         address to = !AdvancedStrings.equal(to_identity, "")
             ? NameService(nameServiceAddress).verifyStrictAndGetOwnerOfIdentity(
@@ -425,24 +426,15 @@ contract Evvm is EvvmStorage {
      *
      * Return Values:
      * - successfulTransactions: Count of completed payments
-     * - failedTransactions: Count of failed payments
      * - results: Boolean array indicating success/failure for each payment
      *
      * @param payData Array of PayData structures containing payment details
      * @return successfulTransactions Number of payments that completed successfully
-     * @return failedTransactions Number of payments that failed
      * @return results Boolean array with success status for each payment
      */
-    function payMultiple(
+    function batchPay(
         PayData[] memory payData
-    )
-        external
-        returns (
-            uint256 successfulTransactions,
-            uint256 failedTransactions,
-            bool[] memory results
-        )
-    {
+    ) external returns (uint256 successfulTransactions, bool[] memory results) {
         address to_aux;
         results = new bool[](payData.length);
         for (uint256 iteration = 0; iteration < payData.length; iteration++) {
@@ -455,9 +447,7 @@ contract Evvm is EvvmStorage {
                     payData[iteration].token,
                     payData[iteration].amount,
                     payData[iteration].priorityFee,
-                    payData[iteration].priorityFlag
-                        ? payData[iteration].nonce
-                        : nextSyncUsedNonce[payData[iteration].from],
+                    payData[iteration].nonce,
                     payData[iteration].priorityFlag,
                     payData[iteration].executor,
                     payData[iteration].signature
@@ -466,7 +456,6 @@ contract Evvm is EvvmStorage {
 
             if (payData[iteration].executor != address(0)) {
                 if (msg.sender != payData[iteration].executor) {
-                    failedTransactions++;
                     results[iteration] = false;
                     continue;
                 }
@@ -484,7 +473,6 @@ contract Evvm is EvvmStorage {
                         payData[iteration].nonce
                     ] = true;
                 } else {
-                    failedTransactions++;
                     results[iteration] = false;
                     continue;
                 }
@@ -497,7 +485,6 @@ contract Evvm is EvvmStorage {
                 ) {
                     nextSyncUsedNonce[payData[iteration].from]++;
                 } else {
-                    failedTransactions++;
                     results[iteration] = false;
                     continue;
                 }
@@ -514,7 +501,6 @@ contract Evvm is EvvmStorage {
                 payData[iteration].priorityFee + payData[iteration].amount >
                 balances[payData[iteration].from][payData[iteration].token]
             ) {
-                failedTransactions++;
                 results[iteration] = false;
                 continue;
             }
@@ -527,7 +513,6 @@ contract Evvm is EvvmStorage {
                     payData[iteration].amount
                 )
             ) {
-                failedTransactions++;
                 results[iteration] = false;
                 continue;
             } else {
@@ -543,7 +528,6 @@ contract Evvm is EvvmStorage {
                             payData[iteration].priorityFee
                         )
                     ) {
-                        failedTransactions++;
                         results[iteration] = false;
                         continue;
                     }
@@ -609,7 +593,7 @@ contract Evvm is EvvmStorage {
                 token,
                 amount,
                 priorityFee,
-                priorityFlag ? nonce : nextSyncUsedNonce[from],
+                nonce,
                 priorityFlag,
                 executor,
                 signature
@@ -623,7 +607,10 @@ contract Evvm is EvvmStorage {
 
         if (priorityFlag) {
             if (asyncUsedNonce[from][nonce])
-                revert ErrorsLib.InvalidAsyncNonce();
+                revert ErrorsLib.AsyncNonceAlreadyUsed();
+        } else {
+            if (nextSyncUsedNonce[from] != nonce)
+                revert ErrorsLib.SyncNonceMismatch();
         }
 
         if (balances[from][token] < amount + priorityFee)
@@ -667,6 +654,7 @@ contract Evvm is EvvmStorage {
         } else {
             nextSyncUsedNonce[from]++;
         }
+
     }
 
     /**
@@ -773,6 +761,7 @@ contract Evvm is EvvmStorage {
         if (isAddressStaker(msg.sender)) {
             _giveReward(msg.sender, 1);
         }
+
     }
 
     //░▒▓█Treasury exclusive functions██████████████████████████████████████████▓▒░
@@ -1134,6 +1123,14 @@ contract Evvm is EvvmStorage {
      */
     function getEvvmMetadata() external view returns (EvvmMetadata memory) {
         return evvmMetadata;
+    }
+
+    function getPrincipalTokenAddress() external view returns (address) {
+        return evvmMetadata.principalTokenAddress;
+    }
+
+    function getChainHostCoinAddress() external pure returns (address) {
+        return address(0);
     }
 
     /**

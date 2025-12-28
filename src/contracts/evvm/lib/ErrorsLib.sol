@@ -7,7 +7,8 @@ library ErrorsLib {
     error InvalidSignature();
     error SenderIsNotTheExecutor();
     error UpdateBalanceFailed();
-    error InvalidAsyncNonce();
+    error SyncNonceMismatch();
+    error AsyncNonceAlreadyUsed();
     error NotAnStaker();
     error InsufficientBalance();
     error InvalidAmount(uint256, uint256);
