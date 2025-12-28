@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: EVVM-NONCOMMERCIAL-1.0
 // Full license terms available at: https://www.evvm.info/docs/EVVMNoncommercialLicense
+pragma solidity ^0.8.0;
 
 import {SignatureUtil} from "@evvm/testnet-contracts/library/utils/SignatureUtil.sol";
 import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
-
-pragma solidity ^0.8.0;
 
 library SignatureUtils {
     /**
@@ -213,7 +212,11 @@ library SignatureUtils {
             SignatureUtil.verifySignature(
                 evvmID,
                 "flushCustomMetadata",
-                string.concat(_identity, ",", AdvancedStrings.uintToString(_nonce)),
+                string.concat(
+                    _identity,
+                    ",",
+                    AdvancedStrings.uintToString(_nonce)
+                ),
                 signature,
                 signer
             );
@@ -230,7 +233,11 @@ library SignatureUtils {
             SignatureUtil.verifySignature(
                 evvmID,
                 "flushUsername",
-                string.concat(_username, ",", AdvancedStrings.uintToString(_nonce)),
+                string.concat(
+                    _username,
+                    ",",
+                    AdvancedStrings.uintToString(_nonce)
+                ),
                 signature,
                 signer
             );

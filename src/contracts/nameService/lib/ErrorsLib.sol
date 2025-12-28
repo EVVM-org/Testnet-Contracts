@@ -8,13 +8,7 @@ library ErrorsLib {
     error UserIsNotOwnerOfIdentity();
     error NonceAlreadyUsed();
     error InvalidSignatureOnNameService();
-    /**
-     * @dev Error thrown when a username is not valid.
-     *      0x01 - Username is too short.
-     *      0x02 - Username does not start with a letter.
-     *      0x03 - Username contains invalid characters.
-     */
-    error InvalidUsername(bytes1);
+    error InvalidUsername();
     error UsernameAlreadyRegistered();
     error PreRegistrationNotValid();
     error MakeOfferVerificationFailed();
