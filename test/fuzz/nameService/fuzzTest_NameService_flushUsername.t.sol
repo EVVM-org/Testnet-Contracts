@@ -55,6 +55,17 @@ import {
 contract fuzzTest_NameService_flushUsername is Test, Constants {
     AccountData COMMON_USER_NO_STAKER_3 = WILDCARD_USER;
 
+    function executeBeforeSetUp() internal override {
+        evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
+        _execute_makeRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0),
+            uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1),
+            uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff2)
+        );
+    }
+
     function addBalance(
         AccountData memory user,
         string memory usernameToFlushCustomMetadata,

@@ -63,9 +63,9 @@ contract fuzzTest_NameService_removeCustomMetadata is Test, Constants {
         _execute_makeRegistrationUsername(
             COMMON_USER_NO_STAKER_1,
             "test",
-            777,
-            10101,
-            20202
+                uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0),
+            uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1),
+            uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff2)
         );
 
         for (uint256 i = 0; i < MAX_AMOUNT_SLOTS_REGISTERED; i++) {

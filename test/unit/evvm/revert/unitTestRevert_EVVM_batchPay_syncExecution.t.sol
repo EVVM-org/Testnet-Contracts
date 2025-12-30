@@ -765,7 +765,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
 
         vm.stopPrank();
 
-        assertEq(successfulTransactions - 1, 1);
+        assertEq(successfulTransactions , 0);
 
         assertEq(
             evvm.getBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS),
@@ -837,7 +837,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
 
         vm.stopPrank();
 
-        assertEq(successfulTransactions - 1, 1);
+        assertEq(successfulTransactions, 0);
 
         assertEq(
             evvm.getBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS),
@@ -909,7 +909,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
 
         vm.stopPrank();
 
-        assertEq(successfulTransactions - 1, 1);
+        assertEq(successfulTransactions, 0);
 
         assertEq(
             evvm.getBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS),

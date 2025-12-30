@@ -51,6 +51,13 @@ contract unitTestCorrect_NameService_makeOffer_AsyncExecutionOnPay is
 
     function executeBeforeSetUp() internal override {
         evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
+        _execute_makeRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0),
+            uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1),
+            uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff2)
+        );
     }
 
     /**
@@ -78,13 +85,6 @@ contract unitTestCorrect_NameService_makeOffer_AsyncExecutionOnPay is
         totalOfferAmount = offerAmount;
         totalPriorityFeeAmount = priorityFeeAmount;
 
-        _execute_makeRegistrationUsername(
-            COMMON_USER_NO_STAKER_1,
-            "test",
-            777,
-            10101,
-            20202
-        );
     }
 
     function test__unit_correct__makeOffer__nS_nPF() external {

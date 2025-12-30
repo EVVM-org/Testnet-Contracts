@@ -49,6 +49,17 @@ contract unitTestCorrect_NameService_removeCustomMetadata_AsyncExecutionOnPay is
 {
     AccountData COMMON_USER_NO_STAKER_3 = WILDCARD_USER;
 
+    function executeBeforeSetUp() internal override {
+        
+        _execute_makeRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0),
+            uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1),
+            uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff2)
+        );
+    }
+
     function addBalance(
         AccountData memory user,
         uint256 priorityFeeAmount

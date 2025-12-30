@@ -199,7 +199,7 @@ abstract contract Constants is Test {
             address(treasury)
         );
 
-        //evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
+        evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
 
         executeBeforeSetUp();
     }

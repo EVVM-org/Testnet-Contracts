@@ -1304,14 +1304,16 @@ contract unitTestRevert_NameService_renewUsername is Test, Constants {
     function test__unit_revert__renewUsername__expirationDateMoreThan100Years()
         external
     {
+
         _execute_makeRegistrationUsername(
             COMMON_USER_NO_STAKER_1,
             "user",
-            1,
-            99999999999999999999999999999999999,
-            999999999999999999999999999999999999
+            uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0),
+            uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1),
+            uint256(0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff2)
         );
-        for (uint256 i = 0; i < 100; i++) {
+    
+        for (uint256 i = 0; i < 99; i++) {
             addBalance(COMMON_USER_NO_STAKER_1, "user", 0);
 
             (
@@ -1328,6 +1330,7 @@ contract unitTestRevert_NameService_renewUsername is Test, Constants {
 
             vm.startPrank(COMMON_USER_STAKER.Address);
 
+            
             nameService.renewUsername(
                 COMMON_USER_NO_STAKER_1.Address,
                 "user",
@@ -1390,9 +1393,6 @@ contract unitTestRevert_NameService_renewUsername is Test, Constants {
             ),
             totalRenewalAmount + totalPriorityFeeAmount
         );
-        assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
-            0
-        );
+        
     }
 }

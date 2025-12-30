@@ -43,7 +43,44 @@ import {
 } from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
 
 contract unitTestRevert_EVVM_adminFunctions is Test, Constants {
+    
     AccountData COMMON_USER = WILDCARD_USER;
+
+    function setUp() public override {
+        staking = new Staking(ADMIN.Address, GOLDEN_STAKER.Address);
+        evvm = new Evvm(
+            ADMIN.Address,
+            address(staking),
+            EvvmStructs.EvvmMetadata({
+                EvvmName: "EVVM",
+                EvvmID: 0,
+                principalTokenName: "EVVM Staking Token",
+                principalTokenSymbol: "EVVM-STK",
+                principalTokenAddress: 0x0000000000000000000000000000000000000001,
+                totalSupply: 2033333333000000000000000000,
+                eraTokens: 2033333333000000000000000000 / 2,
+                reward: 5000000000000000000
+            })
+        );
+        estimator = new Estimator(
+            ACTIVATOR.Address,
+            address(evvm),
+            address(staking),
+            ADMIN.Address
+        );
+        nameService = new NameService(address(evvm), ADMIN.Address);
+
+        staking._setupEstimatorAndEvvm(address(estimator), address(evvm));
+        treasury = new Treasury(address(evvm));
+        evvm._setupNameServiceAndTreasuryAddress(
+            address(nameService),
+            address(treasury)
+        );
+
+        evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
+
+        executeBeforeSetUp();
+    }
 
     function executeBeforeSetUp() internal override {
         evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
