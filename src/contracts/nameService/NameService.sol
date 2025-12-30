@@ -56,7 +56,6 @@ pragma solidity ^0.8.0;
  * - Marketplace takes 0.5% fee on username sales
  */
 
-
 import {IEvvm} from "@evvm/testnet-contracts/interfaces/IEvvm.sol";
 import {
     AsyncNonce
@@ -78,7 +77,6 @@ import {
 } from "@evvm/testnet-contracts/contracts/nameService/lib/IdentityValidation.sol";
 
 contract NameService is AsyncNonce, NameServiceStructs {
-
     /// @dev Time delay constant for accepting proposals
     uint256 constant TIME_TO_ACCEPT_PROPOSAL = 1 days;
 
@@ -105,9 +103,6 @@ contract NameService is AsyncNonce, NameServiceStructs {
 
     /// @dev Proposal system for admin address changes with time delay
     AddressTypeProposal admin;
-
-    
-    
 
     /// @dev Mapping from username to its core metadata and registration details
     mapping(string username => IdentityBaseMetadata basicMetadata)
@@ -1520,4 +1515,3 @@ contract NameService is AsyncNonce, NameServiceStructs {
         );
     }
 }
-
