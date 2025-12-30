@@ -26,57 +26,39 @@ import "forge-std/console2.sol";
 import {Constants} from "test/Constants.sol";
 
 import {Staking} from "@evvm/testnet-contracts/contracts/staking/Staking.sol";
-import {NameService} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
+import {
+    NameService
+} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
 import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
-import {Erc191TestBuilder} from "@evvm/testnet-contracts/library/Erc191TestBuilder.sol";
-import {Estimator} from "@evvm/testnet-contracts/contracts/staking/Estimator.sol";
-import {EvvmStorage} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
-import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
-import {EvvmStructs} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
-import {Treasury} from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
+import {
+    Erc191TestBuilder
+} from "@evvm/testnet-contracts/library/Erc191TestBuilder.sol";
+import {
+    Estimator
+} from "@evvm/testnet-contracts/contracts/staking/Estimator.sol";
+import {
+    EvvmStorage
+} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
+import {
+    AdvancedStrings
+} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
+import {
+    EvvmStructs
+} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
+import {
+    Treasury
+} from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
 import {P2PSwap} from "@evvm/testnet-contracts/contracts/p2pSwap/P2PSwap.sol";
-import {P2PSwapStructs} from "@evvm/testnet-contracts/contracts/p2pSwap/lib/P2PSwapStructs.sol";
+import {
+    P2PSwapStructs
+} from "@evvm/testnet-contracts/contracts/p2pSwap/lib/P2PSwapStructs.sol";
 
 contract fuzzTest_P2PSwap_cancelOrder is Test, Constants {
-    Staking staking;
-    Evvm evvm;
-    Estimator estimator;
-    Treasury treasury;
-    NameService nameService;
     P2PSwap p2pSwap;
 
     AccountData COMMON_USER_NO_STAKER_3 = WILDCARD_USER;
 
-    function setUp() public {
-        staking = new Staking(ADMIN.Address, GOLDEN_STAKER.Address);
-        evvm = new Evvm(
-            ADMIN.Address,
-            address(staking),
-            EvvmStructs.EvvmMetadata({
-                EvvmName: "EVVM",
-                EvvmID: 777,
-                principalTokenName: "EVVM Staking Token",
-                principalTokenSymbol: "EVVM-STK",
-                principalTokenAddress: 0x0000000000000000000000000000000000000001,
-                totalSupply: 2033333333000000000000000000,
-                eraTokens: 2033333333000000000000000000 / 2,
-                reward: 5000000000000000000
-            })
-        );
-        estimator = new Estimator(
-            ACTIVATOR.Address,
-            address(evvm),
-            address(staking),
-            ADMIN.Address
-        );
-        nameService = new NameService(address(evvm), ADMIN.Address);
-
-        staking._setupEstimatorAndEvvm(address(estimator), address(evvm));
-        treasury = new Treasury(address(evvm));
-        evvm._setupNameServiceAndTreasuryAddress(
-            address(nameService),
-            address(treasury)
-        );
+    function executeBeforeSetUp() internal override {
         p2pSwap = new P2PSwap(address(evvm), address(staking), ADMIN.Address);
 
         evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
@@ -100,13 +82,14 @@ contract fuzzTest_P2PSwap_cancelOrder is Test, Constants {
         uint256 nonceEVVM,
         bool priorityFlag
     ) private returns (uint256 market, uint256 orderId) {
-        P2PSwapStructs.MetadataMakeOrder memory orderData = P2PSwapStructs.MetadataMakeOrder({
-            nonce: nonceP2PSwap,
-            tokenA: tokenA,
-            tokenB: tokenB,
-            amountA: amountA,
-            amountB: amountB
-        });
+        P2PSwapStructs.MetadataMakeOrder memory orderData = P2PSwapStructs
+            .MetadataMakeOrder({
+                nonce: nonceP2PSwap,
+                tokenA: tokenA,
+                tokenB: tokenB,
+                amountA: amountA,
+                amountB: amountB
+            });
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             user.PrivateKey,

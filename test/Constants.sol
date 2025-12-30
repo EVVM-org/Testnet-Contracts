@@ -14,15 +14,39 @@ pragma solidity ^0.8.0;
  *         inherited by the implementation contracts to ensure they maintain
  *         the same storage layout.
  */
-
+import "forge-std/Test.sol";
+import "forge-std/console2.sol";
+import {
+    Erc191TestBuilder
+} from "@evvm/testnet-contracts/library/Erc191TestBuilder.sol";
 import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
+import {
+    Estimator
+} from "@evvm/testnet-contracts/contracts/staking/Estimator.sol";
 import {Staking} from "@evvm/testnet-contracts/contracts/staking/Staking.sol";
+import {
+    NameService
+} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
+import {
+    Treasury
+} from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
 import {ERC20} from "@solady/tokens/ERC20.sol";
-import {StakingServiceUtils} from "@evvm/testnet-contracts/library/utils/service/StakingServiceUtils.sol";
+import {
+    StakingServiceUtils
+} from "@evvm/testnet-contracts/library/utils/service/StakingServiceUtils.sol";
 import {IStaking} from "@evvm/testnet-contracts/interfaces/IStaking.sol";
 import {IEvvm} from "@evvm/testnet-contracts/interfaces/IEvvm.sol";
+import {
+    EvvmStructs
+} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
 
-abstract contract Constants {
+abstract contract Constants is Test {
+    Staking staking;
+    Evvm evvm;
+    Estimator estimator;
+    NameService nameService;
+    Treasury treasury;
+
     bytes32 constant DEPOSIT_HISTORY_SMATE_IDENTIFIER = bytes32(uint256(1));
     bytes32 constant WITHDRAW_HISTORY_SMATE_IDENTIFIER = bytes32(uint256(2));
 
@@ -143,6 +167,847 @@ abstract contract Constants {
             Address: ACCOUNT8.Address,
             PrivateKey: ACCOUNT8.PrivateKey
         });
+
+    function setUp() public virtual {
+        staking = new Staking(ADMIN.Address, GOLDEN_STAKER.Address);
+        evvm = new Evvm(
+            ADMIN.Address,
+            address(staking),
+            EvvmStructs.EvvmMetadata({
+                EvvmName: "EVVM",
+                EvvmID: 777,
+                principalTokenName: "EVVM Staking Token",
+                principalTokenSymbol: "EVVM-STK",
+                principalTokenAddress: 0x0000000000000000000000000000000000000001,
+                totalSupply: 2033333333000000000000000000,
+                eraTokens: 2033333333000000000000000000 / 2,
+                reward: 5000000000000000000
+            })
+        );
+        estimator = new Estimator(
+            ACTIVATOR.Address,
+            address(evvm),
+            address(staking),
+            ADMIN.Address
+        );
+        nameService = new NameService(address(evvm), ADMIN.Address);
+
+        staking._setupEstimatorAndEvvm(address(estimator), address(evvm));
+        treasury = new Treasury(address(evvm));
+        evvm._setupNameServiceAndTreasuryAddress(
+            address(nameService),
+            address(treasury)
+        );
+
+        //evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
+
+        executeBeforeSetUp();
+    }
+
+    function executeBeforeSetUp() internal virtual {}
+
+    function _execute_makeSignaturePay(
+        AccountData memory user,
+        address toAddress,
+        string memory toIdentity,
+        address tokenAddress,
+        uint256 amount,
+        uint256 priorityFee,
+        uint256 nonce,
+        bool priorityFlag,
+        address executor
+    ) internal virtual returns (bytes memory signatureEVVM) {
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForPay(
+                evvm.getEvvmID(),
+                toAddress,
+                toIdentity,
+                tokenAddress,
+                amount,
+                priorityFee,
+                nonce,
+                priorityFlag,
+                executor
+            )
+        );
+        signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
+    }
+
+    function _execute_makeDispersePaySignature(
+        AccountData memory user,
+        EvvmStructs.DispersePayMetadata[] memory toData,
+        address tokenAddress,
+        uint256 amount,
+        uint256 priorityFee,
+        uint256 nonce,
+        bool priorityFlag,
+        address executor
+    ) internal virtual returns (bytes memory signatureEVVM) {
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForDispersePay(
+                evvm.getEvvmID(),
+                sha256(abi.encode(toData)),
+                tokenAddress,
+                amount,
+                priorityFee,
+                nonce,
+                priorityFlag,
+                executor
+            )
+        );
+        signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
+    }
+
+    function _execute_makePreRegistrationUsernameSignature(
+        AccountData memory user,
+        string memory username,
+        uint256 clowNumber,
+        uint256 nonceNameService,
+        bool givePriorityFee,
+        uint256 priorityFeeAmount,
+        uint256 nonceEVVM,
+        bool priorityEVVM
+    )
+        internal
+        virtual
+        returns (bytes memory signatureNameService, bytes memory signatureEVVM)
+    {
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+
+        if (givePriorityFee) {
+            (v, r, s) = vm.sign(
+                user.PrivateKey,
+                Erc191TestBuilder.buildMessageSignedForPreRegistrationUsername(
+                    evvm.getEvvmID(),
+                    keccak256(abi.encodePacked(username, uint256(clowNumber))),
+                    nonceNameService
+                )
+            );
+            signatureNameService = Erc191TestBuilder.buildERC191Signature(
+                v,
+                r,
+                s
+            );
+            (v, r, s) = vm.sign(
+                user.PrivateKey,
+                Erc191TestBuilder.buildMessageSignedForPay(
+                    evvm.getEvvmID(),
+                    address(nameService),
+                    "",
+                    MATE_TOKEN_ADDRESS,
+                    0,
+                    priorityFeeAmount,
+                    nonceEVVM,
+                    priorityEVVM,
+                    address(nameService)
+                )
+            );
+            signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
+        } else {
+            (v, r, s) = vm.sign(
+                user.PrivateKey,
+                Erc191TestBuilder.buildMessageSignedForPreRegistrationUsername(
+                    evvm.getEvvmID(),
+                    keccak256(abi.encodePacked(username, uint256(clowNumber))),
+                    nonceNameService
+                )
+            );
+            signatureNameService = Erc191TestBuilder.buildERC191Signature(
+                v,
+                r,
+                s
+            );
+            signatureEVVM = "";
+        }
+    }
+
+    function _execute_makeMakeOfferSignatures(
+        AccountData memory user,
+        string memory usernameToMakeOffer,
+        uint256 expireDate,
+        uint256 amountToOffer,
+        uint256 nonceNameService,
+        uint256 priorityFeeAmountEVVM,
+        uint256 nonceEVVM,
+        bool priorityFlagEVVM
+    )
+        internal
+        virtual
+        returns (bytes memory signatureNameService, bytes memory signatureEVVM)
+    {
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForMakeOffer(
+                evvm.getEvvmID(),
+                usernameToMakeOffer,
+                expireDate,
+                amountToOffer,
+                nonceNameService
+            )
+        );
+        signatureNameService = Erc191TestBuilder.buildERC191Signature(v, r, s);
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForPay(
+                evvm.getEvvmID(),
+                address(nameService),
+                "",
+                MATE_TOKEN_ADDRESS,
+                amountToOffer,
+                priorityFeeAmountEVVM,
+                nonceEVVM,
+                priorityFlagEVVM,
+                address(nameService)
+            )
+        );
+        signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
+    }
+
+    function _execute_makeAcceptOfferSignatures(
+        AccountData memory user,
+        bool givePriorityFee,
+        string memory usernameToFindOffer,
+        uint256 index,
+        uint256 nonceNameService,
+        uint256 priorityFeeAmountEVVM,
+        uint256 nonceEVVM,
+        bool priorityFlagEVVM
+    )
+        internal
+        virtual
+        returns (bytes memory signatureNameService, bytes memory signatureEVVM)
+    {
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+
+        if (givePriorityFee) {
+            (v, r, s) = vm.sign(
+                user.PrivateKey,
+                Erc191TestBuilder.buildMessageSignedForAcceptOffer(
+                    evvm.getEvvmID(),
+                    usernameToFindOffer,
+                    index,
+                    nonceNameService
+                )
+            );
+            signatureNameService = Erc191TestBuilder.buildERC191Signature(
+                v,
+                r,
+                s
+            );
+
+            (v, r, s) = vm.sign(
+                user.PrivateKey,
+                Erc191TestBuilder.buildMessageSignedForPay(
+                    evvm.getEvvmID(),
+                    address(nameService),
+                    "",
+                    MATE_TOKEN_ADDRESS,
+                    0,
+                    priorityFeeAmountEVVM,
+                    nonceEVVM,
+                    priorityFlagEVVM,
+                    address(nameService)
+                )
+            );
+            signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
+        } else {
+            (v, r, s) = vm.sign(
+                user.PrivateKey,
+                Erc191TestBuilder.buildMessageSignedForAcceptOffer(
+                    evvm.getEvvmID(),
+                    usernameToFindOffer,
+                    index,
+                    nonceNameService
+                )
+            );
+            signatureNameService = Erc191TestBuilder.buildERC191Signature(
+                v,
+                r,
+                s
+            );
+            signatureNameService = Erc191TestBuilder.buildERC191Signature(
+                v,
+                r,
+                s
+            );
+            signatureEVVM = "";
+        }
+    }
+
+    function _execute_makeAddCustomMetadataSignatures(
+        AccountData memory user,
+        string memory username,
+        string memory customMetadata,
+        uint256 nonceNameService,
+        uint256 priorityFeeAmountEVVM,
+        uint256 nonceEVVM,
+        bool priorityFlagEVVM
+    )
+        internal
+        virtual
+        returns (bytes memory signatureNameService, bytes memory signatureEVVM)
+    {
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForAddCustomMetadata(
+                evvm.getEvvmID(),
+                username,
+                customMetadata,
+                nonceNameService
+            )
+        );
+        signatureNameService = Erc191TestBuilder.buildERC191Signature(v, r, s);
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForPay(
+                evvm.getEvvmID(),
+                address(nameService),
+                "",
+                MATE_TOKEN_ADDRESS,
+                nameService.getPriceToAddCustomMetadata(),
+                priorityFeeAmountEVVM,
+                nonceEVVM,
+                priorityFlagEVVM,
+                address(nameService)
+            )
+        );
+        signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
+    }
+
+    function _execute_makeFlushUsernameSignatures(
+        AccountData memory user,
+        string memory username,
+        uint256 nonceNameService,
+        uint256 priorityFeeAmountEVVM,
+        uint256 nonceEVVM,
+        bool priorityFlagEVVM
+    )
+        internal
+        virtual
+        returns (bytes memory signatureNameService, bytes memory signatureEVVM)
+    {
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForFlushUsername(
+                evvm.getEvvmID(),
+                username,
+                nonceNameService
+            )
+        );
+        signatureNameService = Erc191TestBuilder.buildERC191Signature(v, r, s);
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForPay(
+                evvm.getEvvmID(),
+                address(nameService),
+                "",
+                MATE_TOKEN_ADDRESS,
+                nameService.getPriceToFlushUsername(username),
+                priorityFeeAmountEVVM,
+                nonceEVVM,
+                priorityFlagEVVM,
+                address(nameService)
+            )
+        );
+        signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
+    }
+
+    function _execute_makePreRegistrationUsername(
+        AccountData memory user,
+        string memory username,
+        uint256 clowNumber,
+        uint256 nonceNameService
+    ) internal virtual {
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForPreRegistrationUsername(
+                evvm.getEvvmID(),
+                keccak256(abi.encodePacked(username, uint256(clowNumber))),
+                nonceNameService
+            )
+        );
+
+        nameService.preRegistrationUsername(
+            user.Address,
+            keccak256(abi.encodePacked(username, uint256(clowNumber))),
+            nonceNameService,
+            Erc191TestBuilder.buildERC191Signature(v, r, s),
+            0,
+            0,
+            false,
+            hex""
+        );
+    }
+
+    function _execute_makeRegistrationUsername(
+        AccountData memory user,
+        string memory username,
+        uint256 clowNumber,
+        uint256 nonceNameServicePre,
+        uint256 nonceNameService
+    ) internal virtual {
+        evvm.addBalance(
+            user.Address,
+            MATE_TOKEN_ADDRESS,
+            nameService.getPriceOfRegistration(username)
+        );
+
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForPreRegistrationUsername(
+                evvm.getEvvmID(),
+                keccak256(abi.encodePacked(username, uint256(clowNumber))),
+                nonceNameServicePre
+            )
+        );
+
+        nameService.preRegistrationUsername(
+            user.Address,
+            keccak256(abi.encodePacked(username, uint256(clowNumber))),
+            nonceNameServicePre,
+            Erc191TestBuilder.buildERC191Signature(v, r, s),
+            0,
+            0,
+            false,
+            hex""
+        );
+
+        skip(30 minutes);
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForRegistrationUsername(
+                evvm.getEvvmID(),
+                username,
+                clowNumber,
+                nonceNameService
+            )
+        );
+        bytes memory signatureNameService = Erc191TestBuilder
+            .buildERC191Signature(v, r, s);
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForPay(
+                evvm.getEvvmID(),
+                address(nameService),
+                "",
+                MATE_TOKEN_ADDRESS,
+                nameService.getPriceOfRegistration(username),
+                0,
+                evvm.getNextCurrentSyncNonce(COMMON_USER_NO_STAKER_1.Address),
+                false,
+                address(nameService)
+            )
+        );
+        bytes memory signatureEVVM = Erc191TestBuilder.buildERC191Signature(
+            v,
+            r,
+            s
+        );
+
+        nameService.registrationUsername(
+            user.Address,
+            username,
+            clowNumber,
+            nonceNameService,
+            signatureNameService,
+            0,
+            evvm.getNextCurrentSyncNonce(COMMON_USER_NO_STAKER_1.Address),
+            false,
+            signatureEVVM
+        );
+    }
+
+    function _execute_makeAddCustomMetadata(
+        AccountData memory user,
+        string memory username,
+        string memory customMetadata,
+        uint256 nonceNameService,
+        uint256 nonceEVVM,
+        bool priorityFlagEVVM
+    ) internal virtual {
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+
+        evvm.addBalance(
+            user.Address,
+            MATE_TOKEN_ADDRESS,
+            nameService.getPriceToAddCustomMetadata()
+        );
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForAddCustomMetadata(
+                evvm.getEvvmID(),
+                username,
+                customMetadata,
+                nonceNameService
+            )
+        );
+        bytes memory signatureNameService = Erc191TestBuilder
+            .buildERC191Signature(v, r, s);
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForPay(
+                evvm.getEvvmID(),
+                address(nameService),
+                "",
+                MATE_TOKEN_ADDRESS,
+                nameService.getPriceToAddCustomMetadata(),
+                0,
+                nonceEVVM,
+                priorityFlagEVVM,
+                address(nameService)
+            )
+        );
+        bytes memory signatureEVVM = Erc191TestBuilder.buildERC191Signature(
+            v,
+            r,
+            s
+        );
+
+        nameService.addCustomMetadata(
+            user.Address,
+            username,
+            customMetadata,
+            nonceNameService,
+            signatureNameService,
+            0,
+            nonceEVVM,
+            priorityFlagEVVM,
+            signatureEVVM
+        );
+    }
+
+    function _execute_makeRemoveCustomMetadataSignatures(
+        AccountData memory user,
+        string memory username,
+        uint256 indexCustomMetadata,
+        uint256 nonceNameService,
+        uint256 priorityFeeAmountEVVM,
+        uint256 nonceEVVM,
+        bool priorityFlagEVVM
+    )
+        internal
+        virtual
+        returns (bytes memory signatureNameService, bytes memory signatureEVVM)
+    {
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForRemoveCustomMetadata(
+                evvm.getEvvmID(),
+                username,
+                indexCustomMetadata,
+                nonceNameService
+            )
+        );
+        signatureNameService = Erc191TestBuilder.buildERC191Signature(v, r, s);
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForPay(
+                evvm.getEvvmID(),
+                address(nameService),
+                "",
+                MATE_TOKEN_ADDRESS,
+                nameService.getPriceToRemoveCustomMetadata(),
+                priorityFeeAmountEVVM,
+                nonceEVVM,
+                priorityFlagEVVM,
+                address(nameService)
+            )
+        );
+        signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
+    }
+
+    function _execute_makeWithdrawOfferSignatures(
+        AccountData memory user,
+        bool givePriorityFee,
+        string memory usernameToFindOffer,
+        uint256 index,
+        uint256 nonceNameService,
+        uint256 priorityFeeAmountEVVM,
+        uint256 nonceEVVM,
+        bool priorityFlagEVVM
+    )
+        internal
+        virtual
+        returns (bytes memory signatureNameService, bytes memory signatureEVVM)
+    {
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+
+        if (givePriorityFee) {
+            (v, r, s) = vm.sign(
+                user.PrivateKey,
+                Erc191TestBuilder.buildMessageSignedForWithdrawOffer(
+                    evvm.getEvvmID(),
+                    usernameToFindOffer,
+                    index,
+                    nonceNameService
+                )
+            );
+            signatureNameService = Erc191TestBuilder.buildERC191Signature(
+                v,
+                r,
+                s
+            );
+
+            (v, r, s) = vm.sign(
+                user.PrivateKey,
+                Erc191TestBuilder.buildMessageSignedForPay(
+                    evvm.getEvvmID(),
+                    address(nameService),
+                    "",
+                    MATE_TOKEN_ADDRESS,
+                    0,
+                    priorityFeeAmountEVVM,
+                    nonceEVVM,
+                    priorityFlagEVVM,
+                    address(nameService)
+                )
+            );
+            signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
+        } else {
+            (v, r, s) = vm.sign(
+                user.PrivateKey,
+                Erc191TestBuilder.buildMessageSignedForWithdrawOffer(
+                    evvm.getEvvmID(),
+                    usernameToFindOffer,
+                    index,
+                    nonceNameService
+                )
+            );
+            signatureNameService = Erc191TestBuilder.buildERC191Signature(
+                v,
+                r,
+                s
+            );
+            signatureEVVM = "";
+        }
+    }
+
+    function _execute_makeRenewUsernameSignatures(
+        AccountData memory user,
+        string memory usernameToRenew,
+        uint256 nonceNameService,
+        uint256 priorityFeeAmountEVVM,
+        uint256 nonceEVVM,
+        bool priorityFlagEVVM
+    )
+        internal
+        virtual
+        returns (bytes memory signatureNameService, bytes memory signatureEVVM)
+    {
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForRenewUsername(
+                evvm.getEvvmID(),
+                usernameToRenew,
+                nonceNameService
+            )
+        );
+        signatureNameService = Erc191TestBuilder.buildERC191Signature(v, r, s);
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForPay(
+                evvm.getEvvmID(),
+                address(nameService),
+                "",
+                MATE_TOKEN_ADDRESS,
+                nameService.seePriceToRenew(usernameToRenew),
+                priorityFeeAmountEVVM,
+                nonceEVVM,
+                priorityFlagEVVM,
+                address(nameService)
+            )
+        );
+        signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
+    }
+
+    function _execute_makeFlushCustomMetadataSignatures(
+        AccountData memory user,
+        string memory username,
+        uint256 nonceNameService,
+        uint256 priorityFeeAmountEVVM,
+        uint256 nonceEVVM,
+        bool priorityFlagEVVM
+    )
+        internal
+        virtual
+        returns (bytes memory signatureNameService, bytes memory signatureEVVM)
+    {
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForFlushCustomMetadata(
+                evvm.getEvvmID(),
+                username,
+                nonceNameService
+            )
+        );
+        signatureNameService = Erc191TestBuilder.buildERC191Signature(v, r, s);
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForPay(
+                evvm.getEvvmID(),
+                address(nameService),
+                "",
+                MATE_TOKEN_ADDRESS,
+                nameService.getPriceToFlushCustomMetadata(username),
+                priorityFeeAmountEVVM,
+                nonceEVVM,
+                priorityFlagEVVM,
+                address(nameService)
+            )
+        );
+        signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
+    }
+
+    function _execute_makeRegistrationUsernameSignatures(
+        AccountData memory user,
+        string memory username,
+        uint256 clowNumber,
+        uint256 nonceNameService,
+        uint256 priorityFeeAmountEVVM,
+        uint256 nonceEVVM,
+        bool priorityFlagEVVM
+    )
+        internal
+        virtual
+        returns (bytes memory signatureNameService, bytes memory signatureEVVM)
+    {
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForRegistrationUsername(
+                evvm.getEvvmID(),
+                username,
+                clowNumber,
+                nonceNameService
+            )
+        );
+        signatureNameService = Erc191TestBuilder.buildERC191Signature(v, r, s);
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForPay(
+                evvm.getEvvmID(),
+                address(nameService),
+                "",
+                MATE_TOKEN_ADDRESS,
+                nameService.getPriceOfRegistration(username),
+                priorityFeeAmountEVVM,
+                nonceEVVM,
+                priorityFlagEVVM,
+                address(nameService)
+            )
+        );
+        signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
+    }
+
+    function makeOffer(
+        AccountData memory user,
+        string memory usernameToMakeOffer,
+        uint256 expireDate,
+        uint256 amountToOffer,
+        uint256 nonceNameService,
+        uint256 nonceEVVM,
+        bool priorityFlagEVVM
+    ) internal virtual {
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+        bytes memory signatureNameService;
+        bytes memory signatureEVVM;
+
+        evvm.addBalance(user.Address, MATE_TOKEN_ADDRESS, amountToOffer);
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForMakeOffer(
+                evvm.getEvvmID(),
+                usernameToMakeOffer,
+                expireDate,
+                amountToOffer,
+                nonceNameService
+            )
+        );
+        signatureNameService = Erc191TestBuilder.buildERC191Signature(v, r, s);
+
+        (v, r, s) = vm.sign(
+            user.PrivateKey,
+            Erc191TestBuilder.buildMessageSignedForPay(
+                evvm.getEvvmID(),
+                address(nameService),
+                "",
+                MATE_TOKEN_ADDRESS,
+                amountToOffer,
+                0,
+                nonceEVVM,
+                priorityFlagEVVM,
+                address(nameService)
+            )
+        );
+        signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
+
+        nameService.makeOffer(
+            user.Address,
+            usernameToMakeOffer,
+            expireDate,
+            amountToOffer,
+            nonceNameService,
+            signatureNameService,
+            0,
+            nonceEVVM,
+            priorityFlagEVVM,
+            signatureEVVM
+        );
+    }
 }
 
 contract MockContractToStake is StakingServiceUtils {
@@ -212,449 +1077,36 @@ contract MockContractToStake is StakingServiceUtils {
 }
 
 contract TestERC20 is ERC20 {
-
     function mint(address to, uint256 amount) public {
         _mint(to, amount);
     }
 
-
-    function name() public view override returns (string memory){
+    function name() public view override returns (string memory) {
         return "TestToken";
     }
 
     /// @dev Returns the symbol of the token.
-    function symbol() public view override returns (string memory){
+    function symbol() public view override returns (string memory) {
         return "TTK";
     }
-
 }
 
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+contract HelperCa {
+    Evvm evvm;
 
-contract RegistryEvvmTestTwo is
-    Initializable,
-    OwnableUpgradeable,
-    UUPSUpgradeable
-{
-    error InvalidUser();
-    error InvalidInput();
-    error AlreadyRegistered(uint256 chainId, address evvmAddress);
-    error ChainIdNotRegistered();
-    error EvvmIdAlreadyRegistered();
-
-    /**
-     * @notice Metadata structure for EVVM registration
-     * @param chainId The chain ID where the EVVM is deployed
-     * @param evvmAddress The contract address of the EVVM
-     */
-    struct Metadata {
-        uint256 chainId;
-        address evvmAddress;
+    constructor(address _evvm) {
+        evvm = Evvm(_evvm);
     }
 
-    /**
-     * @notice Structure for managing time-delayed governance proposals
-     * @param current The currently active address
-     * @param proposal The proposed new address
-     * @param timeToAccept Timestamp when the proposal can be accepted (current time + 7 days)
-     */
-    struct AddressTypeProposal {
-        address current;
-        address proposal;
-        uint256 timeToAccept;
+    function makeCaPay(address user, address token, uint256 amount) public {
+        evvm.caPay(user, token, amount);
     }
 
-    AddressTypeProposal superUser;
-    AddressTypeProposal upgradeProposal;
-
-    mapping(uint256 evvmID => Metadata) private registry;
-    mapping(uint256 chainId => bool answer) private isThisChainIdRegistered;
-    mapping(uint256 chainId => mapping(address evvm => bool answer)) isThisAddressRegistered;
-
-    uint256 constant MAX_WHITE_LISTED_EVMM_ID = 999;
-    uint256 publicCounter;
-
-    modifier isSuperUser() {
-        if (msg.sender != superUser.current) revert InvalidUser();
-
-        _;
-    }
-
-    /**
-     * @notice Constructor that disables initializers for the implementation contract
-     * @dev Prevents the implementation contract from being initialized directly
-     */
-    constructor() {
-        _disableInitializers();
-    }
-
-    /**
-     * @notice Initializes the registry contract with initial superUser
-     * @dev Sets up the contract with initial parameters and inheritance chain
-     * @param initialSuperUser Address that will have superUser privileges
-     */
-    function initialize(address initialSuperUser) public initializer {
-        publicCounter = 1000;
-        superUser = AddressTypeProposal(initialSuperUser, address(0), 0);
-        __Ownable_init(initialSuperUser);
-        __UUPSUpgradeable_init();
-    }
-
-    /**
-     * @notice Public registration function for EVVM instances
-     * @dev Anyone can register an EVVM if the chain ID is whitelisted and the address isn't already registered
-     * @param chainId The chain ID of the testnet where the EVVM is deployed
-     * @param evvmAddress The contract address of the EVVM instance
-     * @return The assigned EVVM ID (auto-incremented from 1000 onwards)
-     *
-     * Requirements:
-     * - chainId must be non-zero and whitelisted
-     * - evvmAddress must be non-zero and not already registered for this chainId
-     *
-     * @custom:security Only works with whitelisted testnet chain IDs to prevent mainnet registration
-     */
-    function registerEvvm(
-        uint256 chainId,
-        address evvmAddress
-    ) external returns (uint256) {
-        if (chainId == 0 || evvmAddress == address(0)) revert InvalidInput();
-
-        if (isThisAddressRegistered[chainId][evvmAddress])
-            revert AlreadyRegistered(chainId, evvmAddress);
-
-        if (!isThisChainIdRegistered[chainId]) revert ChainIdNotRegistered();
-
-        uint256 evvmID = publicCounter;
-        registry[evvmID] = Metadata(chainId, evvmAddress);
-        isThisAddressRegistered[chainId][evvmAddress] = true;
-        publicCounter++;
-
-        return evvmID;
-    }
-
-    /**
-     * @notice SuperUser registration function for whitelisted EVVM IDs
-     * @dev Only superUser can register EVVMs with specific IDs in the reserved range (1-999)
-     * @param evvmID The specific ID to assign (must be between 1-999)
-     * @param chainId The chain ID of the testnet where the EVVM is deployed
-     * @param evvmAddress The contract address of the EVVM instance
-     * @return The assigned EVVM ID (same as input evvmID)
-     *
-     * Requirements:
-     * - Only callable by superUser
-     * - evvmID must be between 1 and 999 (MAX_WHITE_LISTED_EVMM_ID)
-     * - chainId must be non-zero and whitelisted
-     * - evvmAddress must be non-zero and not already registered for this chainId
-     * - The specified evvmID must not already be registered
-     *
-     * @custom:access-control Restricted to superUser only
-     * @custom:security Reserved IDs (1-999) for official EVVM deployments
-     */
-    function sudoRegisterEvvm(
-        uint256 evvmID,
-        uint256 chainId,
-        address evvmAddress
-    ) external isSuperUser returns (uint256) {
-        if (
-            evvmID < 1 ||
-            evvmID > MAX_WHITE_LISTED_EVMM_ID ||
-            chainId == 0 ||
-            evvmAddress == address(0)
-        ) revert InvalidInput();
-
-        if (isThisAddressRegistered[chainId][evvmAddress])
-            revert AlreadyRegistered(chainId, evvmAddress);
-
-        if (
-            registry[evvmID].chainId != 0 &&
-            registry[evvmID].evvmAddress != address(0)
-        ) revert EvvmIdAlreadyRegistered();
-
-        if (!isThisChainIdRegistered[chainId]) revert ChainIdNotRegistered();
-
-        registry[evvmID] = Metadata(chainId, evvmAddress);
-        isThisAddressRegistered[chainId][evvmAddress] = true;
-
-        return evvmID;
-    }
-
-    /**
-     * @notice Registers multiple chain IDs to the whitelist
-     * @dev Only superUser can add chain IDs to prevent mainnet registration
-     * @param chainIds Array of chain IDs to whitelist for EVVM registration
-     *
-     * Requirements:
-     * - Only callable by superUser
-     * - All chain IDs must be non-zero
-     *
-     * @custom:access-control Restricted to superUser only
-     * @custom:security Prevents registration on non-testnet chains by controlling whitelist
-     */
-    function registerChainId(uint256[] memory chainIds) external isSuperUser {
-        for (uint256 i = 0; i < chainIds.length; i++) {
-            if (chainIds[i] == 0) revert InvalidInput();
-            isThisChainIdRegistered[chainIds[i]] = true;
-        }
-    }
-
-    /**
-     * @notice Proposes a new superUser address with 7-day time delay
-     * @dev Part of the time-delayed governance system for superUser changes
-     * @param _newSuperUser Address of the proposed new superUser
-     */
-    function proposeSuperUser(address _newSuperUser) external isSuperUser {
-        if (_newSuperUser == address(0) || _newSuperUser == superUser.current) {
-            revert();
-        }
-
-        superUser.proposal = _newSuperUser;
-        superUser.timeToAccept = block.timestamp + 7 days;
-    }
-
-    /**
-     * @notice Cancels a pending superUser change proposal
-     * @dev Allows current superUser to reject proposed superUser changes
-     */
-    function rejectProposalSuperUser() external isSuperUser {
-        superUser.proposal = address(0);
-        superUser.timeToAccept = 0;
-    }
-
-    /**
-     * @notice Accepts a pending superUser proposal and becomes the new superUser
-     * @dev Can only be called by the proposed superUser after the time delay
-     */
-    function acceptSuperUser() external {
-        if (block.timestamp < superUser.timeToAccept) {
-            revert();
-        }
-        if (msg.sender != superUser.proposal) {
-            revert();
-        }
-
-        superUser.current = superUser.proposal;
-
-        superUser.proposal = address(0);
-        superUser.timeToAccept = 0;
-        _transferOwnership(superUser.current);
-    }
-
-    /**
-     * @notice Proposes a new implementation address for upgrade with 7-day time delay
-     * @dev Part of the time-delayed governance system for contract upgrades
-     * @param _newImplementation Address of the proposed new implementation
-     */
-    function proposeUpgrade(address _newImplementation) external isSuperUser {
-        if (_newImplementation == address(0)) {
-            revert InvalidInput();
-        }
-
-        upgradeProposal.proposal = _newImplementation;
-        upgradeProposal.timeToAccept = block.timestamp + 7 days;
-    }
-
-    /**
-     * @notice Cancels a pending upgrade proposal
-     * @dev Allows current superUser to reject proposed upgrades
-     */
-    function rejectProposalUpgrade() external isSuperUser {
-        upgradeProposal.proposal = address(0);
-        upgradeProposal.timeToAccept = 0;
-    }
-
-    /**
-     * @notice Accepts a pending upgrade proposal and executes the upgrade
-     * @dev Can only be called by the superUser after the time delay
-     */
-    function acceptProposalUpgrade() external isSuperUser {
-        if (block.timestamp < upgradeProposal.timeToAccept) {
-            revert();
-        }
-        if (upgradeProposal.proposal == address(0)) {
-            revert InvalidInput();
-        }
-
-        address newImplementation = upgradeProposal.proposal;
-
-        // Reset the proposal before upgrade
-        upgradeProposal.proposal = address(0);
-        upgradeProposal.timeToAccept = 0;
-
-        // Execute the upgrade
-        upgradeToAndCall(newImplementation, "");
-    }
-
-    /**
-     * @notice Retrieves metadata for a specific EVVM ID
-     * @dev View function that returns chain ID and contract address for given EVVM ID
-     * @param evvmID The EVVM ID to query
-     * @return Metadata struct containing chainId and evvmAddress
-     *
-     * @custom:usage dApps can use this to verify they're interacting with the correct EVVM
-     */
-    function getEvvmIdMetadata(
-        uint256 evvmID
-    ) external view returns (Metadata memory) {
-        return registry[evvmID];
-    }
-
-    /**
-     * @notice Retrieves all active whitelisted EVVM IDs (1-999)
-     * @dev View function that returns array of registered EVVM IDs in the reserved range
-     * @return Array of active EVVM IDs in the whitelisted range (1-999)
-     *
-     * @custom:usage Indexer function to discover all official EVVM deployments
-     * @custom:gas-warning This function can be gas-intensive for large numbers of registrations
-     */
-    function getWhiteListedEvvmIdActive()
-        external
-        view
-        returns (uint256[] memory)
-    {
-        uint256 count;
-        for (uint256 i = 1; i <= MAX_WHITE_LISTED_EVMM_ID; i++) {
-            if (
-                registry[i].chainId != 0 &&
-                registry[i].evvmAddress != address(0)
-            ) {
-                count++;
-            }
-        }
-
-        uint256[] memory activeEvvmIds = new uint256[](count);
-        uint256 index;
-
-        for (uint256 i = 1; i <= MAX_WHITE_LISTED_EVMM_ID; i++) {
-            if (
-                registry[i].chainId != 0 &&
-                registry[i].evvmAddress != address(0)
-            ) {
-                activeEvvmIds[index] = i;
-                index++;
-            }
-        }
-
-        return activeEvvmIds;
-    }
-
-    /**
-     * @notice Retrieves all active public EVVM IDs (1000+)
-     * @dev View function that returns array of registered EVVM IDs in the public range
-     * @return Array of active EVVM IDs in the public range (1000+)
-     *
-     * @custom:usage Indexer function to discover all community EVVM deployments
-     * @custom:gas-warning This function can be gas-intensive for large numbers of registrations
-     */
-    function getPublicEvvmIdActive() external view returns (uint256[] memory) {
-        uint256 count = publicCounter - MAX_WHITE_LISTED_EVMM_ID - 1;
-
-        uint256[] memory activeEvvmIds = new uint256[](count);
-        uint256 index;
-
-        for (uint256 i = MAX_WHITE_LISTED_EVMM_ID + 1; i < publicCounter; i++) {
-            if (
-                registry[i].chainId != 0 &&
-                registry[i].evvmAddress != address(0)
-            ) {
-                activeEvvmIds[index] = i;
-                index++;
-            }
-        }
-
-        return activeEvvmIds;
-    }
-
-    /**
-     * @notice Internal authorization function for upgrades
-     * @dev Required by UUPSUpgradeable, but authorization is handled in acceptProposalUpgrade
-     * @param newImplementation Address of the new implementation (unused in this context)
-     *
-     * @custom:security Authorization is handled through time-delayed governance in acceptProposalUpgrade
-     */
-    function _authorizeUpgrade(
-        address newImplementation
-    ) internal override isSuperUser {
-        // Authorization is now handled in acceptProposalUpgrade
-        // This function is called internally by upgradeToAndCall
-    }
-
-    /**
-     * @notice Retrieves complete superUser governance data
-     * @dev Returns the full AddressTypeProposal struct with current, proposed, and timing information
-     * @return AddressTypeProposal struct containing current superUser, proposed superUser, and acceptance timestamp
-     *
-     * @custom:usage For governance interfaces to display superUser change status
-     */
-    function getSuperUserData()
-        external
-        view
-        returns (AddressTypeProposal memory)
-    {
-        return superUser;
-    }
-
-    /**
-     * @notice Retrieves the current superUser address
-     * @dev Simple getter for the current superUser address
-     * @return Address of the current superUser
-     */
-    function getSuperUser() external view returns (address) {
-        return superUser.current;
-    }
-
-    /**
-     * @notice Checks if a chain ID is whitelisted for registration
-     * @dev View function to verify if registrations are allowed on a specific chain
-     * @param chainId The chain ID to check
-     * @return bool True if the chain ID is whitelisted, false otherwise
-     *
-     * @custom:usage dApps can use this to verify if a chain is supported before attempting registration
-     */
-    function isChainIdRegistered(uint256 chainId) external view returns (bool) {
-        return isThisChainIdRegistered[chainId];
-    }
-
-    /**
-     * @notice Checks if an EVVM address is already registered on a specific chain
-     * @dev View function to prevent duplicate registrations
-     * @param chainId The chain ID to check
-     * @param evvmAddress The EVVM address to check
-     * @return bool True if the address is already registered on this chain, false otherwise
-     *
-     * @custom:usage Prevents duplicate registrations and verifies existing registrations
-     */
-    function isAddressRegistered(
-        uint256 chainId,
-        address evvmAddress
-    ) external view returns (bool) {
-        return isThisAddressRegistered[chainId][evvmAddress];
-    }
-
-    /**
-     * @notice Retrieves complete upgrade proposal governance data
-     * @dev Returns the full AddressTypeProposal struct with current, proposed, and timing information for upgrades
-     * @return AddressTypeProposal struct containing current implementation, proposed implementation, and acceptance timestamp
-     *
-     * @custom:usage For governance interfaces to display upgrade proposal status
-     */
-    function getUpgradeProposalData()
-        external
-        view
-        returns (AddressTypeProposal memory)
-    {
-        return upgradeProposal;
-    }
-
-    /**
-     * @notice Returns the contract version
-     * @dev Simple version identifier for tracking contract updates
-     * @return uint256 Current version number of the contract
-     *
-     * @custom:usage For compatibility checks and version tracking
-     */
-    function getVersion() external pure returns (uint256) {
-        return 2;
+    function makeDisperseCaPay(
+        EvvmStructs.DisperseCaPayMetadata[] memory toData,
+        address token,
+        uint256 totalAmount
+    ) public {
+        evvm.disperseCaPay(toData, token, totalAmount);
     }
 }

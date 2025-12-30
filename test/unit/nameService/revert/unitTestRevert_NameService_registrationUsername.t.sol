@@ -20,50 +20,31 @@ import "forge-std/console2.sol";
 import {Constants} from "test/Constants.sol";
 
 import {Staking} from "@evvm/testnet-contracts/contracts/staking/Staking.sol";
-import {NameService} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
+import {
+    NameService
+} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
 import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
-import {Erc191TestBuilder} from "@evvm/testnet-contracts/library/Erc191TestBuilder.sol";
-import {Estimator} from "@evvm/testnet-contracts/contracts/staking/Estimator.sol";
-import {EvvmStorage} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
-import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
-import {EvvmStructs} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
-import {Treasury} from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
+import {
+    Erc191TestBuilder
+} from "@evvm/testnet-contracts/library/Erc191TestBuilder.sol";
+import {
+    Estimator
+} from "@evvm/testnet-contracts/contracts/staking/Estimator.sol";
+import {
+    EvvmStorage
+} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
+import {
+    AdvancedStrings
+} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
+import {
+    EvvmStructs
+} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
+import {
+    Treasury
+} from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
 
 contract unitTestRevert_NameService_registrationUsername is Test, Constants {
-    Staking staking;
-    Evvm evvm;
-    Estimator estimator;
-    NameService nameService;
-    Treasury treasury;
-
-    function setUp() public {
-        staking = new Staking(ADMIN.Address, GOLDEN_STAKER.Address);
-        evvm = new Evvm(
-            ADMIN.Address,
-            address(staking),
-            EvvmStructs.EvvmMetadata({
-                EvvmName: "EVVM",
-                EvvmID: 777,
-                principalTokenName: "EVVM Staking Token",
-                principalTokenSymbol: "EVVM-STK",
-                principalTokenAddress: 0x0000000000000000000000000000000000000001,
-                totalSupply: 2033333333000000000000000000,
-                eraTokens: 2033333333000000000000000000 / 2,
-                reward: 5000000000000000000
-            })
-        );
-        estimator = new Estimator(
-            ACTIVATOR.Address,
-            address(evvm),
-            address(staking),
-            ADMIN.Address
-        );
-        nameService = new NameService(address(evvm), ADMIN.Address);
-
-        staking._setupEstimatorAndEvvm(address(estimator), address(evvm));
-        treasury = new Treasury(address(evvm));
-        evvm._setupNameServiceAndTreasuryAddress(address(nameService), address(treasury));
-
+    function executeBeforeSetUp() internal override {
         evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
     }
 
@@ -85,78 +66,6 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         totalPriorityFeeAmount = priorityFeeAmount;
     }
 
-    function makePreRegistrationUsername(
-        AccountData memory user,
-        string memory username,
-        uint256 clowNumber,
-        uint256 nonceNameService
-    ) private {
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
-            user.PrivateKey,
-            Erc191TestBuilder.buildMessageSignedForPreRegistrationUsername(
-                evvm.getEvvmID(),
-                keccak256(abi.encodePacked(username, uint256(clowNumber))),
-                nonceNameService
-            )
-        );
-
-        nameService.preRegistrationUsername(
-            user.Address,
-            keccak256(abi.encodePacked(username, uint256(clowNumber))),
-            nonceNameService,
-            Erc191TestBuilder.buildERC191Signature(v, r, s),
-            0,
-            0,
-            false,
-            hex""
-        );
-    }
-
-    function makeRegistrationUsernameSignatures(
-        AccountData memory user,
-        string memory username,
-        uint256 clowNumber,
-        uint256 nonceNameService,
-        uint256 priorityFeeAmountEVVM,
-        uint256 nonceEVVM,
-        bool priorityFlagEVVM
-    )
-        private
-        view
-        returns (bytes memory signatureNameService, bytes memory signatureEVVM)
-    {
-        uint8 v;
-        bytes32 r;
-        bytes32 s;
-
-        (v, r, s) = vm.sign(
-            user.PrivateKey,
-            Erc191TestBuilder.buildMessageSignedForRegistrationUsername(
-                evvm.getEvvmID(),
-                username,
-                clowNumber,
-                nonceNameService
-            )
-        );
-        signatureNameService = Erc191TestBuilder.buildERC191Signature(v, r, s);
-
-        (v, r, s) = vm.sign(
-            user.PrivateKey,
-            Erc191TestBuilder.buildMessageSignedForPay(
-                evvm.getEvvmID(),
-                address(nameService),
-                "",
-                MATE_TOKEN_ADDRESS,
-                nameService.getPriceOfRegistration(username),
-                priorityFeeAmountEVVM,
-                nonceEVVM,
-                priorityFlagEVVM,
-                address(nameService)
-            )
-        );
-        signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
-    }
-
     /**
      * Function to test:
      * bSigAt[variable]: bad signature at
@@ -168,7 +77,7 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
     function test__unit_revert__registrationUsername__() external {
 
 
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
 
         skip(30 minutes);
 
@@ -180,7 +89,7 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         (
             bytes memory signatureNameService,
             bytes memory signatureEVVM
-        ) = makeRegistrationUsernameSignatures(
+        ) = _execute_makeRegistrationUsernameSignatures(
                 COMMON_USER_NO_STAKER_1,
                 "test",
                 777,
@@ -233,14 +142,19 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         bytes32 r;
         bytes32 s;
 
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (v, r, s) = vm.sign(
             COMMON_USER_NO_STAKER_2.PrivateKey,
@@ -311,14 +225,19 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         bytes32 r;
         bytes32 s;
 
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (v, r, s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -389,14 +308,19 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         bytes32 r;
         bytes32 s;
 
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (v, r, s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -467,14 +391,19 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         bytes32 r;
         bytes32 s;
 
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (v, r, s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -545,14 +474,19 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         bytes32 r;
         bytes32 s;
 
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (v, r, s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -623,14 +557,19 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         bytes32 r;
         bytes32 s;
 
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (v, r, s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -701,14 +640,19 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         bytes32 r;
         bytes32 s;
 
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (v, r, s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -779,14 +723,19 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         bytes32 r;
         bytes32 s;
 
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (v, r, s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -857,14 +806,19 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         bytes32 r;
         bytes32 s;
 
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (v, r, s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -935,14 +889,19 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         bytes32 r;
         bytes32 s;
 
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (v, r, s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -1013,14 +972,19 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         bytes32 r;
         bytes32 s;
 
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (v, r, s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -1091,14 +1055,19 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         bytes32 r;
         bytes32 s;
 
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (v, r, s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -1169,14 +1138,19 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         bytes32 r;
         bytes32 s;
 
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (v, r, s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -1244,12 +1218,12 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (
             bytes memory signatureNameService,
             bytes memory signatureEVVM
-        ) = makeRegistrationUsernameSignatures(
+        ) = _execute_makeRegistrationUsernameSignatures(
                 COMMON_USER_NO_STAKER_1,
                 "test",
                 777,
@@ -1295,19 +1269,24 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
     function test__unit_revert__registrationUsername__userTriesToRegisterWithoutWait()
         external
     {
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(10 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (
             bytes memory signatureNameService,
             bytes memory signatureEVVM
-        ) = makeRegistrationUsernameSignatures(
+        ) = _execute_makeRegistrationUsernameSignatures(
                 COMMON_USER_NO_STAKER_1,
                 "test",
                 777,
@@ -1353,11 +1332,17 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
     function test__unit_revert__registrationUsername__userTriesToRegisterWithNotEnoughBalance()
         external
     {
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_1, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_1,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
-        uint256 registrationPrice = nameService.getPriceOfRegistration("test") / 2;
+        uint256 registrationPrice = nameService.getPriceOfRegistration("test") /
+            2;
 
         evvm.addBalance(
             COMMON_USER_NO_STAKER_1.Address,
@@ -1368,7 +1353,7 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
         (
             bytes memory signatureNameService,
             bytes memory signatureEVVM
-        ) = makeRegistrationUsernameSignatures(
+        ) = _execute_makeRegistrationUsernameSignatures(
                 COMMON_USER_NO_STAKER_1,
                 "test",
                 777,
@@ -1414,19 +1399,24 @@ contract unitTestRevert_NameService_registrationUsername is Test, Constants {
     function test__unit_revert__registrationUsername__userTriesToRegisterAUsernameWithDifferentPreOwner()
         external
     {
-        makePreRegistrationUsername(COMMON_USER_NO_STAKER_2, "test", 777, 111);
+        _execute_makePreRegistrationUsername(
+            COMMON_USER_NO_STAKER_2,
+            "test",
+            777,
+            111
+        );
 
         skip(30 minutes);
 
         (
             uint256 registrationPrice,
             uint256 totalPriorityFeeAmount
-        ) = addBalance(COMMON_USER_NO_STAKER_1.Address,"test", 0.001 ether);
+        ) = addBalance(COMMON_USER_NO_STAKER_1.Address, "test", 0.001 ether);
 
         (
             bytes memory signatureNameService,
             bytes memory signatureEVVM
-        ) = makeRegistrationUsernameSignatures(
+        ) = _execute_makeRegistrationUsernameSignatures(
                 COMMON_USER_NO_STAKER_1,
                 "test",
                 777,

@@ -20,53 +20,34 @@ import "forge-std/console2.sol";
 import {Constants} from "test/Constants.sol";
 
 import {Staking} from "@evvm/testnet-contracts/contracts/staking/Staking.sol";
-import {NameService} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
+import {
+    NameService
+} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
 import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
-import {Erc191TestBuilder} from "@evvm/testnet-contracts/library/Erc191TestBuilder.sol";
-import {Estimator} from "@evvm/testnet-contracts/contracts/staking/Estimator.sol";
-import {EvvmStorage} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
-import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
-import {EvvmStructs} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
-import {Treasury} from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
+import {
+    Erc191TestBuilder
+} from "@evvm/testnet-contracts/library/Erc191TestBuilder.sol";
+import {
+    Estimator
+} from "@evvm/testnet-contracts/contracts/staking/Estimator.sol";
+import {
+    EvvmStorage
+} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
+import {
+    AdvancedStrings
+} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
+import {
+    EvvmStructs
+} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
+import {
+    Treasury
+} from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
 
 contract unitTestCorrect_NameService_preRegistrationUsername_AsyncExecutionOnPay is
     Test,
     Constants
 {
-    Staking staking;
-    Evvm evvm;
-    Estimator estimator;
-    NameService nameService;
-    Treasury treasury;
-
-    function setUp() public {
-        staking = new Staking(ADMIN.Address, GOLDEN_STAKER.Address);
-        evvm = new Evvm(
-            ADMIN.Address,
-            address(staking),
-            EvvmStructs.EvvmMetadata({
-                EvvmName: "EVVM",
-                EvvmID: 777,
-                principalTokenName: "EVVM Staking Token",
-                principalTokenSymbol: "EVVM-STK",
-                principalTokenAddress: 0x0000000000000000000000000000000000000001,
-                totalSupply: 2033333333000000000000000000,
-                eraTokens: 2033333333000000000000000000 / 2,
-                reward: 5000000000000000000
-            })
-        );
-        estimator = new Estimator(
-            ACTIVATOR.Address,
-            address(evvm),
-            address(staking),
-            ADMIN.Address
-        );
-        nameService = new NameService(address(evvm), ADMIN.Address);
-
-        staking._setupEstimatorAndEvvm(address(estimator), address(evvm));
-        treasury = new Treasury(address(evvm));
-        evvm._setupNameServiceAndTreasuryAddress(address(nameService), address(treasury));
-
+    function executeBeforeSetUp() internal override {
         evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
     }
 
@@ -78,70 +59,6 @@ contract unitTestCorrect_NameService_preRegistrationUsername_AsyncExecutionOnPay
         evvm.addBalance(user, token, priorityFeeAmount);
 
         totalPriorityFeeAmount = priorityFeeAmount;
-    }
-
-    function makePreRegistrationUsernameSignature(
-        string memory username,
-        uint256 clowNumber,
-        uint256 nonceNameService,
-        bool givePriorityFee,
-        uint256 priorityFeeAmount,
-        uint256 nonceEVVM,
-        bool priorityEVVM
-    )
-        private
-        view
-        returns (bytes memory signatureNameService, bytes memory signatureEVVM)
-    {
-        uint8 v;
-        bytes32 r;
-        bytes32 s;
-
-        if (givePriorityFee) {
-            (v, r, s) = vm.sign(
-                COMMON_USER_NO_STAKER_1.PrivateKey,
-                Erc191TestBuilder.buildMessageSignedForPreRegistrationUsername(
-                evvm.getEvvmID(),
-                    keccak256(abi.encodePacked(username, uint256(clowNumber))),
-                    nonceNameService
-                )
-            );
-            signatureNameService = Erc191TestBuilder.buildERC191Signature(
-                v,
-                r,
-                s
-            );
-            (v, r, s) = vm.sign(
-                COMMON_USER_NO_STAKER_1.PrivateKey,
-                Erc191TestBuilder.buildMessageSignedForPay(
-                evvm.getEvvmID(),
-                    address(nameService),
-                    "",
-                    MATE_TOKEN_ADDRESS,
-                    0,
-                    priorityFeeAmount,
-                    nonceEVVM,
-                    priorityEVVM,
-                    address(nameService)
-                )
-            );
-            signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
-        } else {
-            (v, r, s) = vm.sign(
-                COMMON_USER_NO_STAKER_1.PrivateKey,
-                Erc191TestBuilder.buildMessageSignedForPreRegistrationUsername(
-                evvm.getEvvmID(),
-                    keccak256(abi.encodePacked(username, uint256(clowNumber))),
-                    nonceNameService
-                )
-            );
-            signatureNameService = Erc191TestBuilder.buildERC191Signature(
-                v,
-                r,
-                s
-            );
-            signatureEVVM = "";
-        }
     }
 
     /**
@@ -156,7 +73,8 @@ contract unitTestCorrect_NameService_preRegistrationUsername_AsyncExecutionOnPay
         (
             bytes memory signatureNameService,
 
-        ) = makePreRegistrationUsernameSignature(
+        ) = _execute_makePreRegistrationUsernameSignature(
+                COMMON_USER_NO_STAKER_1,
                 "test",
                 10101,
                 1001,
@@ -218,7 +136,8 @@ contract unitTestCorrect_NameService_preRegistrationUsername_AsyncExecutionOnPay
         (
             bytes memory signatureNameService,
             bytes memory signatureEVVM
-        ) = makePreRegistrationUsernameSignature(
+        ) = _execute_makePreRegistrationUsernameSignature(
+                COMMON_USER_NO_STAKER_1,
                 "test",
                 10101,
                 1001,
@@ -271,7 +190,8 @@ contract unitTestCorrect_NameService_preRegistrationUsername_AsyncExecutionOnPay
         (
             bytes memory signatureNameService,
 
-        ) = makePreRegistrationUsernameSignature(
+        ) = _execute_makePreRegistrationUsernameSignature(
+                COMMON_USER_NO_STAKER_1,
                 "test",
                 10101,
                 1001,
@@ -330,7 +250,8 @@ contract unitTestCorrect_NameService_preRegistrationUsername_AsyncExecutionOnPay
         (
             bytes memory signatureNameService,
             bytes memory signatureEVVM
-        ) = makePreRegistrationUsernameSignature(
+        ) = _execute_makePreRegistrationUsernameSignature(
+                COMMON_USER_NO_STAKER_1,
                 "test",
                 10101,
                 1001,

@@ -26,57 +26,39 @@ import "forge-std/console2.sol";
 import {Constants} from "test/Constants.sol";
 
 import {Staking} from "@evvm/testnet-contracts/contracts/staking/Staking.sol";
-import {NameService} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
+import {
+    NameService
+} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
 import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
-import {Erc191TestBuilder} from "@evvm/testnet-contracts/library/Erc191TestBuilder.sol";
-import {Estimator} from "@evvm/testnet-contracts/contracts/staking/Estimator.sol";
-import {EvvmStorage} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
-import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
-import {EvvmStructs} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
-import {Treasury} from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
+import {
+    Erc191TestBuilder
+} from "@evvm/testnet-contracts/library/Erc191TestBuilder.sol";
+import {
+    Estimator
+} from "@evvm/testnet-contracts/contracts/staking/Estimator.sol";
+import {
+    EvvmStorage
+} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
+import {
+    AdvancedStrings
+} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
+import {
+    EvvmStructs
+} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
+import {
+    Treasury
+} from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
 import {P2PSwap} from "@evvm/testnet-contracts/contracts/p2pSwap/P2PSwap.sol";
-import {P2PSwapStructs} from "@evvm/testnet-contracts/contracts/p2pSwap/lib/P2PSwapStructs.sol";
+import {
+    P2PSwapStructs
+} from "@evvm/testnet-contracts/contracts/p2pSwap/lib/P2PSwapStructs.sol";
 
 contract fuzzTest_P2PSwap_makeOrder is Test, Constants {
-    Staking staking;
-    Evvm evvm;
-    Estimator estimator;
-    Treasury treasury;
-    NameService nameService;
     P2PSwap p2pSwap;
 
     AccountData COMMON_USER_NO_STAKER_3 = WILDCARD_USER;
 
-    function setUp() public {
-        staking = new Staking(ADMIN.Address, GOLDEN_STAKER.Address);
-        evvm = new Evvm(
-            ADMIN.Address,
-            address(staking),
-            EvvmStructs.EvvmMetadata({
-                EvvmName: "EVVM",
-                EvvmID: 777,
-                principalTokenName: "EVVM Staking Token",
-                principalTokenSymbol: "EVVM-STK",
-                principalTokenAddress: 0x0000000000000000000000000000000000000001,
-                totalSupply: 2033333333000000000000000000,
-                eraTokens: 2033333333000000000000000000 / 2,
-                reward: 5000000000000000000
-            })
-        );
-        estimator = new Estimator(
-            ACTIVATOR.Address,
-            address(evvm),
-            address(staking),
-            ADMIN.Address
-        );
-        nameService = new NameService(address(evvm), ADMIN.Address);
-
-        staking._setupEstimatorAndEvvm(address(estimator), address(evvm));
-        treasury = new Treasury(address(evvm));
-        evvm._setupNameServiceAndTreasuryAddress(
-            address(nameService),
-            address(treasury)
-        );
+    function executeBeforeSetUp() internal override {
         p2pSwap = new P2PSwap(address(evvm), address(staking), ADMIN.Address);
 
         evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
@@ -116,13 +98,14 @@ contract fuzzTest_P2PSwap_makeOrder is Test, Constants {
 
         uint256 priorityFee = input.hasPriorityFee ? input.priorityFee : 0;
         uint256 nonceEVVM = input.isAsync ? input.nonceEVVM : 0;
-        P2PSwapStructs.MetadataMakeOrder memory metadata = P2PSwapStructs.MetadataMakeOrder({
-            nonce: input.nonceP2PSwap,
-            tokenA: tokenA,
-            tokenB: tokenB,
-            amountA: input.amountA,
-            amountB: input.amountB
-        });
+        P2PSwapStructs.MetadataMakeOrder memory metadata = P2PSwapStructs
+            .MetadataMakeOrder({
+                nonce: input.nonceP2PSwap,
+                tokenA: tokenA,
+                tokenB: tokenB,
+                amountA: input.amountA,
+                amountB: input.amountB
+            });
         uint256 rewardAmountMateToken = priorityFee > 0
             ? (evvm.getRewardAmount() * 3)
             : (evvm.getRewardAmount() * 2);
