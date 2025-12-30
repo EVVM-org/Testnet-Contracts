@@ -46,7 +46,7 @@ import {
     Treasury
 } from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
 
-contract unitTestCorrect_EVVM_batchPay is Test, Constants, EvvmStructs {
+contract unitTestCorrect_EVVM_payMultiple is Test, Constants, EvvmStructs {
     function executeBeforeSetUp() internal override {
         evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
     }
@@ -77,7 +77,7 @@ contract unitTestCorrect_EVVM_batchPay is Test, Constants, EvvmStructs {
         bytes signatureEVVM;
     }
 
-    function test__unit_correct__batchPay__nonStaker() external {
+    function test__unit_correct__payMultiple__nonStaker() external {
         _execute_makeRegistrationUsername(
             COMMON_USER_NO_STAKER_2,
             "dummy",
@@ -408,7 +408,7 @@ contract unitTestCorrect_EVVM_batchPay is Test, Constants, EvvmStructs {
         });
 
         vm.startPrank(COMMON_USER_NO_STAKER_2.Address);
-        (uint256 successfulTransactions, bool[] memory status) = evvm.batchPay(
+        (uint256 successfulTransactions, bool[] memory status) = evvm.payMultiple(
             payData
         );
         vm.stopPrank();
@@ -432,7 +432,7 @@ contract unitTestCorrect_EVVM_batchPay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test_batchPay_staker() external {
+    function test_payMultiple_staker() external {
         _execute_makeRegistrationUsername(
             COMMON_USER_NO_STAKER_2,
             "dummy",
@@ -762,7 +762,7 @@ contract unitTestCorrect_EVVM_batchPay is Test, Constants, EvvmStructs {
         });
 
         vm.startPrank(COMMON_USER_STAKER.Address);
-        (uint256 successfulTransactions, bool[] memory status) = evvm.batchPay(
+        (uint256 successfulTransactions, bool[] memory status) = evvm.payMultiple(
             payData
         );
         vm.stopPrank();

@@ -42,7 +42,7 @@ import {
     Treasury
 } from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
 
-contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
+contract unitTestRevert_EVVM_payMultiple_asyncExecution is Test, Constants {
     AccountData COMMON_USER_NO_STAKER_3 = WILDCARD_USER;
 
     function executeBeforeSetUp() internal override {
@@ -68,7 +68,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
      * some denominations on test can be explicit expleined
      */
 
-    function test__unit_revert__batchPay_asyncExecution__bSigAtFrom() public {
+    function test__unit_revert__payMultiple_asyncExecution__bSigAtFrom() public {
         addBalance(
             COMMON_USER_NO_STAKER_1.Address,
             ETHER_ADDRESS,
@@ -114,7 +114,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -124,7 +124,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_asyncExecution__bSigAtToAddress()
+    function test__unit_revert__payMultiple_asyncExecution__bSigAtToAddress()
         public
     {
         addBalance(
@@ -172,7 +172,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -182,7 +182,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_asyncExecution__bSigAtToIdentity()
+    function test__unit_revert__payMultiple_asyncExecution__bSigAtToIdentity()
         public
     {
         _execute_makeRegistrationUsername(
@@ -243,7 +243,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -253,7 +253,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_asyncExecution__bSigAtTokenAddress()
+    function test__unit_revert__payMultiple_asyncExecution__bSigAtTokenAddress()
         public
     {
         addBalance(
@@ -301,7 +301,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -311,7 +311,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_asyncExecution__bSigAtAmount() public {
+    function test__unit_revert__payMultiple_asyncExecution__bSigAtAmount() public {
         addBalance(
             COMMON_USER_NO_STAKER_1.Address,
             ETHER_ADDRESS,
@@ -357,7 +357,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -367,7 +367,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_asyncExecution__bSigAtPriorityFee()
+    function test__unit_revert__payMultiple_asyncExecution__bSigAtPriorityFee()
         public
     {
         addBalance(
@@ -415,7 +415,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -425,7 +425,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_asyncExecution__bSigAtNonce() public {
+    function test__unit_revert__payMultiple_asyncExecution__bSigAtNonce() public {
         addBalance(
             COMMON_USER_NO_STAKER_1.Address,
             ETHER_ADDRESS,
@@ -471,7 +471,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -481,7 +481,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_asyncExecution__bSigAtFlagPriority()
+    function test__unit_revert__payMultiple_asyncExecution__bSigAtFlagPriority()
         public
     {
         addBalance(
@@ -529,7 +529,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -539,7 +539,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_asyncExecution__bSigAtExecutor()
+    function test__unit_revert__payMultiple_asyncExecution__bSigAtExecutor()
         public
     {
         addBalance(
@@ -587,7 +587,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -597,7 +597,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_asyncExecution__diferentExecutor()
+    function test__unit_revert__payMultiple_asyncExecution__diferentExecutor()
         public
     {
         addBalance(
@@ -644,7 +644,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
 
         vm.startPrank(COMMON_USER_NO_STAKER_2.Address);
 
-        (uint256 successfulTransactions, ) = evvm.batchPay(payData);
+        (uint256 successfulTransactions, ) = evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -656,7 +656,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_asyncExecution__amountMoreThanBalance()
+    function test__unit_revert__payMultiple_asyncExecution__amountMoreThanBalance()
         public
     {
         addBalance(
@@ -703,7 +703,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
 
         vm.startPrank(COMMON_USER_STAKER.Address);
 
-        (uint256 successfulTransactions, ) = evvm.batchPay(payData);
+        (uint256 successfulTransactions, ) = evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -715,7 +715,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_asyncExecution__priorityFeeMoreThanBalance()
+    function test__unit_revert__payMultiple_asyncExecution__priorityFeeMoreThanBalance()
         public
     {
         addBalance(
@@ -762,7 +762,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
 
         vm.startPrank(COMMON_USER_STAKER.Address);
 
-        (uint256 successfulTransactions, ) = evvm.batchPay(payData);
+        (uint256 successfulTransactions, ) = evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -774,7 +774,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_asyncExecution__nonceAlreadyUsed()
+    function test__unit_revert__payMultiple_asyncExecution__nonceAlreadyUsed()
         public
     {
         addBalance(
@@ -834,7 +834,7 @@ contract unitTestRevert_EVVM_batchPay_asyncExecution is Test, Constants {
 
         vm.startPrank(COMMON_USER_STAKER.Address);
 
-        (uint256 successfulTransactions, bool[] memory results) = evvm.batchPay(
+        (uint256 successfulTransactions, bool[] memory results) = evvm.payMultiple(
             payData
         );
 

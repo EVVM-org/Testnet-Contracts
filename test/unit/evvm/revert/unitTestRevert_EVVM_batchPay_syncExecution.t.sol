@@ -42,7 +42,7 @@ import {
     Treasury
 } from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
 
-contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
+contract unitTestRevert_EVVM_payMultiple_syncExecution is Test, Constants {
     AccountData COMMON_USER_NO_STAKER_3 = WILDCARD_USER;
 
     function executeBeforeSetUp() internal override {
@@ -68,7 +68,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
      * some denominations on test can be explicit expleined
      */
 
-    function test__unit_revert__batchPay_syncExecution__bSigAtFrom() public {
+    function test__unit_revert__payMultiple_syncExecution__bSigAtFrom() public {
         _execute_makeRegistrationUsername(
             COMMON_USER_NO_STAKER_2,
             "dummy",
@@ -127,7 +127,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -137,7 +137,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_syncExecution__bSigAtToAddress()
+    function test__unit_revert__payMultiple_syncExecution__bSigAtToAddress()
         public
     {
         _execute_makeRegistrationUsername(
@@ -198,7 +198,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -208,7 +208,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_syncExecution__bSigAtToIdentity()
+    function test__unit_revert__payMultiple_syncExecution__bSigAtToIdentity()
         public
     {
         _execute_makeRegistrationUsername(
@@ -269,7 +269,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -279,7 +279,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_syncExecution__bSigAtTokenAddress()
+    function test__unit_revert__payMultiple_syncExecution__bSigAtTokenAddress()
         public
     {
         _execute_makeRegistrationUsername(
@@ -340,7 +340,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -350,7 +350,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_syncExecution__bSigAtAmount() public {
+    function test__unit_revert__payMultiple_syncExecution__bSigAtAmount() public {
         _execute_makeRegistrationUsername(
             COMMON_USER_NO_STAKER_2,
             "dummy",
@@ -409,7 +409,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -419,7 +419,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_syncExecution__bSigAtPriorityFee()
+    function test__unit_revert__payMultiple_syncExecution__bSigAtPriorityFee()
         public
     {
         _execute_makeRegistrationUsername(
@@ -480,7 +480,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -490,7 +490,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_syncExecution__bSigAtNonce() public {
+    function test__unit_revert__payMultiple_syncExecution__bSigAtNonce() public {
         _execute_makeRegistrationUsername(
             COMMON_USER_NO_STAKER_2,
             "dummy",
@@ -549,7 +549,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -559,7 +559,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_syncExecution__bSigAtFlagPriority()
+    function test__unit_revert__payMultiple_syncExecution__bSigAtFlagPriority()
         public
     {
         _execute_makeRegistrationUsername(
@@ -620,7 +620,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -630,7 +630,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_syncExecution__bSigAtExecutor()
+    function test__unit_revert__payMultiple_syncExecution__bSigAtExecutor()
         public
     {
         _execute_makeRegistrationUsername(
@@ -691,7 +691,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         vm.startPrank(COMMON_USER_STAKER.Address);
 
         vm.expectRevert();
-        evvm.batchPay(payData);
+        evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -701,7 +701,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_syncExecution__diferentExecutor()
+    function test__unit_revert__payMultiple_syncExecution__diferentExecutor()
         public
     {
         _execute_makeRegistrationUsername(
@@ -761,7 +761,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
 
         vm.startPrank(COMMON_USER_NO_STAKER_2.Address);
 
-        (uint256 successfulTransactions, ) = evvm.batchPay(payData);
+        (uint256 successfulTransactions, ) = evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -773,7 +773,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_syncExecution__amountMoreThanBalance()
+    function test__unit_revert__payMultiple_syncExecution__amountMoreThanBalance()
         public
     {
         _execute_makeRegistrationUsername(
@@ -833,7 +833,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
 
         vm.startPrank(COMMON_USER_STAKER.Address);
 
-        (uint256 successfulTransactions, ) = evvm.batchPay(payData);
+        (uint256 successfulTransactions, ) = evvm.payMultiple(payData);
 
         vm.stopPrank();
 
@@ -845,7 +845,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
         );
     }
 
-    function test__unit_revert__batchPay_syncExecution__priorityFeeMoreThanBalance()
+    function test__unit_revert__payMultiple_syncExecution__priorityFeeMoreThanBalance()
         public
     {
         _execute_makeRegistrationUsername(
@@ -905,7 +905,7 @@ contract unitTestRevert_EVVM_batchPay_syncExecution is Test, Constants {
 
         vm.startPrank(COMMON_USER_STAKER.Address);
 
-        (uint256 successfulTransactions, ) = evvm.batchPay(payData);
+        (uint256 successfulTransactions, ) = evvm.payMultiple(payData);
 
         vm.stopPrank();
 

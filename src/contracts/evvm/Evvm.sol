@@ -432,7 +432,7 @@ contract Evvm is EvvmStorage {
      * @return successfulTransactions Number of payments that completed successfully
      * @return results Boolean array with success status for each payment
      */
-    function batchPay(
+    function payMultiple(
         PayData[] memory payData
     ) external returns (uint256 successfulTransactions, bool[] memory results) {
         address to_aux;

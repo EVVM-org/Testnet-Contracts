@@ -58,7 +58,7 @@ interface IEvvm {
     function acceptImplementation() external;
     function addAmountToUser(address user, address token, uint256 amount) external;
     function addBalance(address user, address token, uint256 quantity) external;
-    function batchPay(EvvmStructs.PayData[] memory payData)
+    function payMultiple(EvvmStructs.PayData[] memory payData)
         external
         returns (uint256 successfulTransactions, bool[] memory results);
     function caPay(address to, address token, uint256 amount) external;

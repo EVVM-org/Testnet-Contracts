@@ -50,7 +50,7 @@ import {
     Treasury
 } from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
 
-contract fuzzTest_EVVM_batchPay is Test, Constants, EvvmStructs {
+contract fuzzTest_EVVM_payMultiple is Test, Constants, EvvmStructs {
     AccountData COMMON_USER_NO_STAKER_3 = WILDCARD_USER;
 
     function executeBeforeSetUp() internal override {
@@ -103,7 +103,7 @@ contract fuzzTest_EVVM_batchPay is Test, Constants, EvvmStructs {
         bool[2] priorityFlag;
     }
 
-    function test__fuzz__batchPay__nonStaker(
+    function test__fuzz__payMultiple__nonStaker(
         PayMultipleFuzzTestInput memory input
     ) external {
         vm.assume(
@@ -197,7 +197,7 @@ contract fuzzTest_EVVM_batchPay is Test, Constants, EvvmStructs {
         }
 
         vm.startPrank(FISHER.Address);
-        (uint256 successfulTransactions, bool[] memory status) = evvm.batchPay(
+        (uint256 successfulTransactions, bool[] memory status) = evvm.payMultiple(
             payData
         );
         vm.stopPrank();
