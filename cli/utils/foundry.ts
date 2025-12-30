@@ -593,7 +593,6 @@ export async function showAllCrossChainDeployedContracts(
     `${colors.bright}═══════════════════════════════════════${colors.reset}\n`
   );
 
-
   infoWithChainData(
     `Deployed`,
     ChainData[chainIdHost]?.Chain || "",
@@ -679,7 +678,7 @@ export async function showAllCrossChainDeployedContracts(
  *
  * @returns {Promise<void>} Resolves when interfaces are generated
  */
-export async function contractInterfacesGenerator() {
+export async function contractInterfacesGenerator(contractName?: string) {
   let contracts: ContractFileMetadata[] = [
     {
       contractName: "Evvm",
@@ -734,16 +733,19 @@ export async function contractInterfacesGenerator() {
     fs.mkdirSync(path);
   }
 
-  for (const contract of contracts) {
-    console.log(
-      `${colors.blue}▸ Processing ${contract.contractName}...${colors.reset}`
-    );
+  if (contractName) {
+    const folderName = contracts.find(
+      (c) => c.contractName === contractName
+    )?.folderName;
 
-    let evvmInterface =
-      await $`cast interface src/contracts/${contract.folderName}/${contract.contractName}.sol`.quiet();
-    let interfacePath = `./src/interfaces/I${contract.contractName}.sol`;
+    if (!folderName) {
+      criticalError(`Contract '${contractName}' not found in metadata.`);
+    }
 
-    // Process and clean the interface content
+    const evvmInterface =
+      await $`cast interface src/contracts/${folderName}/${contractName}.sol`.quiet();
+    const interfacePath = `./src/interfaces/I${contractName}.sol`;
+
     let content = evvmInterface.stdout
       .toString()
       .replace(
@@ -751,19 +753,40 @@ export async function contractInterfacesGenerator() {
         "// SPDX-License-Identifier: EVVM-NONCOMMERCIAL-1.0\n// Full license terms available at: https://www.evvm.info/docs/EVVMNoncommercialLicense"
       )
       .replace("pragma solidity ^0.8.4;", "pragma solidity ^0.8.0;")
-      .replace(
-        `interface ${contract.contractName} {`,
-        `interface I${contract.contractName} {`
-      );
+      .replace(`interface ${contractName} {`, `interface I${contractName} {`);
 
     fs.writeFileSync(interfacePath, content);
 
-    console.log(
-      `  ${colors.green}✓ I${contract.contractName}.sol${colors.reset} ${colors.darkGray}→ ${interfacePath}${colors.reset}\n`
-    );
-  }
+    confirmation(`I${contractName}.sol generated at ${interfacePath}`);
+  } else {
+    for (const contract of contracts) {
+      console.log(
+        `${colors.blue}▸ Processing ${contract.contractName}...${colors.reset}`
+      );
 
-  console.log(
-    `${colors.green}✓${colors.reset}${colors.bright} Successfully generated ${contracts.length} interfaces${colors.reset}`
-  );
+      let evvmInterface =
+        await $`cast interface src/contracts/${contract.folderName}/${contract.contractName}.sol`.quiet();
+      let interfacePath = `./src/interfaces/I${contract.contractName}.sol`;
+
+      // Process and clean the interface content
+      let content = evvmInterface.stdout
+        .toString()
+        .replace(
+          /^\/\/ SPDX-License-Identifier:.*$/m,
+          "// SPDX-License-Identifier: EVVM-NONCOMMERCIAL-1.0\n// Full license terms available at: https://www.evvm.info/docs/EVVMNoncommercialLicense"
+        )
+        .replace("pragma solidity ^0.8.4;", "pragma solidity ^0.8.0;")
+        .replace(
+          `interface ${contract.contractName} {`,
+          `interface I${contract.contractName} {`
+        );
+
+      fs.writeFileSync(interfacePath, content);
+      confirmation(
+        `I${contract.contractName}.sol generated at ${interfacePath}`
+      );
+    }
+  }
+  console.log();
+  confirmation("Contract interface generation completed");
 }

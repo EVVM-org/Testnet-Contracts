@@ -10,6 +10,7 @@
 import { $ } from "bun";
 import { colors } from "../constants";
 import { contractInterfacesGenerator } from "../utils/foundry";
+import { promptSelect, promptString } from "../utils/prompts";
 
 /**
  * Developer utilities command handler
@@ -20,7 +21,7 @@ import { contractInterfacesGenerator } from "../utils/foundry";
  * - Service-specific tests (fuzz and unit) (to be implemented)
  * - Individual unit tests (to be implemented)
  * - Individual fuzz tests (to be implemented)
- * 
+ *
  * @param {string[]} _args - Command arguments (unused, reserved for future use)
  * @param {any} options - Command options:
  *   - makeInterface: Generate Solidity interfaces for contracts (default: false)
@@ -29,5 +30,21 @@ import { contractInterfacesGenerator } from "../utils/foundry";
 export async function developer(_args: string[], options: any) {
   const makeInterface = options.makeInterface || false;
 
-  if (makeInterface) await contractInterfacesGenerator();
+  if (makeInterface) {
+    const name = await promptSelect("Select contract to make interface for:", [
+      "Evvm",
+      "NameService",
+      "P2PSwap",
+      "Staking",
+      "Estimator",
+      "Treasury",
+      "TreasuryExternalChainStation",
+      "TreasuryHostChainStation",
+      "All Contracts",
+    ]);
+
+    await contractInterfacesGenerator(
+      name === "All Contracts" ? undefined : name
+    );
+  }
 }
