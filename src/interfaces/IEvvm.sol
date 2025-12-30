@@ -3,35 +3,9 @@
 pragma solidity ^0.8.0;
 
 library EvvmStructs {
-    struct CaPayData {
-        address from;
-        address to;
-        address token;
-        uint256 amount;
-    }
-
-    struct DisperseCaPayData {
-        address from;
-        DisperseCaPayMetadata[] toData;
-        address token;
-        uint256 amount;
-    }
-
     struct DisperseCaPayMetadata {
         uint256 amount;
         address toAddress;
-    }
-
-    struct DispersePayData {
-        address from;
-        DispersePayMetadata[] toData;
-        address token;
-        uint256 totalAmount;
-        uint256 priorityFee;
-        uint256 nonce;
-        bool priorityFlag;
-        address executor;
-        bytes signature;
     }
 
     struct DispersePayMetadata {
@@ -76,12 +50,6 @@ interface IEvvm {
     error SyncNonceMismatch();
     error UpdateBalanceFailed();
     error WindowToChangeEvvmIDExpired();
-
-    event BatchPayExecuted(EvvmStructs.PayData[] indexed payData, bool[] results);
-    event CaPayExecuted(EvvmStructs.CaPayData indexed caPayData);
-    event DisperseCaPayExecuted(EvvmStructs.DisperseCaPayData indexed disperseCaPayData);
-    event DispersePayExecuted(EvvmStructs.DispersePayData indexed dispersePayData);
-    event PayExecuted(EvvmStructs.PayData indexed payData);
 
     fallback() external;
 
