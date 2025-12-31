@@ -103,7 +103,7 @@ contract fuzzTest_EVVM_payMultiple is Test, Constants, EvvmStructs {
         bool[2] priorityFlag;
     }
 
-    function test__fuzz__payMultiple__nonStaker(
+    function test__fuzz__payMultiple(
         PayMultipleFuzzTestInput memory input
     ) external {
         vm.assume(
@@ -111,7 +111,8 @@ contract fuzzTest_EVVM_payMultiple is Test, Constants, EvvmStructs {
                 input.amount[1] > 0 &&
                 input.token[0] != input.token[1] &&
                 input.token[0] != MATE_TOKEN_ADDRESS &&
-                input.token[1] != MATE_TOKEN_ADDRESS
+                input.token[1] != MATE_TOKEN_ADDRESS &&
+                !(input.priorityFlag[0] && input.priorityFlag[1] && input.nonce[0] == input.nonce[1])
         );
 
         EvvmStructs.PayData[] memory payData = new EvvmStructs.PayData[](2);
@@ -212,7 +213,8 @@ contract fuzzTest_EVVM_payMultiple is Test, Constants, EvvmStructs {
                     COMMON_USER_NO_STAKER_2.Address,
                     input.token[i]
                 ),
-                input.amount[i]
+                input.amount[i],
+                "balance incorrect for recipient"
             );
         }
 
@@ -220,13 +222,15 @@ contract fuzzTest_EVVM_payMultiple is Test, Constants, EvvmStructs {
             for (uint256 i = 0; i < 2; i++) {
                 assertEq(
                     evvm.getBalance(COMMON_USER_STAKER.Address, input.token[i]),
-                    input.priorityFee[i]
+                    input.priorityFee[i],
+                    "balance incorrect for staker"
                 );
             }
 
             assertEq(
                 evvm.getBalance(FISHER.Address, MATE_TOKEN_ADDRESS),
-                evvm.getRewardAmount() * 2
+                evvm.getRewardAmount() * 2,
+                "executor did not receive correct reward"
             );
         } else {
             for (uint256 i = 0; i < 2; i++) {
