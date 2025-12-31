@@ -30,6 +30,8 @@ import {
   saveCrossChainDeploymentToJson,
   saveDeploymentToJson,
 } from "./outputJson";
+import { promptSelect, promptYesNo } from "./prompts";
+import test from "node:test";
 
 /**
  * Checks if a chain ID is registered in the EVVM Registry
@@ -678,7 +680,24 @@ export async function showAllCrossChainDeployedContracts(
  *
  * @returns {Promise<void>} Resolves when interfaces are generated
  */
-export async function contractInterfacesGenerator(contractName?: string) {
+export async function contractInterfacesGenerator() {
+  const contractName = await promptSelect(
+    "Select contract to make interface for:",
+    [
+      "Evvm",
+      "NameService",
+      "P2PSwap",
+      "Staking",
+      "Estimator",
+      "Treasury",
+      "TreasuryExternalChainStation",
+      "TreasuryHostChainStation",
+      "All Contracts",
+    ]
+  );
+
+  const generateOnlyOne: boolean = contractName !== "All Contracts";
+
   let contracts: ContractFileMetadata[] = [
     {
       contractName: "Evvm",
@@ -714,16 +733,6 @@ export async function contractInterfacesGenerator(contractName?: string) {
     },
   ];
 
-  console.log(
-    `\n${colors.bright}╔═══════════════════════════════════════════════════════════╗${colors.reset}`
-  );
-  console.log(
-    `${colors.bright}║          Generating Contract Interfaces                   ║${colors.reset}`
-  );
-  console.log(
-    `${colors.bright}╚═══════════════════════════════════════════════════════════╝${colors.reset}\n`
-  );
-
   const fs = require("fs");
   const path = "./src/interfaces";
   if (!fs.existsSync(path)) {
@@ -733,7 +742,7 @@ export async function contractInterfacesGenerator(contractName?: string) {
     fs.mkdirSync(path);
   }
 
-  if (contractName) {
+  if (generateOnlyOne) {
     const folderName = contracts.find(
       (c) => c.contractName === contractName
     )?.folderName;
@@ -789,4 +798,106 @@ export async function contractInterfacesGenerator(contractName?: string) {
   }
   console.log();
   confirmation("Contract interface generation completed");
+}
+
+export async function contractTesting() {
+  const contractName: string = await promptSelect(
+    "Select contract to make interface for:",
+    [
+      "EVVM",
+      "NameService",
+      "P2PSwap",
+      "Staking",
+      "Estimator",
+      "Treasury",
+      "All Contracts",
+    ]
+  );
+
+  const testType: string = await promptSelect("Select test type:", [
+    "unit correct",
+    "unit revert",
+    "fuzzing",
+    "full test suite",
+  ]);
+
+  // Build a compact name filter: prefix with '_' when a specific contract is selected
+  const nameFilterPart =
+    contractName === "All Contracts" ? "" : `_${contractName}`;
+
+  let testNameFilter: string;
+  switch (testType) {
+    case "unit correct":
+      testNameFilter = `unitTestCorrect${nameFilterPart}`;
+      break;
+    case "unit revert":
+      testNameFilter = `unitTestRevert${nameFilterPart}`;
+      break;
+    case "fuzzing":
+      testNameFilter = `fuzzTest${nameFilterPart}`;
+      break;
+    case "full test suite":
+      // For full test suite we match the contract name (if provided) or run all tests
+      testNameFilter = nameFilterPart; // may be empty to run all
+      break;
+    default:
+      testNameFilter = "";
+  }
+
+  const print: string = await promptSelect("Select output format:", [
+    "markdown",
+    "json",
+    "none",
+  ]);
+
+  let printCommand: string;
+  switch (print) {
+    case "markdown":
+      printCommand = `--show-progress --md`;
+      break;
+    case "json":
+      printCommand = `--json`;
+      break;
+    case "none":
+      printCommand = `--show-progress`;
+      break;
+    default:
+      printCommand = "";
+  }
+
+  // Build command arguments array for Bun $ execution (avoids running a single string as an executable)
+  const command: string[] = ["forge", "test"];
+  if (testNameFilter && testNameFilter.trim() !== "") {
+    command.push("--match-contract", testNameFilter);
+  }
+  command.push("--summary", "--detailed", "--gas-report", "-vvv");
+  if (printCommand && printCommand.trim() !== "") {
+    const printParts = printCommand.split(" ");
+    command.push(...printParts);
+  }
+
+  console.log("running");
+  console.log(command.join(" "));
+
+  // si se eligio print json o markdown guardar en ./test-results el resultado
+  if (print === "json" || print === "markdown") {
+    const fs = require("fs");
+    const path = "./testResults";
+    if (!fs.existsSync(path)) {
+      console.log(
+        `${colors.yellow}⚠  Test Results folder not found. Creating...${colors.reset}\n`
+      );
+      fs.mkdirSync(path);
+    }
+    const result = await $`${command}`.quiet();
+    const outputContent = result.stdout.toString();
+    const fileExtension = print === "json" ? "json" : "md";
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-"); // Replace colon and dot for filename safety
+    const outputPath = `./testResults/test-results-${timestamp}.${fileExtension}`;
+
+    fs.writeFileSync(outputPath, outputContent);
+    confirmation(`Test results saved to ${outputPath}`);
+  } else {
+    await $`${command}`;
+  }
 }

@@ -122,6 +122,7 @@ async function main() {
 
       //dev command specific
       makeInterface: { type: "boolean", short: "i"},
+      runTest: { type: "boolean", short: "t"},
     },
     allowPositionals: true,
   });

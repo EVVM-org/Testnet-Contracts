@@ -9,7 +9,7 @@
 
 import { $ } from "bun";
 import { colors } from "../constants";
-import { contractInterfacesGenerator } from "../utils/foundry";
+import { contractInterfacesGenerator, contractTesting } from "../utils/foundry";
 import { promptSelect, promptString } from "../utils/prompts";
 
 /**
@@ -29,22 +29,8 @@ import { promptSelect, promptString } from "../utils/prompts";
  */
 export async function developer(_args: string[], options: any) {
   const makeInterface = options.makeInterface || false;
+  const runTest = options.runTest || false;
 
-  if (makeInterface) {
-    const name = await promptSelect("Select contract to make interface for:", [
-      "Evvm",
-      "NameService",
-      "P2PSwap",
-      "Staking",
-      "Estimator",
-      "Treasury",
-      "TreasuryExternalChainStation",
-      "TreasuryHostChainStation",
-      "All Contracts",
-    ]);
-
-    await contractInterfacesGenerator(
-      name === "All Contracts" ? undefined : name
-    );
-  }
+  if (makeInterface) await contractInterfacesGenerator();
+  if (runTest) await contractTesting();
 }

@@ -4,6 +4,7 @@ out/
 
 # cli output files
 /output/
+/testResults/
 
 # Ignores development broadcast logs
 /broadcast/
