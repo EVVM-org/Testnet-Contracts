@@ -141,6 +141,7 @@ contract unitTestCorrect_P2PSwap_cancelOrder is Test, Constants {
         bool priorityFlag = false;
 
         addBalance(COMMON_USER_NO_STAKER_1.Address, tokenA, amountA);
+        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(
@@ -368,6 +369,7 @@ contract unitTestCorrect_P2PSwap_cancelOrder is Test, Constants {
         bool priorityFlag = true;
 
         addBalance(COMMON_USER_NO_STAKER_1.Address, tokenA, amountA);
+        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(
