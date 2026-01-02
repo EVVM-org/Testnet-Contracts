@@ -62,9 +62,6 @@ export async function deploySingle(args: string[], options: any) {
 
   let verificationflag: string | undefined = "";
 
-  // Banner
-  showEvvmLogo();
-
   await verifyFoundryInstalledAndAccountSetup([walletName]);
 
   if (skipInputConfig) {

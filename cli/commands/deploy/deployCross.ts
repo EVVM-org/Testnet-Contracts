@@ -77,9 +77,6 @@ export async function deployCross(args: string[], options: any) {
   let hostRpcUrl: string | null = null;
   let hostChainId: number | null = null;
 
-  // Banner
-  showEvvmLogo();
-
   await verifyFoundryInstalledAndAccountSetup([
     walletNameHost,
     walletNameExternal,
