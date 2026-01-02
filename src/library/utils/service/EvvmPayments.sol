@@ -8,7 +8,9 @@ import {IEvvm, EvvmStructs} from "@evvm/testnet-contracts/interfaces/IEvvm.sol";
 abstract contract EvvmPayments {
     IEvvm internal evvm;
 
-    constructor(address evvmAddress) {}
+    constructor(address evvmAddress) {
+        evvm = IEvvm(evvmAddress);
+    }
 
     function requestPay(
         address from,
