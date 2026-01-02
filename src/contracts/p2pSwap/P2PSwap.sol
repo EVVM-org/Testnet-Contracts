@@ -128,9 +128,9 @@ contract P2PSwap is
         requestPay(
             user,
             metadata.tokenA,
-            _nonce_Evvm,
             metadata.amountA,
             _priorityFee_Evvm,
+            _nonce_Evvm,
             _priority_Evvm,
             _signature_Evvm
         );
@@ -219,9 +219,9 @@ contract P2PSwap is
             requestPay(
                 user,
                 MATE_TOKEN_ADDRESS,
-                _nonce_Evvm,
                 0,
                 _priorityFee_Evvm,
+                _nonce_Evvm,
                 _priority_Evvm,
                 _signature_Evvm
             );
@@ -295,9 +295,9 @@ contract P2PSwap is
         requestPay(
             user,
             metadata.tokenB,
-            _nonce_Evvm,
             metadata.amountOfTokenBToFill,
             _priorityFee_Evvm,
+            _nonce_Evvm,
             _priority_Evvm,
             _signature_Evvm
         );
@@ -416,9 +416,9 @@ contract P2PSwap is
         requestPay(
             user,
             metadata.tokenB,
-            _nonce_Evvm,
             metadata.amountOfTokenBToFill,
             _priorityFee_Evvm,
+            _nonce_Evvm,
             _priority_Evvm,
             _signature_Evvm
         );
