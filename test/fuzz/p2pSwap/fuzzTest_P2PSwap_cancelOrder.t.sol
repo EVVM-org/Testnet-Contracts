@@ -209,8 +209,8 @@ contract fuzzTest_P2PSwap_cancelOrder is Test, Constants {
             input.isAsync
         );
         // update nonces
-        nonceEVVM++;
-        input.nonceP2PSwap = 43132;
+        uint256 nextNonceEvvm = uint256(nonceEVVM)+1;
+        uint256 nextNonceP2PSwap = uint256(input.nonceP2PSwap)+1;
 
         // create signatures
         // p2pswap
@@ -218,7 +218,7 @@ contract fuzzTest_P2PSwap_cancelOrder is Test, Constants {
             COMMON_USER_NO_STAKER_1.PrivateKey,
             Erc191TestBuilder.buildMessageSignedForCancelOrder(
                 evvm.getEvvmID(),
-                input.nonceP2PSwap,
+                nextNonceP2PSwap,
                 tokenA,
                 tokenB,
                 orderId
@@ -232,7 +232,7 @@ contract fuzzTest_P2PSwap_cancelOrder is Test, Constants {
 
         P2PSwapStructs.MetadataCancelOrder memory metadata = P2PSwapStructs
             .MetadataCancelOrder({
-                nonce: input.nonceP2PSwap,
+                nonce: nextNonceP2PSwap,
                 tokenA: tokenA,
                 tokenB: tokenB,
                 orderId: orderId,
@@ -249,7 +249,7 @@ contract fuzzTest_P2PSwap_cancelOrder is Test, Constants {
                 MATE_TOKEN_ADDRESS,
                 0,
                 priorityFee,
-                nonceEVVM,
+                nextNonceEvvm,
                 input.isAsync,
                 address(p2pSwap)
             )
@@ -266,7 +266,7 @@ contract fuzzTest_P2PSwap_cancelOrder is Test, Constants {
             COMMON_USER_NO_STAKER_1.Address,
             metadata,
             priorityFee,
-            nonceEVVM,
+            nextNonceEvvm,
             input.isAsync,
             signatureEVVM
         );
