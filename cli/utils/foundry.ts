@@ -803,24 +803,15 @@ export async function contractInterfacesGenerator() {
 }
 
 export async function contractTesting() {
-  const { start: startAnimationTest, stop: stopAnimationTest } =
-    createLoadingAnimation("Executing tests...", "runner");
-  const { start: startAnimationSaving, stop: stopAnimationSaving } =
-    createLoadingAnimation("Saving test results...", "aesthetic");
-
-
-  const contractName: string = await promptSelect(
-    "Select contract to test:",
-    [
-      "EVVM",
-      "NameService",
-      "P2PSwap",
-      "Staking",
-      "Estimator",
-      "Treasury",
-      "All Contracts",
-    ]
-  );
+  const contractName: string = await promptSelect("Select contract to test:", [
+    "EVVM",
+    "NameService",
+    "P2PSwap",
+    "Staking",
+    "Estimator",
+    "Treasury",
+    "All Contracts",
+  ]);
 
   const testType: string = await promptSelect("Select test type:", [
     "unit correct",
@@ -884,8 +875,16 @@ export async function contractTesting() {
     command.push(...printParts);
   }
 
-  console.log("running");
-  console.log(command.join(" "));
+  console.log(
+    `${colors.darkGray}running\n${command.join(" ")}${colors.reset}\n`
+  );
+
+  const { start: startAnimationTest, stop: stopAnimationTest } =
+    createLoadingAnimation(
+      `Executing ${contractName} ${
+        testType !== "full test suite" ? `${testType} tests` : testType
+      }...`
+    );
 
   // si se eligio print json o markdown guardar en ./test-results el resultado
   if (print === "json" || print === "markdown") {
@@ -897,12 +896,20 @@ export async function contractTesting() {
       );
       fs.mkdirSync(path);
     }
-    
+
     startAnimationTest();
 
     const result = await $`${command}`.quiet();
 
     await stopAnimationTest();
+
+    const { start: startAnimationSaving, stop: stopAnimationSaving } =
+      createLoadingAnimation(
+        `${contractName} ${
+          testType !== "full test suite" ? `${testType} tests` : testType
+        } results...`,
+        "aesthetic"
+      );
 
     startAnimationSaving();
 
@@ -916,10 +923,7 @@ export async function contractTesting() {
     await stopAnimationSaving(500);
 
     confirmation(`Test results saved to ${outputPath}`);
-  
   } else {
-    startAnimationTest();
     await $`${command}`;
-    stopAnimationTest();
   }
 }
