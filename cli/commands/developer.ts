@@ -28,8 +28,36 @@ import { promptSelect, promptString } from "../utils/prompts";
  * @returns {Promise<void>}
  */
 export async function developer(_args: string[], options: any) {
-  const makeInterface = options.makeInterface || false;
-  const runTest = options.runTest || false;
+  let makeInterface = options.makeInterface || false;
+  let runTest = options.runTest || false;
+
+  if (!makeInterface && !runTest) {
+    const action = await promptSelect("Select an action:", [
+      "Generate Contract Interfaces",
+      "Run Full Test Suite",
+      // Future options can be added here
+      "exit",
+    ]);
+
+    switch (action) {
+      case "Generate Contract Interfaces":
+        makeInterface = true;
+        break;
+      case "Run Full Test Suite":
+        runTest = true;
+        break;
+      case "exit":
+        console.log(
+          `${colors.green}Exiting developer utilities.${colors.reset}`
+        );
+        process.exit(0);
+      default:
+        console.log(
+          `${colors.red}Invalid selection. Exiting developer utilities.${colors.reset}`
+        );
+        process.exit(1);
+    }
+  }
 
   if (makeInterface) await contractInterfacesGenerator();
   if (runTest) await contractTesting();
