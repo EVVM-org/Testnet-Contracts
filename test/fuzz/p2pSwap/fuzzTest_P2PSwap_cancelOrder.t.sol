@@ -54,16 +54,7 @@ import {
 } from "@evvm/testnet-contracts/contracts/p2pSwap/lib/P2PSwapStructs.sol";
 
 contract fuzzTest_P2PSwap_cancelOrder is Test, Constants {
-    P2PSwap p2pSwap;
-
     AccountData COMMON_USER_NO_STAKER_3 = WILDCARD_USER;
-
-    function executeBeforeSetUp() internal override {
-        p2pSwap = new P2PSwap(address(evvm), address(staking), ADMIN.Address);
-
-        evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
-        evvm.setPointStaker(address(p2pSwap), 0x01);
-    }
 
     function addBalance(address user, address token, uint256 amount) private {
         if (amount == 0) return;

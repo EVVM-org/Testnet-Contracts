@@ -30,6 +30,10 @@ import {
 import {
     Treasury
 } from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
+import {P2PSwap} from "@evvm/testnet-contracts/contracts/p2pSwap/P2PSwap.sol";
+import {
+    P2PSwapStructs
+} from "@evvm/testnet-contracts/contracts/p2pSwap/lib/P2PSwapStructs.sol";
 import {ERC20} from "@solady/tokens/ERC20.sol";
 import {
     StakingServiceUtils
@@ -46,6 +50,7 @@ abstract contract Constants is Test {
     Estimator estimator;
     NameService nameService;
     Treasury treasury;
+    P2PSwap p2pSwap;
 
     bytes32 constant DEPOSIT_HISTORY_SMATE_IDENTIFIER = bytes32(uint256(1));
     bytes32 constant WITHDRAW_HISTORY_SMATE_IDENTIFIER = bytes32(uint256(2));
@@ -199,7 +204,13 @@ abstract contract Constants is Test {
             address(treasury)
         );
 
+        p2pSwap = new P2PSwap(address(evvm), address(staking), ADMIN.Address);
+        evvm.setPointStaker(address(p2pSwap), 0x01);
+
+        if (address(p2pSwap) == address(0)) revert();
+
         evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
+        
 
         executeBeforeSetUp();
     }

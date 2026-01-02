@@ -48,23 +48,7 @@ import {
 } from "@evvm/testnet-contracts/contracts/p2pSwap/lib/P2PSwapStructs.sol";
 
 contract unitTestCorrect_P2PSwap_makeOrder is Test, Constants {
-    P2PSwap p2pSwap;
-
-    function executeBeforeSetUp() internal override {
-        staking._setupEstimatorAndEvvm(address(estimator), address(evvm));
-
-        treasury = new Treasury(address(evvm));
-
-        evvm._setupNameServiceAndTreasuryAddress(
-            address(nameService),
-            address(treasury)
-        );
-
-        p2pSwap = new P2PSwap(address(evvm), address(staking), ADMIN.Address);
-
-        evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
-        evvm.setPointStaker(address(p2pSwap), 0x01);
-    }
+    
 
     function addBalance(address user, address token, uint256 amount) private {
         evvm.addBalance(user, token, amount);
