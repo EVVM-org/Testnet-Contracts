@@ -11,6 +11,7 @@
  */
 
 import { $ } from "bun";
+
 import type { CreatedContract, ContractFileMetadata } from "../types";
 import {
   colors,
@@ -24,6 +25,7 @@ import {
   criticalErrorCustom,
   infoWithChainData,
   warning,
+  createLoadingAnimation,
 } from "./outputMesages";
 import { getAddress } from "viem/utils";
 import {
@@ -801,8 +803,14 @@ export async function contractInterfacesGenerator() {
 }
 
 export async function contractTesting() {
+  const { start: startAnimationTest, stop: stopAnimationTest } =
+    createLoadingAnimation("Executing tests...", "runner");
+  const { start: startAnimationSaving, stop: stopAnimationSaving } =
+    createLoadingAnimation("Saving test results...", "aesthetic");
+
+
   const contractName: string = await promptSelect(
-    "Select contract to make interface for:",
+    "Select contract to test:",
     [
       "EVVM",
       "NameService",
@@ -889,15 +897,29 @@ export async function contractTesting() {
       );
       fs.mkdirSync(path);
     }
+    
+    startAnimationTest();
+
     const result = await $`${command}`.quiet();
+
+    await stopAnimationTest();
+
+    startAnimationSaving();
+
     const outputContent = result.stdout.toString();
     const fileExtension = print === "json" ? "json" : "md";
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-"); // Replace colon and dot for filename safety
     const outputPath = `./testResults/test-results-${timestamp}.${fileExtension}`;
 
     fs.writeFileSync(outputPath, outputContent);
+
+    await stopAnimationSaving(500);
+
     confirmation(`Test results saved to ${outputPath}`);
+  
   } else {
+    startAnimationTest();
     await $`${command}`;
+    stopAnimationTest();
   }
 }
