@@ -157,6 +157,7 @@ contract unitTestRevert_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
 
         addBalance(COMMON_USER_NO_STAKER_1.Address, tokenA, amountA);
         addBalance(COMMON_USER_NO_STAKER_2.Address, tokenB, amountB + fee);
+        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(
@@ -285,6 +286,7 @@ contract unitTestRevert_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
 
         addBalance(COMMON_USER_NO_STAKER_1.Address, tokenA, amountA);
         addBalance(COMMON_USER_NO_STAKER_2.Address, tokenB, amountB + fee);
+        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(
@@ -520,6 +522,7 @@ contract unitTestRevert_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
 
         addBalance(COMMON_USER_NO_STAKER_1.Address, tokenA, amountA);
         addBalance(COMMON_USER_NO_STAKER_2.Address, tokenB, amountB + fee);
+        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(
@@ -648,6 +651,7 @@ contract unitTestRevert_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
 
         addBalance(COMMON_USER_NO_STAKER_1.Address, tokenA, amountA);
         addBalance(COMMON_USER_NO_STAKER_2.Address, tokenB, amountB + fee);
+        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(

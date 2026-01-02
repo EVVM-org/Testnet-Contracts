@@ -141,6 +141,7 @@ contract unitTestRevert_P2PSwap_cancelOrder is Test, Constants {
 
         // Fund user1 with amountA
         addBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS, amountA);
+        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
 
         (uint256 market, uint256 orderId) = createOrder(
             COMMON_USER_STAKER,
@@ -237,6 +238,7 @@ contract unitTestRevert_P2PSwap_cancelOrder is Test, Constants {
 
         // Fund user1 with amountA
         addBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS, amountA);
+        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
 
         (uint256 market, uint256 orderId) = createOrder(
             COMMON_USER_STAKER,
@@ -410,6 +412,7 @@ contract unitTestRevert_P2PSwap_cancelOrder is Test, Constants {
             ETHER_ADDRESS,
             amountA + (priorityFee * 2)
         );
+        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
 
         (uint256 market, uint256 orderId) = createOrder(
             COMMON_USER_STAKER,

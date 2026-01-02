@@ -175,6 +175,7 @@ contract fuzzTest_P2PSwap_dispatchOrder is Test, Constants {
             tokenB,
             input.amountB + fee + priorityFee
         );
+        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(
@@ -334,6 +335,7 @@ contract fuzzTest_P2PSwap_dispatchOrder is Test, Constants {
             tokenB,
             input.amountB + fee + priorityFee
         );
+        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(
