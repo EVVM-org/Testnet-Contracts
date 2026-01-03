@@ -36,7 +36,7 @@ export function createLoadingAnimation(
 
   const spinnerConfig = spinners[spinnerType] || spinners.bouncingBar;
 
-  const { start, stop: originalStop } = loading(message, {
+  const { start, stop: originalStop } = loading(` ${message}`, {
     clearOnEnd: true,
     spinner: spinnerConfig,
   });
@@ -51,6 +51,15 @@ export function createLoadingAnimation(
   };
 
   return { start, stop };
+}
+
+export function seccionTitle(title: string, subTitle?: string) {
+  if (subTitle) {
+    title = `▬▬▬▬▬▬▬▬▬▬${colors.reset} ${title} ▬▬ ${subTitle} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬`;
+  } else {
+    title = `▬▬▬▬▬▬▬▬▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬`;
+  }
+  
 }
 
 /**
