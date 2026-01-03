@@ -11,7 +11,7 @@ import { $ } from "bun";
 import { colors } from "../constants";
 import { contractInterfacesGenerator, contractTesting } from "../utils/foundry";
 import { promptSelect, promptString } from "../utils/prompts";
-import { seccionTitle } from "../utils/outputMesages";
+import { confirmation, seccionTitle, sectionSubtitle } from "../utils/outputMesages";
 
 /**
  * Developer utilities command handler
@@ -64,4 +64,14 @@ export async function developer(_args: string[], options: any) {
 
   if (makeInterface) await contractInterfacesGenerator();
   if (runTest) await contractTesting();
+}
+
+
+export async function installDependencies() {
+  sectionSubtitle("Installing EVVM CLI Dependencies");
+  await $`bun install`;
+  sectionSubtitle("Installing EVVM Foundry Dependencies");
+  await $`forge install`;
+  console.log();
+  confirmation(`All dependencies installed successfully`);
 }

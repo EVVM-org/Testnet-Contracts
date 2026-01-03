@@ -19,7 +19,7 @@
 import { parseArgs } from "util";
 import { colors } from "./constants";
 import { register, showHelp, showVersion } from "./commands";
-import { developer } from "./commands/developer";
+import { developer, installDependencies } from "./commands/developer";
 import { setUpCrossChainTreasuries } from "./commands/setUpCrossChainTreasuries";
 import { deploy } from "./commands/deploy";
 import { showEvvmLogo } from "./utils/outputMesages";
@@ -43,6 +43,7 @@ const commands = {
   register: register,
   setUpCrossChainTreasuries: setUpCrossChainTreasuries,
   dev: developer,
+  install: installDependencies
 };
 
 /**
