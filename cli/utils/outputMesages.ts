@@ -54,20 +54,33 @@ export function createLoadingAnimation(
 }
 
 export function seccionTitle(title: string, subTitle?: string) {
+  console.log();
   if (subTitle) {
-    console.log(`${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬${colors.reset} ${subTitle} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset}`);
+    console.log(
+      `${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬${colors.reset} ${subTitle} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset}`
+    );
   } else {
-    console.log(`${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset}`);
+    console.log(
+      `${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset}`
+    );
   }
+  console.log();
 }
 
 export function sectionSubtitle(title: string, subTitle?: string) {
+  console.log();
   if (subTitle) {
-    console.log(`${colors.evvmGreen}▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬${colors.reset} ${subTitle} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬${colors.reset}`);
+    console.log(
+      `${colors.evvmGreen}▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬${colors.reset} ${subTitle} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬${colors.reset}`
+    );
   } else {
-    console.log(`${colors.evvmGreen}▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬${colors.reset}`);
+    console.log(
+      `${colors.evvmGreen}▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬${colors.reset}`
+    );
   }
+  console.log();
 }
+
 
 /**
  * Displays a critical error message and exits the process
@@ -308,11 +321,7 @@ export function baseConfigurationSummary(
   addresses: BaseInputAddresses,
   evvmMetadata: EvvmMetadata
 ) {
-  console.log(`
-${colors.bright}═══════════════════════════════════════${colors.reset}
-${colors.bright}          Configuration Summary$${colors.reset}
-${colors.bright}═══════════════════════════════════════${colors.reset}
-`);
+  sectionSubtitle("Configuration Summary");
   console.log(`${colors.bright}Addresses:${colors.reset}`);
   for (const key of Object.keys(addresses) as (keyof BaseInputAddresses)[]) {
     console.log(`  ${colors.blue}${key}:${colors.reset} ${addresses[key]}`);
@@ -354,11 +363,8 @@ export function crossChainConfigurationSummary(
   hostChainData: ChainData,
   crossChainInputs: CrossChainInputs
 ) {
+  sectionSubtitle("Cross-Chain Configuration Summary");
   console.log(`
-${colors.bright}═══════════════════════════════════════${colors.reset}
-${colors.bright}      Cross-Chain Configuration Summary${colors.reset}
-${colors.bright}═══════════════════════════════════════${colors.reset}
-
 ${colors.bright}External Admin:${colors.reset}
   ${colors.blue}${crossChainInputs.adminExternal}${colors.reset}
 
