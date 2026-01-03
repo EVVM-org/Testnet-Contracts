@@ -77,9 +77,11 @@ export async function callRegisterEvvm(
   ethRpcUrl: string = EthSepoliaPublicRpc
 ): Promise<number | undefined> {
   let evvmID: string = "";
+
   try {
     const result =
       await $`cast call ${RegisteryEvvmAddress} --rpc-url ${ethRpcUrl} "registerEvvm(uint256,address)(uint256)" ${hostChainId} ${evvmAddress} --account ${walletName}`.quiet();
+
 
     await castSend(
       RegisteryEvvmAddress as `0x${string}`,
@@ -483,10 +485,23 @@ export async function walletIsSetup(
 export async function showDeployContractsAndFindEvvm(
   chainId: number
 ): Promise<`0x${string}` | null> {
+  const {
+    start: startGettingDeployedContractsAnimation,
+    stop: stopGettingDeployedContractsAnimation,
+  } = createLoadingAnimation(`Getting deployed contracts data...`, "dots13");
+
+  startGettingDeployedContractsAnimation();
   const broadcastFile = `./broadcast/Deploy.s.sol/${chainId}/run-latest.json`;
   const broadcastContent = await Bun.file(broadcastFile).text();
   const broadcastJson = JSON.parse(broadcastContent);
+  await stopGettingDeployedContractsAnimation(500);
 
+  const {
+    start: startSearchDeployedContractsAnimation,
+    stop: stopSearchDeployedContractsAnimation,
+  } = createLoadingAnimation(`Searching deployed contracts...`, "growVertical");
+
+  startSearchDeployedContractsAnimation();
   const createdContracts = broadcastJson.transactions
     .filter((tx: any) => tx.transactionType === "CREATE")
     .map(
@@ -496,6 +511,7 @@ export async function showDeployContractsAndFindEvvm(
           contractAddress: getAddress(tx.contractAddress),
         } as CreatedContract)
     );
+  await stopSearchDeployedContractsAnimation(500);
 
   seccionTitle("Deployed Contracts");
 
@@ -555,6 +571,11 @@ export async function showAllCrossChainDeployedContracts(
   treasuryHostChainStationAddress: `0x${string}` | null;
   treasuryExternalChainStationAddress: `0x${string}` | null;
 }> {
+  const {
+    start: startGettingDeployedContractsAnimation,
+    stop: stopGettingDeployedContractsAnimation,
+  } = createLoadingAnimation(`Getting deployed contracts data...`, "dots13");
+  startGettingDeployedContractsAnimation();
   const broadcastFileHost = `./broadcast/DeployCrossChainHost.s.sol/${chainIdHost}/run-latest.json`;
   const broadcastContentHost = await Bun.file(broadcastFileHost).text();
   const broadcastJsonHost = JSON.parse(broadcastContentHost);
@@ -562,7 +583,14 @@ export async function showAllCrossChainDeployedContracts(
   const broadcastFileExternal = `./broadcast/DeployCrossChainExternal.s.sol/${chainIdExternal}/run-latest.json`;
   const broadcastContentExternal = await Bun.file(broadcastFileExternal).text();
   const broadcastJsonExternal = JSON.parse(broadcastContentExternal);
+  await stopGettingDeployedContractsAnimation(500);
 
+  const {
+    start: startSearchDeployedContractsAnimation,
+    stop: stopSearchDeployedContractsAnimation,
+  } = createLoadingAnimation(`Searching deployed contracts...`, "growVertical");
+
+  startSearchDeployedContractsAnimation();
   const createdContractsHost = broadcastJsonHost.transactions
     .filter((tx: any) => tx.transactionType === "CREATE")
     .map(
@@ -582,6 +610,7 @@ export async function showAllCrossChainDeployedContracts(
           contractAddress: getAddress(tx.contractAddress),
         } as CreatedContract)
     );
+  await stopSearchDeployedContractsAnimation(500);
 
   seccionTitle(
     "Deployed Contracts",
@@ -624,6 +653,7 @@ export async function showAllCrossChainDeployedContracts(
   });
 
   console.log();
+
   await saveCrossChainDeploymentToJson(
     createdContractsHost,
     chainIdHost,
