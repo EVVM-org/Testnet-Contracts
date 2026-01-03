@@ -64,7 +64,7 @@ export async function getChainId(rpcUrl: string): Promise<number> {
     if (parsed.username) {
       const user = decodeURIComponent(parsed.username);
       const pass = decodeURIComponent(parsed.password);
-      // eliminar credenciales de la URL para la petición
+      // Remove credentials from URL for the request
       parsed.username = "";
       parsed.password = "";
       rpcUrl = parsed.toString();
@@ -76,7 +76,7 @@ export async function getChainId(rpcUrl: string): Promise<number> {
       headers["Authorization"] = `Basic ${basic}`;
     }
   } catch (err) {
-    // si rpcUrl no es una URL válida, seguimos intentando usarla tal cual
+    // If rpcUrl is not a valid URL, continue attempting to use it as-is
   }
 
   const response = await fetch(rpcUrl, {
