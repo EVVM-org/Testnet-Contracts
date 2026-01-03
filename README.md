@@ -4,31 +4,48 @@
 
 A compact toolkit for creating virtual EVM chains on testnets.
 
-Quick overview
-- Use the Solidity packages in `src/` as a library (install via NPM or Forge).
-- Use the `evvm` CLI to deploy and manage EVVM instances.
+Two ways to use EVVM:
+1. As a library - Import Solidity contracts in your dApp
+2. As a CLI tool - Deploy and manage EVVM instances on testnets
 
 Docs & hosted library: https://www.evvm.info/
 
+## Use as a Library (for dApp developers)
 
-Install the library (1 min)
+### Install the library (1 min)
 
+**NPM (recommended):**
 ```bash
-# NPM (recommended for dApp developers)
 npm install @evvm/testnet-contracts
+```
 
-# Or with Forge
+**Or with Forge:**
+```bash
 forge install EVVM-org/Testnet-Contracts
 ```
 
-Guide: How to build on top of EVVM (library): https://www.evvm.info/docs/HowToMakeAEVVMService
+**Import in your contracts:**
+```solidity
+import "@evvm/testnet-contracts/interfaces/IEvvm.sol";
+```
 
-Quick start (2 min)
+Guide: How to build on top of EVVM: https://www.evvm.info/docs/HowToMakeAEVVMService
+
+## Use as a CLI Tool (for EVVM deployment)
+
+### Quick start (2 min)
 1) Clone & install
 ```bash
 git clone --recursive https://github.com/EVVM-org/Testnet-Contracts
 cd Testnet-Contracts
-make install
+
+# Option 1: Using CLI (recommended)
+chmod +x ./evvm
+./evvm install
+
+# Option 2: Manual installation
+bun install
+forge install
 ```
 
 2) Prepare environment
@@ -43,41 +60,96 @@ cast wallet import defaultKey --interactive
 ```
 
 4) Deploy (interactive)
+
+If you are on Linux or macOS, run:
 ```bash
-# If installed globally:
-evvm deploy
-# Or from repo:
+./evvm deploy
+```
+
+If you are on Windows, run on PowerShell:
+```powershell
+.\evvm.bat deploy
+```
+
+Or use Bun from any directory:
+```bash
 bun run evvm deploy
 ```
+
+**Using CLI Scripts (Recommended for local development)**
+
+The repository includes platform-specific wrapper scripts to easily call the CLI:
+
+**Linux/macOS:**
+```bash
+# Make script executable (first time only)
+chmod +x ./evvm
+
+# Run any EVVM CLI command
+./evvm deploy
+./evvm register --evvmAddress 0x...
+./evvm developer --makeInterface
+./evvm help
+```
+
+**Windows (PowerShell):**
+```powershell
+# Run any EVVM CLI command
+.\evvm.bat deploy
+.\evvm.bat register --evvmAddress 0x...
+.\evvm.bat developer --makeInterface
+.\evvm.bat help
+```
+
+The scripts automatically detect your OS and architecture (x64, ARM64, MUSL) and execute the appropriate compiled binary from `.executables/` folder.
+
 Quick Start (CLI): https://www.evvm.info/docs/QuickStart
 
-CLI - common commands
-- evvm deploy       # deploy EVVM (single or cross-chain)
-- evvm register     # register EVVM in registry
-- evvm fulltest     # run full test suite
-- evvm help         # show CLI help
-- evvm version      # CLI version
+## CLI - Available Commands
 
-Library usage (quick)
-- NPM: `npm install @evvm/testnet-contracts`
-- Forge: `forge install EVVM-org/Testnet-Contracts`
-- Import interfaces: `import "@evvm/testnet-contracts/interfaces/IEvvm.sol";`
+**Deployment & Registration:**
+- `evvm deploy`                           # Deploy EVVM (single or cross-chain)
+- `evvm deploy --skipInputConfig`         # Deploy with existing config (no prompts)
+- `evvm deploy --crossChain`              # Deploy cross-chain EVVM instance
+- `evvm register --evvmAddress <addr>`    # Register EVVM in registry
+- `evvm register --crossChain`            # Register cross-chain EVVM
 
-Troubleshooting (short)
-- RPC timeouts: CLI automatically tries fallback RPCs; set `RPC_URL` in `.env` to a reliable endpoint.
-- Wallet not found: import with `cast wallet import <name> --interactive`.
-- Bun missing: install Bun (`curl -fsSL https://bun.sh/install | bash`).
-- Tests: run `evvm fulltest` or `forge test`.
+**Cross-Chain Management:**
+- `evvm setUpCrossChainTreasuries`        # Configure treasury station connections
+
+**Developer Utilities:**
+- `evvm developer --makeInterface`        # Generate Solidity interfaces from contracts
+- `evvm developer --runTest`              # Run test suites with custom filters
+- `evvm install`                          # Install Bun and Foundry dependencies
+
+**Information:**
+- `evvm help`                             # Show comprehensive CLI help
+- `evvm version`                          # Show CLI version
+
+## Library Usage (Quick Reference)
+
+- **NPM install:** `npm install @evvm/testnet-contracts`
+- **Forge install:** `forge install EVVM-org/Testnet-Contracts`
+- **Import in Solidity:** `import "@evvm/testnet-contracts/interfaces/IEvvm.sol";`
+
+## Troubleshooting
+- **RPC timeouts**: CLI automatically tries fallback RPCs; set `RPC_URL` in `.env` to a reliable endpoint.
+- **Wallet not found**: import with `cast wallet import <name> --interactive`.
+- **Bun missing**: install Bun (`curl -fsSL https://bun.sh/install | bash`).
+- **Tests**: run `./evvm developer --runTest` (Linux/Mac) or `evvm.bat developer --runTest` (Windows), or `forge test`.
+- **Script not executable (Linux/Mac)**: run `chmod +x ./evvm` and ensure `.executables/` binaries have execute permissions.
+- **Wrong architecture detected**: The wrapper scripts auto-detect OS/architecture. If issues occur, manually run the correct binary from `.executables/`.
 
 Files & structure (short)
 - `src/contracts/` — core contracts (Evvm, NameService, Staking, Treasury, P2PSwap)
 - `cli/` — TypeScript CLI source
 - `script/` — Foundry deployment scripts
 - `input/` — optional JSON/Sol files generated by CLI
+- `.executables/` — pre-compiled CLI binaries for multiple platforms
+- `evvm` — Linux/macOS CLI wrapper script (auto-detects architecture)
+- `evvm.bat` — Windows CLI wrapper script (auto-detects architecture)
 
-Security & contributing (short)
-- Never commit private keys. Use `cast wallet import`.
-- Add tests for new features and open a PR.
+## Security & Contributing
 
 ### How to Contribute
 1. Fork the repository
