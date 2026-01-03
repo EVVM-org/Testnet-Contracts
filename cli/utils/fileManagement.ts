@@ -28,7 +28,7 @@ export async function writeFilePath(path: string, content: string) {
   );
   start();
 
-  writeFileSync(path, content);
+  await Bun.write(path, content);
 
   await stop(1500);
 }
