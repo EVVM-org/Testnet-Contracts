@@ -1,4 +1,3 @@
-import { $ } from "bun";
 import { colors } from "../constants";
 import {
   promptString,
@@ -7,7 +6,6 @@ import {
   promptYesNo,
 } from "./prompts";
 import { formatNumber } from "./validators";
-
 import type {
   BaseInputAddresses,
   CrossChainInputs,
@@ -21,8 +19,8 @@ import {
   confirmation,
   criticalError,
   crossChainConfigurationSummary,
-  error,
 } from "./outputMesages";
+import { checkDirectoryPath, writeFilePath } from "./fileManagement";
 
 /**
  * Interactive configuration wizard for EVVM deployment.
@@ -266,13 +264,7 @@ export async function writeBaseInputsFile(
   )
     criticalError(`Invalid addresses provided to write BaseInputs file.`);
 
-  try {
-    await Bun.file(inputFile).text();
-  } catch {
-    await $`mkdir -p ${inputDir}`.quiet();
-    await Bun.write(inputFile, "");
-    confirmation(`${colors.blue}Created ${inputFile}${colors.reset}`);
-  }
+  await checkDirectoryPath(inputDir);
 
   const inputFileContent = `// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
@@ -298,7 +290,7 @@ abstract contract BaseInputs {
 }
 `;
 
-  await Bun.write(inputFile, inputFileContent);
+  await writeFilePath(inputFile, inputFileContent);
 }
 
 /**
@@ -316,13 +308,7 @@ export async function writeCrossChainInputsFile(
   const inputDir = "./input";
   const inputFile = `${inputDir}/CrossChainInputs.sol`;
 
-  try {
-    await Bun.file(inputFile).text();
-  } catch {
-    await $`mkdir -p ${inputDir}`.quiet();
-    await Bun.write(inputFile, "");
-    confirmation(`${colors.blue}Created ${inputFile}${colors.reset}`);
-  }
+  await checkDirectoryPath(inputDir);
 
   const inputFileContent = `// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
@@ -416,5 +402,5 @@ abstract contract CrossChainInputs {
 }
 `;
 
-  await Bun.write(inputFile, inputFileContent);
+  await writeFilePath(inputFile, inputFileContent);
 }

@@ -7,12 +7,11 @@
  * @module cli/utils/outputJson
  */
 
-import { mkdir, writeFile } from "fs/promises";
-import { existsSync } from "fs";
 import { join } from "path";
 import type { CreatedContract } from "../types";
 import { colors } from "../constants";
 import { confirmation, warning } from "./outputMesages";
+import { checkDirectoryPath, writeFilePath } from "./fileManagement";
 
 /**
  * Base function to write JSON data to the output directory
@@ -38,17 +37,13 @@ async function writeJsonToOutput(
   try {
     const outputDir = join(process.cwd(), "output");
 
-    // Create output directory if it doesn't exist
-    if (!existsSync(outputDir)) {
-      warning("Output directory not found", "Creating directory...");
-      await mkdir(outputDir, { recursive: true });
-    }
+    await checkDirectoryPath(outputDir);
 
     // Construct file path
     const filePath = join(outputDir, `${fileName}.json`);
 
     // Write to file with pretty formatting
-    await writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+    await writeFilePath(filePath, JSON.stringify(data, null, 2));
 
     confirmation(
       `${operationName} saved to: ${colors.blue}${filePath}${colors.reset}`

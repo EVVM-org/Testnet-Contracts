@@ -20,6 +20,8 @@ import {
   criticalError,
   customErrorWithExit,
   infoWithChainData,
+  seccionTitle,
+  sectionSubtitle,
   showEvvmLogo,
   warning,
 } from "../../utils/outputMesages";
@@ -62,8 +64,7 @@ export async function deploySingle(args: string[], options: any) {
 
   let verificationflag: string | undefined = "";
 
-  // Banner
-  showEvvmLogo();
+  seccionTitle("Deploy EVVM Contracts");
 
   await verifyFoundryInstalledAndAccountSetup([walletName]);
 
@@ -120,8 +121,8 @@ export async function deploySingle(args: string[], options: any) {
   const evvmAddress: `0x${string}` | null =
     await showDeployContractsAndFindEvvm(chainId);
 
+  sectionSubtitle("EVVM Registration");
   console.log(`
-${colors.bright}Next Step: Registration${colors.reset}
 ${colors.blue}Your EVVM instance is ready to be registered.${colors.reset}
 
 ${colors.yellow}Important:${colors.reset}

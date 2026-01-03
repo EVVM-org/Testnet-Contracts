@@ -13,6 +13,8 @@ import {
   confirmation,
   criticalError,
   infoWithChainData,
+  seccionTitle,
+  sectionSubtitle,
   warning,
 } from "../../utils/outputMesages";
 import {
@@ -58,6 +60,10 @@ export async function registerSingle(_args: string[], options: any) {
 
   let ethRPC: string | undefined;
 
+  seccionTitle("Register EVVM in Registry");
+
+  await verifyFoundryInstalledAndAccountSetup([walletName]);
+
   // If --useCustomEthRpc is present, look for EVVM_REGISTRATION_RPC_URL in .env or prompt user
   ethRPC = useCustomEthRpc
     ? process.env.EVVM_REGISTRATION_RPC_URL ||
@@ -65,8 +71,6 @@ export async function registerSingle(_args: string[], options: any) {
         `${colors.yellow}Enter the custom Ethereum Sepolia RPC URL:${colors.reset}`
       )
     : EthSepoliaPublicRpc;
-
-  await verifyFoundryInstalledAndAccountSetup([walletName]);
 
   // Validate or prompt for missing values
   evvmAddress ||= promptAddress(
@@ -76,15 +80,13 @@ export async function registerSingle(_args: string[], options: any) {
   let { rpcUrl, chainId } = await getRPCUrlAndChainId(process.env.RPC_URL);
 
   if (chainId === 31337 || chainId === 1337) {
-    warning("Local blockchain detected", "Skipping registry registration")
+    warning("Local blockchain detected", "Skipping registry registration");
     return;
   }
 
   if (!(await isChainIdRegistered(chainId))) chainIdNotSupported(chainId);
 
-  console.log(
-    `${colors.blue}Making registration to EVVM Registry on Ethereum Sepolia...${colors.reset}\n`
-  );
+  sectionSubtitle("Registering EVVM and Obtaining EVVM ID on Ethereum Sepolia");
 
   const evvmID: number | undefined = await callRegisterEvvm(
     Number(chainId),
@@ -92,13 +94,13 @@ export async function registerSingle(_args: string[], options: any) {
     walletName,
     ethRPC
   );
+
   if (!evvmID) {
     criticalError(`Failed to obtain EVVM ID for contract ${evvmAddress}.`);
   }
-  console.log(
-    `${colors.green}EVVM ID generated: ${colors.bright}${evvmID}${colors.reset}`
-  );
-  
+
+  confirmation(`Generated EVVM ID: ${colors.bright}${evvmID}${colors.reset}`);
+
   infoWithChainData(
     `Setting EVVM ID on EVVM contract`,
     ChainData[chainId]?.Chain || "",
@@ -115,6 +117,8 @@ export async function registerSingle(_args: string[], options: any) {
   );
 
   confirmation(`EVVM registration completed successfully!`);
+
+  sectionSubtitle("Registration Summary");
   console.log(
     `${colors.green}EVVM ID: ${colors.bright}${evvmID}${colors.reset}`
   );

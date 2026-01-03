@@ -13,7 +13,8 @@ import {
   criticalError,
   customErrorWithExit,
   infoWithChainData,
-  showEvvmLogo,
+  seccionTitle,
+  sectionSubtitle,
   warning,
 } from "../../utils/outputMesages";
 import {
@@ -77,8 +78,7 @@ export async function deployCross(args: string[], options: any) {
   let hostRpcUrl: string | null = null;
   let hostChainId: number | null = null;
 
-  // Banner
-  showEvvmLogo();
+  seccionTitle("Deploy EVVM Contracts", "Cross Chain Edition");
 
   await verifyFoundryInstalledAndAccountSetup([
     walletNameHost,
@@ -97,13 +97,11 @@ export async function deployCross(args: string[], options: any) {
       process.env.HOST_RPC_URL
     ));
   } else {
-    console.log(`\n${colors.bright}Base Configuration:${colors.reset}\n`);
+    sectionSubtitle("Configuration Basic Data");
 
     await configurationBasic();
 
-    console.log(
-      `\n${colors.bright}Cross-Chain Configuration:${colors.reset}\n`
-    );
+    sectionSubtitle("Configuration Cross-Chain Data");
 
     const ccConfig = await configurationCrossChain();
     if (typeof ccConfig === "boolean" && ccConfig === false) return;
@@ -121,7 +119,7 @@ export async function deployCross(args: string[], options: any) {
     !promptYesNo(
       `${colors.yellow}Proceed with deployment? (y/n):${colors.reset}`
     )
-  ){
+  ) {
     customErrorWithExit(
       "Deployment cancelled by user",
       `${colors.darkGray}Exiting deployment process.${colors.reset}`
@@ -143,10 +141,6 @@ export async function deployCross(args: string[], options: any) {
     `Deploying`,
     ChainData[externalChainId]?.Chain || "",
     externalChainId
-  );
-
-  console.log(
-    `  ${colors.green}•${colors.reset} Treasury cross-chain contract  ${colors.darkGray}(TreasuryExternalChainStation.sol)${colors.reset}\n`
   );
 
   await forgeScript(
@@ -196,9 +190,8 @@ export async function deployCross(args: string[], options: any) {
     treasuryExternalChainStationAddress,
   } = await showAllCrossChainDeployedContracts(hostChainId!, externalChainId!);
 
+  sectionSubtitle("Cross-chain communication setup and EVVM registration");
   console.log(`
-${colors.evvmGreen}Next step: Cross-chain communication setup and EVVM registration${colors.reset}
-
 ${colors.yellow}⚠ Important:${colors.reset} Admin addresses on both chains must match each wallet used during deployment
 ${colors.yellow}  Host Chain Admin:     ${walletNameHost}${colors.reset}
 ${colors.yellow}  External Chain Admin: ${walletNameExternal}${colors.reset}
@@ -235,8 +228,6 @@ ${colors.darkGray}More info: ${colors.blue}https://www.evvm.info/docs/QuickStart
     );
   }
 
-  console.log(`Setting up cross-chain treasury stations...`);
-
   await setUpCrossChainTreasuries([], {
     treasuryHostStationAddress:
       treasuryHostChainStationAddress as `0x${string}`,
@@ -245,8 +236,6 @@ ${colors.darkGray}More info: ${colors.blue}https://www.evvm.info/docs/QuickStart
     walletNameHost: walletNameHost,
     walletNameExternal: walletNameExternal,
   });
-
-  console.log(`Setting up EVVM registration...`);
 
   // If user decides, add --useCustomEthRpc flag to the registerEvvm call
   const ethRPCAns = promptYesNo(

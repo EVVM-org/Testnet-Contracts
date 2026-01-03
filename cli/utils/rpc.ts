@@ -1,9 +1,9 @@
 /**
  * RPC Utilities
- * 
+ *
  * Provides functions for RPC endpoint management and chain ID retrieval.
  * Handles RPC URL validation and fetching chain information from RPC endpoints.
- * 
+ *
  * @module cli/utils/rpc
  */
 
@@ -11,10 +11,10 @@ import { colors } from "../constants";
 
 /**
  * Gets RPC URL from environment or prompts user, then fetches chain ID
- * 
+ *
  * If RPC URL is not provided in environment variables, prompts the user
  * to enter it. Then queries the RPC endpoint to retrieve the chain ID.
- * 
+ *
  * @param {string | undefined | null} rpcUrl - Optional RPC URL from environment
  * @returns {Promise<{rpcUrl: string, chainId: number}>} RPC URL and chain ID
  */
@@ -31,9 +31,7 @@ export async function getRPCUrlAndChainId(
     console.log(
       `${colors.orange}RPC URL not found in .env file.${colors.reset}`
     );
-    rpcUrl = prompt(
-      stringPrompt
-    );
+    rpcUrl = prompt(stringPrompt);
     if (!rpcUrl) {
       console.log(
         `${colors.red}RPC URL cannot be empty. Please enter a valid RPC URL.${colors.reset}`
@@ -48,34 +46,37 @@ export async function getRPCUrlAndChainId(
 
 /**
  * Fetches chain ID from an RPC endpoint
- * 
+ *
  * Makes an eth_chainId RPC call to retrieve the chain ID and converts
  * the hexadecimal result to a decimal number.
- * 
+ *
  * @param {string} rpcUrl - RPC endpoint URL
  * @returns {Promise<number>} Chain ID as decimal number
  * @throws {Error} If RPC request fails
  */
 export async function getChainId(rpcUrl: string): Promise<number> {
   // Prepare headers, supporting Basic Auth if the URL contains username:password
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
   try {
     const parsed = new URL(rpcUrl);
     if (parsed.username) {
       const user = decodeURIComponent(parsed.username);
       const pass = decodeURIComponent(parsed.password);
-      // eliminar credenciales de la URL para la petición
+      // Remove credentials from URL for the request
       parsed.username = "";
       parsed.password = "";
       rpcUrl = parsed.toString();
 
-      const basic = typeof Buffer !== "undefined"
-        ? Buffer.from(`${user}:${pass}`).toString("base64")
-        : btoa(`${user}:${pass}`);
+      const basic =
+        typeof Buffer !== "undefined"
+          ? Buffer.from(`${user}:${pass}`).toString("base64")
+          : btoa(`${user}:${pass}`);
       headers["Authorization"] = `Basic ${basic}`;
     }
   } catch (err) {
-    // si rpcUrl no es una URL válida, seguimos intentando usarla tal cual
+    // If rpcUrl is not a valid URL, continue attempting to use it as-is
   }
 
   const response = await fetch(rpcUrl, {

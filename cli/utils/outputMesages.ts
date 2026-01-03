@@ -16,6 +16,73 @@ import type {
 } from "../types";
 
 /**
+ * Creates a loading animation with auto-clearing and optional timeout on stop
+ *
+ * @param {string} message - Message to display during animation
+ * @param {string} [spinnerType="bouncingBar"] - Spinner style from cli-spinners
+ * @param {number} [stopTimeout=0] - Milliseconds to wait before stopping animation
+ * @returns {Object} Object with start and stop functions
+ */
+export function createLoadingAnimation(
+  message: string,
+  spinnerType: string = "bouncingBar",
+  stopTimeout: number = 0
+): {
+  start: () => void;
+  stop: (timeout?: number) => Promise<void>;
+} {
+  const { loading } = require("cli-loading-animation");
+  const spinners = require("cli-spinners");
+
+  const spinnerConfig = spinners[spinnerType] || spinners.bouncingBar;
+
+  const { start, stop: originalStop } = loading(` ${message}`, {
+    clearOnEnd: true,
+    spinner: spinnerConfig,
+  });
+
+  const stop = (timeout: number = stopTimeout) => {
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        originalStop();
+        resolve();
+      }, timeout);
+    });
+  };
+
+  return { start, stop };
+}
+
+export function seccionTitle(title: string, subTitle?: string) {
+  console.log();
+  if (subTitle) {
+    console.log(
+      `${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬${colors.reset} ${subTitle} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset}`
+    );
+  } else {
+    console.log(
+      `${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset}`
+    );
+  }
+  console.log();
+}
+
+export function sectionSubtitle(title: string, subTitle?: string) {
+  console.log();
+  if (subTitle) {
+    console.log(
+      `${colors.evvmGreen}▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬${colors.reset} ${subTitle} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬${colors.reset}`
+    );
+  } else {
+    console.log(
+      `${colors.evvmGreen}▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬${colors.reset}`
+    );
+  }
+  console.log();
+}
+
+
+/**
  * Displays a critical error message and exits the process
  *
  * Prints a formatted error message with GitHub issue link for support,
@@ -152,21 +219,21 @@ export function warningCrossChainSuportNotAvailable(
 
 /**
  * Displays an informational message with blockchain network details
- * 
+ *
  * Prints a formatted informational message that includes both the human-readable
  * chain name and numeric chain ID. If chain name is not available, displays only
  * the chain ID. Useful for contextual messages during deployment or operations.
- * 
+ *
  * @param {string} message - Informational message to display
  * @param {string} chainName - Human-readable blockchain network name (e.g., "Sepolia")
  * @param {number} chainId - Numeric chain identifier
  * @returns {void}
- * 
+ *
  * @example
  * ```typescript
  * infoWithChainData("Deploying", "Sepolia", 11155111);
  * // Output: "Deploying on Sepolia (11155111)"
- * 
+ *
  * infoWithChainData("Deploying", "", 280919610);
  * // Output: "Deploying on Chain ID 280919610"
  * ```
@@ -254,11 +321,7 @@ export function baseConfigurationSummary(
   addresses: BaseInputAddresses,
   evvmMetadata: EvvmMetadata
 ) {
-  console.log(`
-${colors.bright}═══════════════════════════════════════${colors.reset}
-${colors.bright}          Configuration Summary$${colors.reset}
-${colors.bright}═══════════════════════════════════════${colors.reset}
-`);
+  sectionSubtitle("Configuration Summary");
   console.log(`${colors.bright}Addresses:${colors.reset}`);
   for (const key of Object.keys(addresses) as (keyof BaseInputAddresses)[]) {
     console.log(`  ${colors.blue}${key}:${colors.reset} ${addresses[key]}`);
@@ -300,11 +363,8 @@ export function crossChainConfigurationSummary(
   hostChainData: ChainData,
   crossChainInputs: CrossChainInputs
 ) {
+  sectionSubtitle("Cross-Chain Configuration Summary");
   console.log(`
-${colors.bright}═══════════════════════════════════════${colors.reset}
-${colors.bright}      Cross-Chain Configuration Summary${colors.reset}
-${colors.bright}═══════════════════════════════════════${colors.reset}
-
 ${colors.bright}External Admin:${colors.reset}
   ${colors.blue}${crossChainInputs.adminExternal}${colors.reset}
 

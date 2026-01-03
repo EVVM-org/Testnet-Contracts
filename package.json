@@ -54,6 +54,7 @@
   "dependencies": {
     "@hyperlane-xyz/core": "^3.6.1",
     "chalk": "^5.3.0",
+    "cli-loading-animation": "^1.0.6",
     "dotenv": "^16.4.5",
     "execa": "^8.0.1",
     "prompts": "^2.4.2",

@@ -11,6 +11,7 @@
  */
 
 import { $ } from "bun";
+
 import type { CreatedContract, ContractFileMetadata } from "../types";
 import {
   colors,
@@ -22,16 +23,17 @@ import {
   confirmation,
   criticalError,
   criticalErrorCustom,
-  infoWithChainData,
   warning,
+  createLoadingAnimation,
+  seccionTitle,
 } from "./outputMesages";
 import { getAddress } from "viem/utils";
 import {
   saveCrossChainDeploymentToJson,
   saveDeploymentToJson,
 } from "./outputJson";
-import { promptSelect, promptYesNo } from "./prompts";
-import test from "node:test";
+import { promptSelect } from "./prompts";
+import { checkDirectoryPath, writeFilePath } from "./fileManagement";
 
 /**
  * Checks if a chain ID is registered in the EVVM Registry
@@ -75,9 +77,11 @@ export async function callRegisterEvvm(
   ethRpcUrl: string = EthSepoliaPublicRpc
 ): Promise<number | undefined> {
   let evvmID: string = "";
+
   try {
     const result =
       await $`cast call ${RegisteryEvvmAddress} --rpc-url ${ethRpcUrl} "registerEvvm(uint256,address)(uint256)" ${hostChainId} ${evvmAddress} --account ${walletName}`.quiet();
+
 
     await castSend(
       RegisteryEvvmAddress as `0x${string}`,
@@ -481,10 +485,23 @@ export async function walletIsSetup(
 export async function showDeployContractsAndFindEvvm(
   chainId: number
 ): Promise<`0x${string}` | null> {
+  const {
+    start: startGettingDeployedContractsAnimation,
+    stop: stopGettingDeployedContractsAnimation,
+  } = createLoadingAnimation(`Getting deployed contracts data...`, "dots13");
+
+  startGettingDeployedContractsAnimation();
   const broadcastFile = `./broadcast/Deploy.s.sol/${chainId}/run-latest.json`;
   const broadcastContent = await Bun.file(broadcastFile).text();
   const broadcastJson = JSON.parse(broadcastContent);
+  await stopGettingDeployedContractsAnimation(500);
 
+  const {
+    start: startSearchDeployedContractsAnimation,
+    stop: stopSearchDeployedContractsAnimation,
+  } = createLoadingAnimation(`Searching deployed contracts...`, "growVertical");
+
+  startSearchDeployedContractsAnimation();
   const createdContracts = broadcastJson.transactions
     .filter((tx: any) => tx.transactionType === "CREATE")
     .map(
@@ -494,14 +511,9 @@ export async function showDeployContractsAndFindEvvm(
           contractAddress: getAddress(tx.contractAddress),
         } as CreatedContract)
     );
+  await stopSearchDeployedContractsAnimation(500);
 
-  console.log(
-    `\n${colors.bright}═══════════════════════════════════════${colors.reset}`
-  );
-  console.log(`${colors.bright}          Deployed Contracts${colors.reset}`);
-  console.log(
-    `${colors.bright}═══════════════════════════════════════${colors.reset}\n`
-  );
+  seccionTitle("Deployed Contracts");
 
   const chainData = ChainData[chainId];
   const explorerUrl = chainData?.ExplorerToAddress;
@@ -559,6 +571,11 @@ export async function showAllCrossChainDeployedContracts(
   treasuryHostChainStationAddress: `0x${string}` | null;
   treasuryExternalChainStationAddress: `0x${string}` | null;
 }> {
+  const {
+    start: startGettingDeployedContractsAnimation,
+    stop: stopGettingDeployedContractsAnimation,
+  } = createLoadingAnimation(`Getting deployed contracts data...`, "dots13");
+  startGettingDeployedContractsAnimation();
   const broadcastFileHost = `./broadcast/DeployCrossChainHost.s.sol/${chainIdHost}/run-latest.json`;
   const broadcastContentHost = await Bun.file(broadcastFileHost).text();
   const broadcastJsonHost = JSON.parse(broadcastContentHost);
@@ -566,7 +583,14 @@ export async function showAllCrossChainDeployedContracts(
   const broadcastFileExternal = `./broadcast/DeployCrossChainExternal.s.sol/${chainIdExternal}/run-latest.json`;
   const broadcastContentExternal = await Bun.file(broadcastFileExternal).text();
   const broadcastJsonExternal = JSON.parse(broadcastContentExternal);
+  await stopGettingDeployedContractsAnimation(500);
 
+  const {
+    start: startSearchDeployedContractsAnimation,
+    stop: stopSearchDeployedContractsAnimation,
+  } = createLoadingAnimation(`Searching deployed contracts...`, "growVertical");
+
+  startSearchDeployedContractsAnimation();
   const createdContractsHost = broadcastJsonHost.transactions
     .filter((tx: any) => tx.transactionType === "CREATE")
     .map(
@@ -586,19 +610,11 @@ export async function showAllCrossChainDeployedContracts(
           contractAddress: getAddress(tx.contractAddress),
         } as CreatedContract)
     );
+  await stopSearchDeployedContractsAnimation(500);
 
-  console.log(
-    `\n${colors.bright}═══════════════════════════════════════${colors.reset}`
-  );
-  console.log(`${colors.bright}          Deployed Contracts${colors.reset}`);
-  console.log(
-    `${colors.bright}═══════════════════════════════════════${colors.reset}\n`
-  );
-
-  infoWithChainData(
-    `Deployed`,
-    ChainData[chainIdHost]?.Chain || "",
-    chainIdHost
+  seccionTitle(
+    "Deployed Contracts",
+    ChainData[chainIdHost]?.Chain || chainIdHost.toString()
   );
 
   const chainDataHost = ChainData[chainIdHost];
@@ -617,19 +633,9 @@ export async function showAllCrossChainDeployedContracts(
 
   console.log();
 
-  await saveCrossChainDeploymentToJson(
-    createdContractsHost,
-    chainIdHost,
-    ChainData[chainIdHost]?.Chain || undefined,
-    createdContractsExternal,
-    chainIdExternal,
-    ChainData[chainIdExternal]?.Chain || undefined
-  );
-
-  infoWithChainData(
-    `Deployed`,
-    ChainData[chainIdExternal]?.Chain || "",
-    chainIdExternal
+  seccionTitle(
+    "Deployed Contracts",
+    ChainData[chainIdExternal]?.Chain || chainIdExternal.toString()
   );
 
   const chainDataExternal = ChainData[chainIdExternal];
@@ -647,6 +653,15 @@ export async function showAllCrossChainDeployedContracts(
   });
 
   console.log();
+
+  await saveCrossChainDeploymentToJson(
+    createdContractsHost,
+    chainIdHost,
+    ChainData[chainIdHost]?.Chain || undefined,
+    createdContractsExternal,
+    chainIdExternal,
+    ChainData[chainIdExternal]?.Chain || undefined
+  );
 
   const evvmAddress =
     createdContractsHost.find(
@@ -735,12 +750,8 @@ export async function contractInterfacesGenerator() {
 
   const fs = require("fs");
   const path = "./src/interfaces";
-  if (!fs.existsSync(path)) {
-    console.log(
-      `${colors.yellow}⚠  Interfaces folder not found. Creating...${colors.reset}\n`
-    );
-    fs.mkdirSync(path);
-  }
+
+  await checkDirectoryPath(path);
 
   if (generateOnlyOne) {
     const folderName = contracts.find(
@@ -750,7 +761,15 @@ export async function contractInterfacesGenerator() {
     if (!folderName) {
       criticalError(`Contract '${contractName}' not found in metadata.`);
     }
+    const {
+      start: startGeneratingInterfacesAnimation,
+      stop: stopGeneratingInterfacesAnimation,
+    } = createLoadingAnimation(
+      `Generating interface for ${contractName}...`,
+      "growVertical"
+    );
 
+    startGeneratingInterfacesAnimation();
     const evvmInterface =
       await $`cast interface src/contracts/${folderName}/${contractName}.sol`.quiet();
     const interfacePath = `./src/interfaces/I${contractName}.sol`;
@@ -763,16 +782,22 @@ export async function contractInterfacesGenerator() {
       )
       .replace("pragma solidity ^0.8.4;", "pragma solidity ^0.8.0;")
       .replace(`interface ${contractName} {`, `interface I${contractName} {`);
+    await stopGeneratingInterfacesAnimation(1500);
 
-    fs.writeFileSync(interfacePath, content);
+    await writeFilePath(interfacePath, content);
 
     confirmation(`I${contractName}.sol generated at ${interfacePath}`);
   } else {
     for (const contract of contracts) {
-      console.log(
-        `${colors.blue}▸ Processing ${contract.contractName}...${colors.reset}`
+      const {
+        start: startGeneratingInterfacesAnimation,
+        stop: stopGeneratingInterfacesAnimation,
+      } = createLoadingAnimation(
+        `Generating interface for ${contract.contractName}...`,
+        "growVertical"
       );
 
+      startGeneratingInterfacesAnimation();
       let evvmInterface =
         await $`cast interface src/contracts/${contract.folderName}/${contract.contractName}.sol`.quiet();
       let interfacePath = `./src/interfaces/I${contract.contractName}.sol`;
@@ -790,7 +815,9 @@ export async function contractInterfacesGenerator() {
           `interface I${contract.contractName} {`
         );
 
-      fs.writeFileSync(interfacePath, content);
+      await stopGeneratingInterfacesAnimation(1500);
+      await writeFilePath(interfacePath, content);
+
       confirmation(
         `I${contract.contractName}.sol generated at ${interfacePath}`
       );
@@ -801,18 +828,15 @@ export async function contractInterfacesGenerator() {
 }
 
 export async function contractTesting() {
-  const contractName: string = await promptSelect(
-    "Select contract to make interface for:",
-    [
-      "EVVM",
-      "NameService",
-      "P2PSwap",
-      "Staking",
-      "Estimator",
-      "Treasury",
-      "All Contracts",
-    ]
-  );
+  const contractName: string = await promptSelect("Select contract to test:", [
+    "EVVM",
+    "NameService",
+    "P2PSwap",
+    "Staking",
+    "Estimator",
+    "Treasury",
+    "All Contracts",
+  ]);
 
   const testType: string = await promptSelect("Select test type:", [
     "unit correct",
@@ -876,26 +900,48 @@ export async function contractTesting() {
     command.push(...printParts);
   }
 
-  console.log("running");
-  console.log(command.join(" "));
+  console.log(
+    `${colors.darkGray}running\n${command.join(" ")}${colors.reset}\n`
+  );
 
-  // si se eligio print json o markdown guardar en ./test-results el resultado
+  const { start: startTestAnimation, stop: stopTestAnimation } =
+    createLoadingAnimation(
+      `Executing ${contractName} ${
+        testType !== "full test suite" ? `${testType} tests` : testType
+      }...`,
+      "runner"
+    );
+
   if (print === "json" || print === "markdown") {
-    const fs = require("fs");
     const path = "./testResults";
-    if (!fs.existsSync(path)) {
-      console.log(
-        `${colors.yellow}⚠  Test Results folder not found. Creating...${colors.reset}\n`
-      );
-      fs.mkdirSync(path);
-    }
+
+    await checkDirectoryPath(path);
+
+    startTestAnimation();
+
     const result = await $`${command}`.quiet();
+
+    await stopTestAnimation();
+
+    const {
+      start: startPreparingTestAnimation,
+      stop: stopPreparingTestAnimation,
+    } = createLoadingAnimation(
+      `Preparing ${contractName} ${
+        testType !== "full test suite" ? `${testType} tests` : testType
+      } results...`,
+      "layer"
+    );
+
+    startPreparingTestAnimation();
     const outputContent = result.stdout.toString();
     const fileExtension = print === "json" ? "json" : "md";
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-"); // Replace colon and dot for filename safety
     const outputPath = `./testResults/test-results-${timestamp}.${fileExtension}`;
+    await stopPreparingTestAnimation(500);
 
-    fs.writeFileSync(outputPath, outputContent);
+    await writeFilePath(outputPath, outputContent);
+
     confirmation(`Test results saved to ${outputPath}`);
   } else {
     await $`${command}`;
