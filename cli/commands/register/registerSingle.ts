@@ -14,6 +14,7 @@ import {
   criticalError,
   infoWithChainData,
   seccionTitle,
+  sectionSubtitle,
   warning,
 } from "../../utils/outputMesages";
 import {
@@ -85,9 +86,7 @@ export async function registerSingle(_args: string[], options: any) {
 
   if (!(await isChainIdRegistered(chainId))) chainIdNotSupported(chainId);
 
-  console.log(
-    `${colors.blue}Making registration to EVVM Registry on Ethereum Sepolia...${colors.reset}\n`
-  );
+  sectionSubtitle("Registering EVVM and Obtaining EVVM ID on Ethereum Sepolia");
 
   const evvmID: number | undefined = await callRegisterEvvm(
     Number(chainId),
@@ -95,12 +94,12 @@ export async function registerSingle(_args: string[], options: any) {
     walletName,
     ethRPC
   );
+
   if (!evvmID) {
     criticalError(`Failed to obtain EVVM ID for contract ${evvmAddress}.`);
   }
-  console.log(
-    `${colors.green}EVVM ID generated: ${colors.bright}${evvmID}${colors.reset}`
-  );
+
+  confirmation(`Generated EVVM ID: ${colors.bright}${evvmID}${colors.reset}`);
 
   infoWithChainData(
     `Setting EVVM ID on EVVM contract`,
@@ -118,6 +117,8 @@ export async function registerSingle(_args: string[], options: any) {
   );
 
   confirmation(`EVVM registration completed successfully!`);
+
+  sectionSubtitle("Registration Summary");
   console.log(
     `${colors.green}EVVM ID: ${colors.bright}${evvmID}${colors.reset}`
   );

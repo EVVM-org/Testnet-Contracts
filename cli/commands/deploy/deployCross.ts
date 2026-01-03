@@ -85,8 +85,6 @@ export async function deployCross(args: string[], options: any) {
     walletNameExternal,
   ]);
 
-  
-
   if (skipInputConfig) {
     warning(
       `Skipping input configuration`,
@@ -99,13 +97,11 @@ export async function deployCross(args: string[], options: any) {
       process.env.HOST_RPC_URL
     ));
   } else {
-    console.log(`\n${colors.bright}Base Configuration:${colors.reset}\n`);
+    sectionSubtitle("Configuration Basic Data");
 
     await configurationBasic();
 
-    console.log(
-      `\n${colors.bright}Cross-Chain Configuration:${colors.reset}\n`
-    );
+    sectionSubtitle("Configuration Cross-Chain Data");
 
     const ccConfig = await configurationCrossChain();
     if (typeof ccConfig === "boolean" && ccConfig === false) return;
@@ -123,7 +119,7 @@ export async function deployCross(args: string[], options: any) {
     !promptYesNo(
       `${colors.yellow}Proceed with deployment? (y/n):${colors.reset}`
     )
-  ){
+  ) {
     customErrorWithExit(
       "Deployment cancelled by user",
       `${colors.darkGray}Exiting deployment process.${colors.reset}`
@@ -145,10 +141,6 @@ export async function deployCross(args: string[], options: any) {
     `Deploying`,
     ChainData[externalChainId]?.Chain || "",
     externalChainId
-  );
-
-  console.log(
-    `  ${colors.green}•${colors.reset} Treasury cross-chain contract  ${colors.darkGray}(TreasuryExternalChainStation.sol)${colors.reset}\n`
   );
 
   await forgeScript(

@@ -17,6 +17,7 @@ import {
   chainIdNotSupported,
   confirmation,
   seccionTitle,
+  sectionSubtitle,
 } from "../utils/outputMesages";
 import { getRPCUrlAndChainId } from "../utils/rpc";
 
@@ -81,7 +82,7 @@ export async function setUpCrossChainTreasuries(_args: string[], options: any) {
   if (!(await isChainIdRegistered(Number(externalChainId))))
     chainIdNotSupported(Number(externalChainId));
 
-  console.log(`${colors.blue}Setting conections...${colors.reset}\n`);
+  sectionSubtitle("Setting up connections between treasury stations");
 
   await callConnectStations(
     treasuryHostStationAddress as string,

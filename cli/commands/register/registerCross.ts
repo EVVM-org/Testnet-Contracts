@@ -21,6 +21,7 @@ import {
   criticalError,
   infoWithChainData,
   seccionTitle,
+  sectionSubtitle,
   warning,
 } from "../../utils/outputMesages";
 import { ChainData, colors, EthSepoliaPublicRpc } from "../../constants";
@@ -106,9 +107,7 @@ export async function registerCross(_args: string[], options: any) {
   if (!(await isChainIdRegistered(externalChainId)))
     chainIdNotSupported(externalChainId);
 
-  console.log(
-    `${colors.blue}Making registration to EVVM Registry on Ethereum Sepolia...${colors.reset}\n`
-  );
+  sectionSubtitle("Registering EVVM and Obtaining EVVM ID on Ethereum Sepolia");
 
   const evvmID: number | undefined = await callRegisterEvvm(
     Number(hostChainId),
@@ -120,9 +119,8 @@ export async function registerCross(_args: string[], options: any) {
   if (evvmID === undefined) {
     criticalError(`Failed to obtain EVVM ID for contract ${evvmAddress}.`);
   }
-  console.log(
-    `${colors.green}Generated EVVM ID: ${colors.bright}${evvmID}${colors.reset}\n`
-  );
+
+  confirmation(`Generated EVVM ID: ${colors.bright}${evvmID}${colors.reset}`);
 
   infoWithChainData(
     `Setting EVVM ID on EVVM contract`,
@@ -162,6 +160,8 @@ export async function registerCross(_args: string[], options: any) {
   );
 
   confirmation(`EVVM cross-chain registration completed successfully!`);
+  
+  sectionSubtitle("Registration Summary");
   console.log(
     `${colors.green}EVVM ID:  ${colors.bright}${evvmID!}${colors.reset}`
   );
