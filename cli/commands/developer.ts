@@ -11,6 +11,7 @@ import { $ } from "bun";
 import { colors } from "../constants";
 import { contractInterfacesGenerator, contractTesting } from "../utils/foundry";
 import { promptSelect, promptString } from "../utils/prompts";
+import { seccionTitle } from "../utils/outputMesages";
 
 /**
  * Developer utilities command handler
@@ -30,6 +31,8 @@ import { promptSelect, promptString } from "../utils/prompts";
 export async function developer(_args: string[], options: any) {
   let makeInterface = options.makeInterface || false;
   let runTest = options.runTest || false;
+
+  seccionTitle("Developer Utilities");
 
   if (!makeInterface && !runTest) {
     const action = await promptSelect("Select an action:", [

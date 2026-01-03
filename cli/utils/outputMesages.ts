@@ -55,11 +55,18 @@ export function createLoadingAnimation(
 
 export function seccionTitle(title: string, subTitle?: string) {
   if (subTitle) {
-    title = `▬▬▬▬▬▬▬▬▬▬${colors.reset} ${title} ▬▬ ${subTitle} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬`;
+    console.log(`${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬${colors.reset} ${subTitle} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset}`);
   } else {
-    title = `▬▬▬▬▬▬▬▬▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬`;
+    console.log(`${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬${colors.reset}`);
   }
-  
+}
+
+export function sectionSubtitle(title: string, subTitle?: string) {
+  if (subTitle) {
+    console.log(`${colors.evvmGreen}▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬${colors.reset} ${subTitle} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬${colors.reset}`);
+  } else {
+    console.log(`${colors.evvmGreen}▬▬${colors.reset} ${title} ${colors.evvmGreen}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬${colors.reset}`);
+  }
 }
 
 /**

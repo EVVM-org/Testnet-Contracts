@@ -13,7 +13,11 @@ import {
 } from "../utils/foundry";
 import { colors } from "../constants";
 import { promptAddress } from "../utils/prompts";
-import { chainIdNotSupported, confirmation } from "../utils/outputMesages";
+import {
+  chainIdNotSupported,
+  confirmation,
+  seccionTitle,
+} from "../utils/outputMesages";
 import { getRPCUrlAndChainId } from "../utils/rpc";
 
 /**
@@ -22,7 +26,7 @@ import { getRPCUrlAndChainId } from "../utils/rpc";
  * This command establishes the communication link between TreasuryHostChainStation
  * and TreasuryExternalChainStation contracts, enabling cross-chain asset transfers
  * and liquidity management across the EVVM deployment.
- * 
+ *
  * Process:
  * 1. Validates Foundry installation and both wallet accounts
  * 2. Prompts for treasury station addresses if not provided
@@ -38,10 +42,6 @@ import { getRPCUrlAndChainId } from "../utils/rpc";
  * @returns {Promise<void>}
  */
 export async function setUpCrossChainTreasuries(_args: string[], options: any) {
-  console.log(
-    `${colors.bright}Connecting cross-chain treasury stations...${colors.reset}\n`
-  );
-
   // --treasuryHostStationAddress
   let treasuryHostStationAddress: `0x${string}` | undefined =
     options.treasuryHostStationAddress;
@@ -52,6 +52,8 @@ export async function setUpCrossChainTreasuries(_args: string[], options: any) {
   let walletNameHost: string = options.walletNameHost || "defaultKey";
   // --walletNameExternal
   let walletNameExternal: string = options.walletNameExternal || "defaultKey";
+
+  seccionTitle("Set Up Cross-Chain Treasuries");
 
   await verifyFoundryInstalledAndAccountSetup([
     walletNameHost,
@@ -89,5 +91,5 @@ export async function setUpCrossChainTreasuries(_args: string[], options: any) {
     externalRPC,
     walletNameExternal
   );
-  confirmation("Treasury contracts are now connected")
+  confirmation("Treasury contracts are now connected");
 }

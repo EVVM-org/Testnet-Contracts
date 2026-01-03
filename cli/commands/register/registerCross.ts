@@ -20,6 +20,7 @@ import {
   confirmation,
   criticalError,
   infoWithChainData,
+  seccionTitle,
   warning,
 } from "../../utils/outputMesages";
 import { ChainData, colors, EthSepoliaPublicRpc } from "../../constants";
@@ -65,6 +66,13 @@ export async function registerCross(_args: string[], options: any) {
 
   let ethRPC: string | undefined;
 
+  seccionTitle("Register EVVM in Registry", "Cross Chain Edition");
+
+  await verifyFoundryInstalledAndAccountSetup([
+    walletNameHost,
+    walletNameExternal,
+  ]);
+
   // If --useCustomEthRpc is present, look for EVVM_REGISTRATION_RPC_URL in .env or prompt user
   ethRPC = useCustomEthRpc
     ? process.env.EVVM_REGISTRATION_RPC_URL ||
@@ -72,11 +80,6 @@ export async function registerCross(_args: string[], options: any) {
         `${colors.yellow}Enter the custom Ethereum Sepolia RPC URL:${colors.reset}`
       )
     : EthSepoliaPublicRpc;
-
-  await verifyFoundryInstalledAndAccountSetup([
-    walletNameHost,
-    walletNameExternal,
-  ]);
 
   // Validate or prompt for missing values
   evvmAddress ||= promptAddress(
@@ -120,7 +123,6 @@ export async function registerCross(_args: string[], options: any) {
   console.log(
     `${colors.green}Generated EVVM ID: ${colors.bright}${evvmID}${colors.reset}\n`
   );
-
 
   infoWithChainData(
     `Setting EVVM ID on EVVM contract`,

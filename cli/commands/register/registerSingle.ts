@@ -13,6 +13,7 @@ import {
   confirmation,
   criticalError,
   infoWithChainData,
+  seccionTitle,
   warning,
 } from "../../utils/outputMesages";
 import {
@@ -58,6 +59,10 @@ export async function registerSingle(_args: string[], options: any) {
 
   let ethRPC: string | undefined;
 
+  seccionTitle("Register EVVM in Registry");
+
+  await verifyFoundryInstalledAndAccountSetup([walletName]);
+
   // If --useCustomEthRpc is present, look for EVVM_REGISTRATION_RPC_URL in .env or prompt user
   ethRPC = useCustomEthRpc
     ? process.env.EVVM_REGISTRATION_RPC_URL ||
@@ -65,8 +70,6 @@ export async function registerSingle(_args: string[], options: any) {
         `${colors.yellow}Enter the custom Ethereum Sepolia RPC URL:${colors.reset}`
       )
     : EthSepoliaPublicRpc;
-
-  await verifyFoundryInstalledAndAccountSetup([walletName]);
 
   // Validate or prompt for missing values
   evvmAddress ||= promptAddress(
@@ -76,7 +79,7 @@ export async function registerSingle(_args: string[], options: any) {
   let { rpcUrl, chainId } = await getRPCUrlAndChainId(process.env.RPC_URL);
 
   if (chainId === 31337 || chainId === 1337) {
-    warning("Local blockchain detected", "Skipping registry registration")
+    warning("Local blockchain detected", "Skipping registry registration");
     return;
   }
 
@@ -98,7 +101,7 @@ export async function registerSingle(_args: string[], options: any) {
   console.log(
     `${colors.green}EVVM ID generated: ${colors.bright}${evvmID}${colors.reset}`
   );
-  
+
   infoWithChainData(
     `Setting EVVM ID on EVVM contract`,
     ChainData[chainId]?.Chain || "",
