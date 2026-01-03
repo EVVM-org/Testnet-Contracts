@@ -1,24 +1,39 @@
 #!/bin/bash
 
+# Get the directory where the script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Detect OS and architecture
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m)
 
+# Detect if using musl (Alpine Linux, etc.)
+IS_MUSL=false
+if [[ "$OS" == "linux" ]]; then
+  if ldd --version 2>&1 | grep -qi musl; then
+    IS_MUSL=true
+  fi
+fi
+
 # Determine the executable
 if [[ "$OS" == "linux" && "$ARCH" == "x86_64" ]]; then
-  EXECUTABLE="./.executables/evvm-linux-x64"
+  if [[ "$IS_MUSL" == true ]]; then
+    EXECUTABLE="$SCRIPT_DIR/.executables/evvm-linux-x64-musl"
+  else
+    EXECUTABLE="$SCRIPT_DIR/.executables/evvm-linux-x64"
+  fi
 elif [[ "$OS" == "linux" && "$ARCH" == "aarch64" ]]; then
-  EXECUTABLE="./.executables/evvm-linux-arm64"
-elif [[ "$OS" == "linux" && "$ARCH" == "x86_64" && "$MUSL" == "1" ]]; then
-  EXECUTABLE="./.executables/evvm-linux-x64-musl"
-elif [[ "$OS" == "linux" && "$ARCH" == "aarch64" && "$MUSL" == "1" ]]; then
-  EXECUTABLE="./.executables/evvm-linux-arm64-musl"
+  if [[ "$IS_MUSL" == true ]]; then
+    EXECUTABLE="$SCRIPT_DIR/.executables/evvm-linux-arm64-musl"
+  else
+    EXECUTABLE="$SCRIPT_DIR/.executables/evvm-linux-arm64"
+  fi
 elif [[ "$OS" == "darwin" && "$ARCH" == "x86_64" ]]; then
-  EXECUTABLE="./.executables/evvm-darwin-x64"
+  EXECUTABLE="$SCRIPT_DIR/.executables/evvm-darwin-x64"
 elif [[ "$OS" == "darwin" && "$ARCH" == "arm64" ]]; then
-  EXECUTABLE="./.executables/evvm-darwin-arm64"
-elif [[ "$OS" == "cygwin" || "$OS" == "mingw"* ]]; then
-  EXECUTABLE="./.executables/evvm-windows-x64.exe"
+  EXECUTABLE="$SCRIPT_DIR/.executables/evvm-darwin-arm64"
+elif [[ "$OS" == "cygwin" || "$OS" == "mingw"* || "$OS" == "msys"* ]]; then
+  EXECUTABLE="$SCRIPT_DIR/.executables/evvm-windows-x64.exe"
 else
   echo "Unsupported platform or architecture: $OS-$ARCH"
   exit 1
@@ -26,8 +41,10 @@ fi
 
 # Execute the binary
 if [[ -x "$EXECUTABLE" ]]; then
-  $EXECUTABLE "$@"
+  "$EXECUTABLE" "$@"
 else
   echo "Executable not found or not executable: $EXECUTABLE"
+  echo "Please ensure the executable exists and has execute permissions."
+  echo "Try: chmod +x $EXECUTABLE"
   exit 1
 fi
