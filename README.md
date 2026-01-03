@@ -33,6 +33,14 @@ Guide: How to build on top of EVVM: https://www.evvm.info/docs/HowToMakeAEVVMSer
 
 ## Use as a CLI Tool (for EVVM deployment)
 
+### Requirements
+
+Before deploying with the CLI, ensure you have the following installed:
+
+- **Foundry** - [Install](https://getfoundry.sh/introduction/installation/)
+- **Bun** (≥ 1.0) - [Install](https://bun.sh/)
+- **Git** - [Install](https://git-scm.com/downloads)
+
 ### Quick start (2 min)
 1) Clone & install
 ```bash
