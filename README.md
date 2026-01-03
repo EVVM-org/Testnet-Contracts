@@ -79,16 +79,6 @@ Security & contributing (short)
 - Never commit private keys. Use `cast wallet import`.
 - Add tests for new features and open a PR.
 
-If you want, I can further shorten a specific section (CLI, Library, or Troubleshooting).
-
-
-**Development Flow Context**: This repository is the next step after successful playground testing. It is dedicated to advanced integration, deployment, and validation on public testnets, before mainnet implementation.
-
-### Development Flow
-1. **Playground**: Prototype and experiment with new features in the playground repo.
-2. **Testnet (this repo)**: Integrate, test, and validate on public testnets.
-3. **Mainnet**: After successful testnet validation, proceed to mainnet deployment.
-
 ### How to Contribute
 1. Fork the repository
 2. Create a feature branch and make changes
