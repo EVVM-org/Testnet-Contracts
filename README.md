@@ -1,7 +1,14 @@
 # EVVM Testnet Contracts
 
 ![Solidity](https://img.shields.io/badge/Solidity-^0.8.0-363636?logo=solidity) 
-![Foundry](https://img.shields.io/badge/Built%20with-Foundry-FFDB1C?logo=foundry) [![npm version](https://img.shields.io/npm/v/@evvm/testnet-contracts.svg)](https://www.npmjs.com/package/@evvm/testnet-contracts) [![license](https://img.shields.io/badge/license-EVVM--NONCOMMERCIAL--1.0-blue.svg)](LICENSE) [![docs](https://img.shields.io/badge/docs-evvm.info-blue.svg)](https://www.evvm.info/)[![npm downloads](https://img.shields.io/npm/dw/@evvm/testnet-contracts.svg)](https://www.npmjs.com/package/@evvm/testnet-contracts) 
+![Foundry](https://img.shields.io/badge/Built%20with-Foundry-FFDB1C?logo=foundry) 
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript)
+![Bun](https://img.shields.io/badge/Runtime-Bun-000000?logo=bun)
+[![npm version](https://img.shields.io/npm/v/@evvm/testnet-contracts.svg)](https://www.npmjs.com/package/@evvm/testnet-contracts) 
+[![license](https://img.shields.io/badge/license-EVVM--NONCOMMERCIAL--1.0-blue.svg)](LICENSE) 
+[![docs](https://img.shields.io/badge/docs-evvm.info-blue.svg)](https://www.evvm.info/)
+[![npm downloads](https://img.shields.io/npm/dw/@evvm/testnet-contracts.svg)](https://www.npmjs.com/package/@evvm/testnet-contracts)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen) 
 
 A compact toolkit for creating virtual EVM chains on testnets.
 
@@ -161,10 +168,25 @@ Files & structure (short)
 ## Security & Contributing
 
 ### How to Contribute
-1. Fork the repository
-2. Create a feature branch and make changes
-3. Add tests for new features
-4. Submit a PR with a detailed description
+
+We welcome contributions from the community! Here's how you can help:
+
+1. **Report Issues** - Found a bug or have a suggestion? [Open an issue on GitHub](https://github.com/EVVM-org/Testnet-Contracts/issues)
+2. **Suggest Features** - Have an idea for improvement? [Create a feature request issue](https://github.com/EVVM-org/Testnet-Contracts/issues)
+3. **Submit Code Changes**:
+   - Fork the repository
+   - Create a feature branch (`git checkout -b feature/amazing-feature`)
+   - Make your changes and add tests
+   - Push to your branch (`git push origin feature/amazing-feature`)
+   - Submit a Pull Request with a detailed description
+
+### Guidelines
+
+- **Issues**: Use [GitHub Issues](https://github.com/EVVM-org/Testnet-Contracts/issues) for bug reports, feature requests, and discussions
+- **Pull Requests**: Each PR should reference a related issue
+- **Tests**: All new features must include tests
+- **Code Style**: Follow the existing code patterns in the repository
+- **Commit Messages**: Write clear, descriptive commit messages
 
 ## Security Best Practices
 - **Never commit private keys**: Always use `cast wallet import <YOUR_ALIAS> --interactive` to securely store your keys
