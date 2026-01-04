@@ -1,6 +1,7 @@
 # EVVM Testnet Contracts
 
-[![npm version](https://img.shields.io/npm/v/@evvm/testnet-contracts.svg)](https://www.npmjs.com/package/@evvm/testnet-contracts) [![license](https://img.shields.io/badge/license-EVVM--NONCOMMERCIAL--1.0-blue.svg)](LICENSE) [![docs](https://img.shields.io/badge/docs-evvm.info-blue.svg)](https://www.evvm.info/)[![npm downloads](https://img.shields.io/npm/dw/@evvm/testnet-contracts.svg)](https://www.npmjs.com/package/@evvm/testnet-contracts) 
+![Solidity](https://img.shields.io/badge/Solidity-^0.8.0-363636?logo=solidity) 
+![Foundry](https://img.shields.io/badge/Built%20with-Foundry-FFDB1C?logo=foundry) [![npm version](https://img.shields.io/npm/v/@evvm/testnet-contracts.svg)](https://www.npmjs.com/package/@evvm/testnet-contracts) [![license](https://img.shields.io/badge/license-EVVM--NONCOMMERCIAL--1.0-blue.svg)](LICENSE) [![docs](https://img.shields.io/badge/docs-evvm.info-blue.svg)](https://www.evvm.info/)[![npm downloads](https://img.shields.io/npm/dw/@evvm/testnet-contracts.svg)](https://www.npmjs.com/package/@evvm/testnet-contracts) 
 
 A compact toolkit for creating virtual EVM chains on testnets.
 

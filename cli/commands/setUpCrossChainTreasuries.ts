@@ -11,14 +11,14 @@ import {
   isChainIdRegistered,
   verifyFoundryInstalledAndAccountSetup,
 } from "../utils/foundry";
-import { colors } from "../constants";
-import { promptAddress } from "../utils/prompts";
 import {
   chainIdNotSupported,
   confirmation,
   seccionTitle,
   sectionSubtitle,
 } from "../utils/outputMesages";
+import { colors } from "../constants";
+import { promptAddress } from "../utils/prompts";
 import { getRPCUrlAndChainId } from "../utils/rpc";
 
 /**

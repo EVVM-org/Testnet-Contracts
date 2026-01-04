@@ -10,7 +10,7 @@
 import { $ } from "bun";
 import { colors } from "../constants";
 import { contractInterfacesGenerator, contractTesting } from "../utils/foundry";
-import { promptSelect, promptString } from "../utils/prompts";
+import { promptSelect } from "../utils/prompts";
 import { confirmation, seccionTitle, sectionSubtitle } from "../utils/outputMesages";
 
 /**
