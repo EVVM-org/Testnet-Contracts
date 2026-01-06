@@ -516,7 +516,7 @@ export async function showDeployContractsAndFindEvvm(
   seccionTitle("Deployed Contracts");
 
   const chainData = ChainData[chainId];
-  const explorerUrl = chainData?.ExplorerToAddress;
+  const explorerUrl = chainData?.ExplorerUrl;
 
   createdContracts.forEach((contract: CreatedContract) => {
     console.log(
@@ -618,7 +618,7 @@ export async function showAllCrossChainDeployedContracts(
   );
 
   const chainDataHost = ChainData[chainIdHost];
-  const explorerUrlHost = chainDataHost?.ExplorerToAddress;
+  const explorerUrlHost = chainDataHost?.ExplorerUrl;
 
   createdContractsHost.forEach((contract: CreatedContract) => {
     console.log(
@@ -639,7 +639,7 @@ export async function showAllCrossChainDeployedContracts(
   );
 
   const chainDataExternal = ChainData[chainIdExternal];
-  const explorerUrlExternal = chainDataExternal?.ExplorerToAddress;
+  const explorerUrlExternal = chainDataExternal?.ExplorerUrl;
 
   createdContractsExternal.forEach((contract: CreatedContract) => {
     console.log(

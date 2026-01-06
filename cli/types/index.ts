@@ -115,7 +115,7 @@ export type ChainData = {
     Gateway: string;
     GasService: string;
   };
-  ExplorerToAddress: string;
+  ExplorerUrl: string;
 };
 
 export type ChainDataType = {
