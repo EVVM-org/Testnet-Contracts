@@ -6,7 +6,6 @@ pragma solidity ^0.8.0;
 library ErrorsLib {
     error InvalidSignature();
     error SenderIsNotTheExecutor();
-    error UpdateBalanceFailed();
     error SyncNonceMismatch();
     error AsyncNonceAlreadyUsed();
     error NotAnStaker();

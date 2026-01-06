@@ -73,11 +73,21 @@ pragma solidity ^0.8.0;
  * @custom:upgrade-pattern Transparent proxy with admin-controlled implementation
  */
 
-import {NameService} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
-import {EvvmStorage} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
-import {ErrorsLib} from "@evvm/testnet-contracts/contracts/evvm/lib/ErrorsLib.sol";
-import {SignatureUtils} from "@evvm/testnet-contracts/contracts/evvm/lib/SignatureUtils.sol";
-import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
+import {
+    NameService
+} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
+import {
+    EvvmStorage
+} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
+import {
+    ErrorsLib
+} from "@evvm/testnet-contracts/contracts/evvm/lib/ErrorsLib.sol";
+import {
+    SignatureUtils
+} from "@evvm/testnet-contracts/contracts/evvm/lib/SignatureUtils.sol";
+import {
+    AdvancedStrings
+} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
 
 contract Evvm is EvvmStorage {
     /**
@@ -390,12 +400,12 @@ contract Evvm is EvvmStorage {
             : to_address;
 
         if (!_updateBalance(from, to, token, amount))
-            revert ErrorsLib.UpdateBalanceFailed();
+            revert ErrorsLib.InsufficientBalance();
 
         if (isAddressStaker(msg.sender)) {
             if (priorityFee > 0) {
                 if (!_updateBalance(from, msg.sender, token, priorityFee))
-                    revert ErrorsLib.UpdateBalanceFailed();
+                    revert ErrorsLib.InsufficientBalance();
             }
             _giveReward(msg.sender, 1);
         }
@@ -629,8 +639,8 @@ contract Evvm is EvvmStorage {
                     )
                 ) {
                     to_aux = NameService(nameServiceAddress).getOwnerOfIdentity(
-                            toData[i].to_identity
-                        );
+                        toData[i].to_identity
+                    );
                 }
             } else {
                 to_aux = toData[i].to_address;
@@ -654,7 +664,6 @@ contract Evvm is EvvmStorage {
         } else {
             nextSyncUsedNonce[from]++;
         }
-
     }
 
     /**
@@ -694,7 +703,7 @@ contract Evvm is EvvmStorage {
         if (size == 0) revert ErrorsLib.NotAnCA();
 
         if (!_updateBalance(from, to, token, amount))
-            revert ErrorsLib.UpdateBalanceFailed();
+            revert ErrorsLib.InsufficientBalance();
 
         if (isAddressStaker(msg.sender)) {
             _giveReward(msg.sender, 1);
@@ -761,7 +770,6 @@ contract Evvm is EvvmStorage {
         if (isAddressStaker(msg.sender)) {
             _giveReward(msg.sender, 1);
         }
-
     }
 
     //░▒▓█Treasury exclusive functions██████████████████████████████████████████▓▒░
