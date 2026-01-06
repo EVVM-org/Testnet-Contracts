@@ -31,11 +31,9 @@ async function writeJsonToOutput(
   data: any,
   operationName: string
 ): Promise<void> {
-  console.log(
-    `${colors.bright}Saving ${operationName} to JSON...${colors.reset}\n`
-  );
+
   try {
-    const outputDir = join(process.cwd(), "output");
+    const outputDir = "./output/deployments";
 
     await checkDirectoryPath(outputDir);
 
