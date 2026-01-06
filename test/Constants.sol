@@ -244,6 +244,46 @@ abstract contract Constants is Test {
         signatureEVVM = Erc191TestBuilder.buildERC191Signature(v, r, s);
     }
 
+    function _execute_makePay(
+        AccountData memory user,
+        address toAddress,
+        string memory toIdentity,
+        address tokenAddress,
+        uint256 amount,
+        uint256 priorityFee,
+        uint256 nonce,
+        bool priorityFlag,
+        address executor,
+        AccountData memory fisher
+    ) internal virtual {
+        bytes memory signature = _execute_makeSignaturePay(
+            user,
+            toAddress,
+            toIdentity,
+            tokenAddress,
+            amount,
+            priorityFee,
+            nonce,
+            priorityFlag,
+            executor
+        );
+
+        vm.startPrank(fisher.Address);
+        evvm.pay(
+            user.Address,
+            toAddress,
+            toIdentity,
+            tokenAddress,
+            amount,
+            priorityFee,
+            nonce,
+            priorityFlag,
+            executor,
+            signature
+        );
+        vm.stopPrank();
+    }
+
     function _execute_makeDispersePaySignature(
         AccountData memory user,
         EvvmStructs.DispersePayMetadata[] memory toData,
