@@ -173,9 +173,9 @@ contract fuzzTest_EVVM_pay_staker_sync is Test, Constants {
             totalAmount
         );
 
-        if (input.token == MATE_TOKEN_ADDRESS) {
+        if (input.token == PRINCIPAL_TOKEN_ADDRESS) {
             assertEq(
-                evvm.getBalance(selectedExecuter.Address, MATE_TOKEN_ADDRESS),
+                evvm.getBalance(selectedExecuter.Address, PRINCIPAL_TOKEN_ADDRESS),
                 evvm.getRewardAmount() + totalPriorityFee
             );
         } else {
@@ -184,7 +184,7 @@ contract fuzzTest_EVVM_pay_staker_sync is Test, Constants {
                 totalPriorityFee
             );
             assertEq(
-                evvm.getBalance(selectedExecuter.Address, MATE_TOKEN_ADDRESS),
+                evvm.getBalance(selectedExecuter.Address, PRINCIPAL_TOKEN_ADDRESS),
                 evvm.getRewardAmount()
             );
         }
@@ -253,9 +253,9 @@ contract fuzzTest_EVVM_pay_staker_sync is Test, Constants {
             totalAmount
         );
 
-        if (input.token == MATE_TOKEN_ADDRESS) {
+        if (input.token == PRINCIPAL_TOKEN_ADDRESS) {
             assertEq(
-                evvm.getBalance(selectedExecuter.Address, MATE_TOKEN_ADDRESS),
+                evvm.getBalance(selectedExecuter.Address, PRINCIPAL_TOKEN_ADDRESS),
                 evvm.getRewardAmount() + totalPriorityFee
             );
         } else {
@@ -264,7 +264,7 @@ contract fuzzTest_EVVM_pay_staker_sync is Test, Constants {
                 totalPriorityFee
             );
             assertEq(
-                evvm.getBalance(selectedExecuter.Address, MATE_TOKEN_ADDRESS),
+                evvm.getBalance(selectedExecuter.Address, PRINCIPAL_TOKEN_ADDRESS),
                 evvm.getRewardAmount()
             );
         }

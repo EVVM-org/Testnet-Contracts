@@ -198,7 +198,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             true,
             COMMON_USER_NO_STAKER_1,
             COMMON_USER_NO_STAKER_2.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             100000,
             0
         );
@@ -207,7 +207,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             false,
             COMMON_USER_NO_STAKER_2,
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             100,
             0
         );
@@ -217,7 +217,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             99900
         );
@@ -225,21 +225,21 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             100
         );
 
         ITartarusV1(address(evvm)).burnToken(
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             10
         );
 
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             99900
         );
@@ -247,7 +247,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             90
         );
@@ -256,7 +256,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             false,
             COMMON_USER_NO_STAKER_2,
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             10,
             0
         );
@@ -265,7 +265,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             false,
             COMMON_USER_NO_STAKER_1,
             COMMON_USER_NO_STAKER_2.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             100,
             0
         );
@@ -273,7 +273,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             99990
         );
@@ -281,7 +281,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -292,7 +292,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             true,
             COMMON_USER_NO_STAKER_1,
             COMMON_USER_NO_STAKER_2.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             100000,
             0
         );
@@ -301,7 +301,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             false,
             COMMON_USER_NO_STAKER_2,
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             100,
             0
         );
@@ -311,7 +311,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             99900
         );
@@ -319,21 +319,21 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             100
         );
 
         ITartarusV1(address(evvm)).burnToken(
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             10
         );
 
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             99900
         );
@@ -341,7 +341,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             90
         );
@@ -350,7 +350,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             false,
             COMMON_USER_NO_STAKER_2,
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             10,
             0
         );
@@ -359,7 +359,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             false,
             COMMON_USER_NO_STAKER_1,
             COMMON_USER_NO_STAKER_2.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             100,
             0
         );
@@ -367,7 +367,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             99990
         );
@@ -375,7 +375,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -385,13 +385,13 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         ITartarusV2(address(evvm)).fullTransfer(
             COMMON_USER_NO_STAKER_2.Address,
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
 
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -399,7 +399,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             99990
         );
@@ -408,7 +408,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             true,
             COMMON_USER_NO_STAKER_2,
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             10,
             0
         );
@@ -417,7 +417,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             false,
             COMMON_USER_NO_STAKER_1,
             COMMON_USER_NO_STAKER_2.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             100,
             0
         );
@@ -425,7 +425,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             99900
         );
@@ -433,7 +433,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             100
         );
@@ -444,7 +444,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             true,
             COMMON_USER_NO_STAKER_1,
             COMMON_USER_NO_STAKER_2.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             100000,
             0
         );
@@ -453,7 +453,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             false,
             COMMON_USER_NO_STAKER_2,
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             100,
             0
         );
@@ -463,7 +463,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             99900
         );
@@ -471,21 +471,21 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             100
         );
 
         ITartarusV1(address(evvm)).burnToken(
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             10
         );
 
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             99900
         );
@@ -493,7 +493,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             90
         );
@@ -502,7 +502,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             false,
             COMMON_USER_NO_STAKER_2,
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             10,
             0
         );
@@ -511,7 +511,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             false,
             COMMON_USER_NO_STAKER_1,
             COMMON_USER_NO_STAKER_2.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             100,
             0
         );
@@ -519,7 +519,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             99990
         );
@@ -527,7 +527,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -537,13 +537,13 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         ITartarusV2(address(evvm)).fullTransfer(
             COMMON_USER_NO_STAKER_2.Address,
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
 
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -551,7 +551,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             99990
         );
@@ -560,7 +560,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             true,
             COMMON_USER_NO_STAKER_2,
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             10,
             0
         );
@@ -569,7 +569,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             false,
             COMMON_USER_NO_STAKER_1,
             COMMON_USER_NO_STAKER_2.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             100,
             0
         );
@@ -577,7 +577,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             99900
         );
@@ -585,7 +585,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             100
         );
@@ -594,14 +594,14 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
 
         ITartarusV3(address(evvm)).burnToken(
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             99900
         );
 
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -609,7 +609,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             100
         );
@@ -620,7 +620,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             false,
             COMMON_USER_NO_STAKER_2,
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             50,
             0
         );
@@ -629,7 +629,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
             false,
             COMMON_USER_NO_STAKER_1,
             COMMON_USER_NO_STAKER_2.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             50,
             0
         );
@@ -637,7 +637,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -645,7 +645,7 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             100
         );

@@ -85,9 +85,9 @@ contract fuzzTest_P2PSwap_makeOrder is Test, Constants {
         // alternate tokens
         address tokenA = input.tokenScenario
             ? ETHER_ADDRESS
-            : MATE_TOKEN_ADDRESS;
+            : PRINCIPAL_TOKEN_ADDRESS;
         address tokenB = input.tokenScenario
-            ? MATE_TOKEN_ADDRESS
+            ? PRINCIPAL_TOKEN_ADDRESS
             : ETHER_ADDRESS;
 
         uint256 priorityFee = input.hasPriorityFee ? input.priorityFee : 0;
@@ -115,7 +115,7 @@ contract fuzzTest_P2PSwap_makeOrder is Test, Constants {
         // fund contract for reward distribution
         addBalance(
             address(p2pSwap),
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             initialContractBalance
         );
 
@@ -184,7 +184,7 @@ contract fuzzTest_P2PSwap_makeOrder is Test, Constants {
             evvm.getBalance(COMMON_USER_NO_STAKER_1.Address, tokenA),
             0 ether
         );
-        if (tokenA == MATE_TOKEN_ADDRESS) {
+        if (tokenA == PRINCIPAL_TOKEN_ADDRESS) {
             assertEq(
                 evvm.getBalance(address(p2pSwap), tokenA),
                 input.amountA + initialContractBalance
@@ -194,7 +194,7 @@ contract fuzzTest_P2PSwap_makeOrder is Test, Constants {
         }
 
         if (input.hasPriorityFee) {
-            if (tokenA == MATE_TOKEN_ADDRESS) {
+            if (tokenA == PRINCIPAL_TOKEN_ADDRESS) {
                 assertEq(
                     evvm.getBalance(COMMON_USER_STAKER.Address, tokenA),
                     input.priorityFee + rewardAmountMateToken

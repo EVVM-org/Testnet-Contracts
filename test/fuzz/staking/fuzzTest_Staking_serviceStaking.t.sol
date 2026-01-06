@@ -66,7 +66,7 @@ contract fuzzTest_Staking_serviceStaking is Test, Constants {
     ) private returns (uint256 totalOfMate) {
         evvm.addBalance(
             user,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             (staking.priceOfStaking() * stakingAmount)
         );
 
@@ -97,13 +97,13 @@ contract fuzzTest_Staking_serviceStaking is Test, Constants {
 
             if (input[i].isStaking) {
                 if (
-                    evvm.getBalance(address(mockContract), MATE_TOKEN_ADDRESS) <
+                    evvm.getBalance(address(mockContract), PRINCIPAL_TOKEN_ADDRESS) <
                     staking.priceOfStaking() * input[i].amount
                 ) {
                     uint256 totalOfStakeNeeded = input[i].amount -
                         (evvm.getBalance(
                             address(mockContract),
-                            MATE_TOKEN_ADDRESS
+                            PRINCIPAL_TOKEN_ADDRESS
                         ) / staking.priceOfStaking());
                     giveMateToExecute(
                         address(mockContract),

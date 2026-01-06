@@ -69,7 +69,7 @@ contract fuzzTest_NameService_makeOffer is Test, Constants {
     {
         evvm.addBalance(
             user.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             offerAmount + priorityFeeAmount
         );
 
@@ -175,9 +175,9 @@ contract fuzzTest_NameService_makeOffer is Test, Constants {
             block.timestamp + uint256(input.daysForExpire)
         );
 
-        assertEq(evvm.getBalance(selectedUser.Address, MATE_TOKEN_ADDRESS), 0);
+        assertEq(evvm.getBalance(selectedUser.Address, PRINCIPAL_TOKEN_ADDRESS), 0);
         assertEq(
-            evvm.getBalance(selectedFisher.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(selectedFisher.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount() +
                 (uint256(input.offerAmount) * 125) /
                 100_000
@@ -247,9 +247,9 @@ contract fuzzTest_NameService_makeOffer is Test, Constants {
             block.timestamp + uint256(input.daysForExpire)
         );
 
-        assertEq(evvm.getBalance(selectedUser.Address, MATE_TOKEN_ADDRESS), 0);
+        assertEq(evvm.getBalance(selectedUser.Address, PRINCIPAL_TOKEN_ADDRESS), 0);
         assertEq(
-            evvm.getBalance(selectedFisher.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(selectedFisher.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount() +
                 (uint256(input.offerAmount) * 125) /
                 100_000 +

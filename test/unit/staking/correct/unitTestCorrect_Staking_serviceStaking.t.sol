@@ -62,7 +62,7 @@ contract unitTestCorrect_Staking_serviceStaking is Test, Constants {
     ) private returns (uint256 totalOfMate) {
         evvm.addBalance(
             user,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             (staking.priceOfStaking() * stakingAmount)
         );
 
@@ -86,7 +86,7 @@ contract unitTestCorrect_Staking_serviceStaking is Test, Constants {
     function test__unit_correct__publicServiceStaking__stake() external {
         uint256 amountStakingBefore = evvm.getBalance(
             address(staking),
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
 
         uint256 totalOfMate = giveMateToExecute(address(mockContract), 10);
@@ -95,10 +95,10 @@ contract unitTestCorrect_Staking_serviceStaking is Test, Constants {
 
         assert(evvm.isAddressStaker(address(mockContract)));
 
-        assertEq(evvm.getBalance(address(mockContract), MATE_TOKEN_ADDRESS), 0);
+        assertEq(evvm.getBalance(address(mockContract), PRINCIPAL_TOKEN_ADDRESS), 0);
 
         assertEq(
-            evvm.getBalance(address(staking), MATE_TOKEN_ADDRESS),
+            evvm.getBalance(address(staking), PRINCIPAL_TOKEN_ADDRESS),
             amountStakingBefore + totalOfMate
         );
 
@@ -118,7 +118,7 @@ contract unitTestCorrect_Staking_serviceStaking is Test, Constants {
     function test__unit_correct__publicServiceStaking__unstake() external {
         uint256 amountStakingBefore = evvm.getBalance(
             address(staking),
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
 
         giveMateToExecute(address(mockContract), 10);
@@ -132,12 +132,12 @@ contract unitTestCorrect_Staking_serviceStaking is Test, Constants {
         assert(evvm.isAddressStaker(address(mockContract)));
 
         assertEq(
-            evvm.getBalance(address(mockContract), MATE_TOKEN_ADDRESS),
+            evvm.getBalance(address(mockContract), PRINCIPAL_TOKEN_ADDRESS),
             staking.priceOfStaking() * 5
         );
 
         assertEq(
-            evvm.getBalance(address(staking), MATE_TOKEN_ADDRESS),
+            evvm.getBalance(address(staking), PRINCIPAL_TOKEN_ADDRESS),
             amountStakingBefore +
                 (staking.priceOfStaking() * 5) +
                 evvm.getRewardAmount()
@@ -164,7 +164,7 @@ contract unitTestCorrect_Staking_serviceStaking is Test, Constants {
     function test__unit_correct__publicServiceStaking__fullUnstake() external {
         uint256 amountStakingBefore = evvm.getBalance(
             address(staking),
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
 
         giveMateToExecute(address(mockContract), 10);
@@ -180,12 +180,12 @@ contract unitTestCorrect_Staking_serviceStaking is Test, Constants {
         assert(!evvm.isAddressStaker(address(mockContract)));
 
         assertEq(
-            evvm.getBalance(address(mockContract), MATE_TOKEN_ADDRESS),
+            evvm.getBalance(address(mockContract), PRINCIPAL_TOKEN_ADDRESS),
             staking.priceOfStaking() * 10
         );
 
         assertEq(
-            evvm.getBalance(address(staking), MATE_TOKEN_ADDRESS),
+            evvm.getBalance(address(staking), PRINCIPAL_TOKEN_ADDRESS),
             amountStakingBefore + evvm.getRewardAmount()
         );
 
@@ -215,7 +215,7 @@ contract unitTestCorrect_Staking_serviceStaking is Test, Constants {
     {
         uint256 amountStakingBefore = evvm.getBalance(
             address(staking),
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
 
         giveMateToExecute(address(mockContract), 10);
@@ -234,10 +234,10 @@ contract unitTestCorrect_Staking_serviceStaking is Test, Constants {
 
         assert(evvm.isAddressStaker(address(mockContract)));
 
-        assertEq(evvm.getBalance(address(mockContract), MATE_TOKEN_ADDRESS), 0);
+        assertEq(evvm.getBalance(address(mockContract), PRINCIPAL_TOKEN_ADDRESS), 0);
 
         assertEq(
-            evvm.getBalance(address(staking), MATE_TOKEN_ADDRESS),
+            evvm.getBalance(address(staking), PRINCIPAL_TOKEN_ADDRESS),
             amountStakingBefore +
                 (staking.priceOfStaking() * 10) +
                 evvm.getRewardAmount()

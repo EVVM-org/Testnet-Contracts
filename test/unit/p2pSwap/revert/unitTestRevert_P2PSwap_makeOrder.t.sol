@@ -57,7 +57,7 @@ contract unitTestRevert_P2PSwap_makeOrder is Test, Constants {
     function test__unit_revert__makeOrder_invalidSignature() external {
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0;
@@ -145,7 +145,7 @@ contract unitTestRevert_P2PSwap_makeOrder is Test, Constants {
     function test__unit_revert__makeOrder_invalidPay() external {
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0;
@@ -233,7 +233,7 @@ contract unitTestRevert_P2PSwap_makeOrder is Test, Constants {
     function test__unit_revert__makeOrder_invalidSyncNonce() external {
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0;
@@ -321,7 +321,7 @@ contract unitTestRevert_P2PSwap_makeOrder is Test, Constants {
     function test__unit_revert__makeOrder_invalidAsyncNonce() external {
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0;

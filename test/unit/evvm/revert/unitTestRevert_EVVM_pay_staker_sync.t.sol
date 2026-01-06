@@ -223,7 +223,7 @@ contract unitTestRevert_EVVM_pay_staker_sync is Test, Constants {
     function test__unit_revert__pay_staker_sync__bSigAtToken() external {
         addBalance(
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             0.11 ether
         );
 
@@ -254,7 +254,7 @@ contract unitTestRevert_EVVM_pay_staker_sync is Test, Constants {
             COMMON_USER_NO_STAKER_1.Address,
             COMMON_USER_NO_STAKER_2.Address,
             "",
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             0.1 ether,
             0.01 ether,
             0,
@@ -268,7 +268,7 @@ contract unitTestRevert_EVVM_pay_staker_sync is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0.11 ether
         );

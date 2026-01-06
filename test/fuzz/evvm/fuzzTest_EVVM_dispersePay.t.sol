@@ -99,7 +99,7 @@ contract fuzzTest_EVVM_dispersePay is Test, Constants, EvvmStructs {
         vm.assume(
             input.amountA > 0 &&
                 input.amountB > 0 &&
-                input.token != MATE_TOKEN_ADDRESS
+                input.token != PRINCIPAL_TOKEN_ADDRESS
         );
 
         uint256 totalAmount = uint256(input.amountA) + uint256(input.amountB);
@@ -178,7 +178,7 @@ contract fuzzTest_EVVM_dispersePay is Test, Constants, EvvmStructs {
 
         if (selectedExecuter.Address == COMMON_USER_STAKER.Address) {
             assertEq(
-                evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+                evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
                 evvm.getRewardAmount()
             );
         }
@@ -191,7 +191,7 @@ contract fuzzTest_EVVM_dispersePay is Test, Constants, EvvmStructs {
             input.amountA > 0 &&
                 input.amountB > 0 &&
                 input.priorityFee > 0 &&
-                input.token != MATE_TOKEN_ADDRESS
+                input.token != PRINCIPAL_TOKEN_ADDRESS
         );
 
         uint256 totalAmount = uint256(input.amountA) + uint256(input.amountB);
@@ -270,7 +270,7 @@ contract fuzzTest_EVVM_dispersePay is Test, Constants, EvvmStructs {
 
         if (selectedExecuter.Address == COMMON_USER_STAKER.Address) {
             assertEq(
-                evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+                evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
                 evvm.getRewardAmount()
             );
 

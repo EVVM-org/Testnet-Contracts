@@ -146,7 +146,7 @@ contract unitTestRevert_EVVM_proxy is Test, Constants {
         vm.expectRevert();
         IExtraFunctionsV1(address(evvm)).burnToken(
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             10
         );
     }

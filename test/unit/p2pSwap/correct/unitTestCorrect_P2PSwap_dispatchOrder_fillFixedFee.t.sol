@@ -132,7 +132,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
         // 1. define params
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0;
@@ -154,7 +154,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
 
         addBalance(COMMON_USER_NO_STAKER_1.Address, tokenA, amountA);
         addBalance(COMMON_USER_NO_STAKER_2.Address, tokenB, amountB + fee);
-        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
+        addBalance(address(p2pSwap), PRINCIPAL_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(
@@ -251,7 +251,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
         // 1. define params
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0;
@@ -273,7 +273,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
 
         addBalance(COMMON_USER_NO_STAKER_1.Address, tokenA, amountA);
         addBalance(COMMON_USER_NO_STAKER_2.Address, tokenB, amountB + fee);
-        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
+        addBalance(address(p2pSwap), PRINCIPAL_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(
@@ -370,7 +370,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
         // 1. define params
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0.0001 ether;
@@ -400,7 +400,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
             tokenB,
             amountB + fee + priorityFee
         );
-        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
+        addBalance(address(p2pSwap), PRINCIPAL_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(
@@ -497,7 +497,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
         // 1. define params
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0.0001 ether;
@@ -527,7 +527,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
             tokenB,
             amountB + fee + priorityFee
         );
-        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
+        addBalance(address(p2pSwap), PRINCIPAL_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(
@@ -624,7 +624,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
         // 1. define params
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0;
@@ -646,7 +646,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
 
         addBalance(COMMON_USER_NO_STAKER_1.Address, tokenA, amountA);
         addBalance(COMMON_USER_NO_STAKER_2.Address, tokenB, amountB + fee);
-        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
+        addBalance(address(p2pSwap), PRINCIPAL_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(
@@ -743,7 +743,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
         // 1. define params
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0;
@@ -765,7 +765,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
 
         addBalance(COMMON_USER_NO_STAKER_1.Address, tokenA, amountA);
         addBalance(COMMON_USER_NO_STAKER_2.Address, tokenB, amountB + fee);
-        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
+        addBalance(address(p2pSwap), PRINCIPAL_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(
@@ -862,7 +862,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
         // 1. define params
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0.001 ether;
@@ -892,7 +892,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
             tokenB,
             amountB + fee + priorityFee
         );
-        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
+        addBalance(address(p2pSwap), PRINCIPAL_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(
@@ -989,7 +989,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
         // 1. define params
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0.0001 ether;
@@ -1019,7 +1019,7 @@ contract unitTestCorrect_P2PSwap_dispatchOrder_fillFixedFee is Test, Constants {
             tokenB,
             amountB + fee + priorityFee
         );
-        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
+        addBalance(address(p2pSwap), PRINCIPAL_TOKEN_ADDRESS, 50000000000000000000);
 
         // 2. create an order
         (uint256 market, uint256 orderId) = createOrder(

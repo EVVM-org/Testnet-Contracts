@@ -157,9 +157,9 @@ contract fuzzTest_P2PSwap_cancelOrder is Test, Constants {
         // alternate tokens
         address tokenA = input.tokenScenario
             ? ETHER_ADDRESS
-            : MATE_TOKEN_ADDRESS;
+            : PRINCIPAL_TOKEN_ADDRESS;
         address tokenB = input.tokenScenario
-            ? MATE_TOKEN_ADDRESS
+            ? PRINCIPAL_TOKEN_ADDRESS
             : ETHER_ADDRESS;
 
         uint256 priorityFee = input.hasPriorityFee ? input.priorityFee : 0;
@@ -179,7 +179,7 @@ contract fuzzTest_P2PSwap_cancelOrder is Test, Constants {
         // fund account
         addBalance(
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             priorityFee
         );
         addBalance(
@@ -190,7 +190,7 @@ contract fuzzTest_P2PSwap_cancelOrder is Test, Constants {
         // fund contract for reward distribution
         addBalance(
             address(p2pSwap),
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             initialContractBalance
         );
 
@@ -246,7 +246,7 @@ contract fuzzTest_P2PSwap_cancelOrder is Test, Constants {
                 evvm.getEvvmID(),
                 address(p2pSwap),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 0,
                 priorityFee,
                 nextNonceEvvm,
@@ -281,7 +281,7 @@ contract fuzzTest_P2PSwap_cancelOrder is Test, Constants {
             evvm.getBalance(COMMON_USER_NO_STAKER_1.Address, tokenA),
             input.amountA
         );
-        if (tokenA == MATE_TOKEN_ADDRESS) {
+        if (tokenA == PRINCIPAL_TOKEN_ADDRESS) {
             assertEq(
                 evvm.getBalance(address(p2pSwap), tokenA),
                 initialContractBalance
@@ -291,7 +291,7 @@ contract fuzzTest_P2PSwap_cancelOrder is Test, Constants {
         }
 
         if (input.hasPriorityFee) {
-            if (tokenA == MATE_TOKEN_ADDRESS) {
+            if (tokenA == PRINCIPAL_TOKEN_ADDRESS) {
                 assertEq(
                     evvm.getBalance(COMMON_USER_STAKER.Address, tokenA),
                     priorityFee +

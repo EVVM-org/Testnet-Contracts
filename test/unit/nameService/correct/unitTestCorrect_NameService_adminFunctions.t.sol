@@ -99,7 +99,7 @@ contract unitTestCorrect_NameService_adminFunctions is Test, Constants {
     function test__unit_correct__proposeWithdrawPrincipalTokens() external {
         uint256 totalInEvvm = evvm.getBalance(
             address(nameService),
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
         uint256 removeAmount = totalInEvvm / 10;
 
@@ -117,7 +117,7 @@ contract unitTestCorrect_NameService_adminFunctions is Test, Constants {
     function test__unit_correct__cancelWithdrawPrincipalTokenss() external {
         uint256 totalInEvvm = evvm.getBalance(
             address(nameService),
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
         uint256 removeAmount = totalInEvvm / 10;
 
@@ -136,7 +136,7 @@ contract unitTestCorrect_NameService_adminFunctions is Test, Constants {
     function test__unit_correct__claimWithdrawPrincipalTokens() external {
         uint256 totalInEvvm = evvm.getBalance(
             address(nameService),
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
         uint256 removeAmount = totalInEvvm / 10;
 
@@ -147,7 +147,7 @@ contract unitTestCorrect_NameService_adminFunctions is Test, Constants {
         vm.stopPrank();
 
         assertEq(
-            evvm.getBalance(address(nameService), MATE_TOKEN_ADDRESS),
+            evvm.getBalance(address(nameService), PRINCIPAL_TOKEN_ADDRESS),
             (totalInEvvm - removeAmount) + evvm.getRewardAmount()
         );
 

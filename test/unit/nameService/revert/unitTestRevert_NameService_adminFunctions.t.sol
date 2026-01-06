@@ -179,7 +179,7 @@ contract unitTestRevert_NameService_adminFunctions is Test, Constants {
     {
         uint256 totalInEvvm = evvm.getBalance(
             address(nameService),
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
         uint256 removeAmount = totalInEvvm / 10;
 
@@ -200,7 +200,7 @@ contract unitTestRevert_NameService_adminFunctions is Test, Constants {
     {
         uint256 total = evvm.getBalance(
             address(nameService),
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
 
         vm.startPrank(ADMIN.Address);
@@ -235,7 +235,7 @@ contract unitTestRevert_NameService_adminFunctions is Test, Constants {
     {
         uint256 totalInEvvm = evvm.getBalance(
             address(nameService),
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
         uint256 removeAmount = totalInEvvm / 10;
 
@@ -260,7 +260,7 @@ contract unitTestRevert_NameService_adminFunctions is Test, Constants {
     {
         uint256 totalInEvvm = evvm.getBalance(
             address(nameService),
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
         uint256 removeAmount = totalInEvvm / 10;
 
@@ -279,7 +279,7 @@ contract unitTestRevert_NameService_adminFunctions is Test, Constants {
         vm.stopPrank();
 
         assertEq(
-            evvm.getBalance(address(nameService), MATE_TOKEN_ADDRESS),
+            evvm.getBalance(address(nameService), PRINCIPAL_TOKEN_ADDRESS),
             totalInEvvm
         );
 
@@ -295,7 +295,7 @@ contract unitTestRevert_NameService_adminFunctions is Test, Constants {
     {
         uint256 totalInEvvm = evvm.getBalance(
             address(nameService),
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
         uint256 removeAmount = totalInEvvm / 10;
 
@@ -314,7 +314,7 @@ contract unitTestRevert_NameService_adminFunctions is Test, Constants {
         vm.stopPrank();
 
         assertEq(
-            evvm.getBalance(address(nameService), MATE_TOKEN_ADDRESS),
+            evvm.getBalance(address(nameService), PRINCIPAL_TOKEN_ADDRESS),
             totalInEvvm
         );
 

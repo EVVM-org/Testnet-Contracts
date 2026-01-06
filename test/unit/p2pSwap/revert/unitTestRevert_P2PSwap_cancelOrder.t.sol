@@ -132,7 +132,7 @@ contract unitTestRevert_P2PSwap_cancelOrder is Test, Constants {
     function test__unit_revert__cancelOrder_invalidSignature() external {
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0;
@@ -141,7 +141,7 @@ contract unitTestRevert_P2PSwap_cancelOrder is Test, Constants {
 
         // Fund user1 with amountA
         addBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS, amountA);
-        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
+        addBalance(address(p2pSwap), PRINCIPAL_TOKEN_ADDRESS, 50000000000000000000);
 
         (uint256 market, uint256 orderId) = createOrder(
             COMMON_USER_STAKER,
@@ -229,7 +229,7 @@ contract unitTestRevert_P2PSwap_cancelOrder is Test, Constants {
     function test__unit_revert__cancelOrder_invalidNonce() external {
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0;
@@ -238,7 +238,7 @@ contract unitTestRevert_P2PSwap_cancelOrder is Test, Constants {
 
         // Fund user1 with amountA
         addBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS, amountA);
-        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
+        addBalance(address(p2pSwap), PRINCIPAL_TOKEN_ADDRESS, 50000000000000000000);
 
         (uint256 market, uint256 orderId) = createOrder(
             COMMON_USER_STAKER,
@@ -326,7 +326,7 @@ contract unitTestRevert_P2PSwap_cancelOrder is Test, Constants {
     function test__unit_revert__cancelOrder_invalidOrder() external {
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0;
@@ -399,7 +399,7 @@ contract unitTestRevert_P2PSwap_cancelOrder is Test, Constants {
         // of the priority fees
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0.0001 ether;
@@ -412,7 +412,7 @@ contract unitTestRevert_P2PSwap_cancelOrder is Test, Constants {
             ETHER_ADDRESS,
             amountA + (priorityFee * 2)
         );
-        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
+        addBalance(address(p2pSwap), PRINCIPAL_TOKEN_ADDRESS, 50000000000000000000);
 
         (uint256 market, uint256 orderId) = createOrder(
             COMMON_USER_STAKER,

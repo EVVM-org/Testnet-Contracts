@@ -94,7 +94,7 @@ contract fuzzTest_Staking_publicStaking is Test, Constants {
     ) private returns (uint256 totalOfMate, uint256 totalOfPriorityFee) {
         evvm.addBalance(
             user,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             (staking.priceOfStaking() * stakingAmount) + priorityFee
         );
 
@@ -125,7 +125,7 @@ contract fuzzTest_Staking_publicStaking is Test, Constants {
                     evvm.getEvvmID(),
                     address(staking),
                     "",
-                    MATE_TOKEN_ADDRESS,
+                    PRINCIPAL_TOKEN_ADDRESS,
                     staking.priceOfStaking() * amountOfSmate,
                     priorityFee,
                     nonceEVVM,
@@ -140,7 +140,7 @@ contract fuzzTest_Staking_publicStaking is Test, Constants {
                     evvm.getEvvmID(),
                     address(staking),
                     "",
-                    MATE_TOKEN_ADDRESS,
+                    PRINCIPAL_TOKEN_ADDRESS,
                     priorityFee,
                     0,
                     nonceEVVM,
@@ -229,12 +229,12 @@ contract fuzzTest_Staking_publicStaking is Test, Constants {
 
             amountBeforeFisher = evvm.getBalance(
                 FISHER.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             );
 
             amountBeforeUser = evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             );
 
             totalStakedBefore = staking.getUserAmountStaked(
@@ -420,7 +420,7 @@ contract fuzzTest_Staking_publicStaking is Test, Constants {
 
             if (input[i].usingStaker) {
                 assertEq(
-                    evvm.getBalance(FISHER.Address, MATE_TOKEN_ADDRESS),
+                    evvm.getBalance(FISHER.Address, PRINCIPAL_TOKEN_ADDRESS),
                     amountBeforeFisher +
                         calculateRewardPerExecution(1) +
                         (
@@ -431,7 +431,7 @@ contract fuzzTest_Staking_publicStaking is Test, Constants {
                 );
             } else {
                 assertEq(
-                    evvm.getBalance(FISHER.Address, MATE_TOKEN_ADDRESS),
+                    evvm.getBalance(FISHER.Address, PRINCIPAL_TOKEN_ADDRESS),
                     amountBeforeFisher
                 );
             }
@@ -439,7 +439,7 @@ contract fuzzTest_Staking_publicStaking is Test, Constants {
             assertEq(
                 evvm.getBalance(
                     COMMON_USER_NO_STAKER_1.Address,
-                    MATE_TOKEN_ADDRESS
+                    PRINCIPAL_TOKEN_ADDRESS
                 ),
                 amountBeforeUser +
                     (

@@ -328,7 +328,7 @@ contract unitTestRevert_EVVM_payMultiple_syncExecution is Test, Constants {
             from: COMMON_USER_NO_STAKER_1.Address,
             to_address: COMMON_USER_NO_STAKER_2.Address,
             to_identity: "",
-            token: MATE_TOKEN_ADDRESS,
+            token: PRINCIPAL_TOKEN_ADDRESS,
             amount: 0.1 ether,
             priorityFee: 0.01 ether,
             nonce: 0,

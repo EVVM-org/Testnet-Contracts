@@ -61,7 +61,7 @@ contract unitTestCorrect_NameService_registrationUsername_SyncExecutionOnPay is
     {
         evvm.addBalance(
             user,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             nameService.getPriceOfRegistration(username) + priorityFeeAmount
         );
 
@@ -107,7 +107,7 @@ contract unitTestCorrect_NameService_registrationUsername_SyncExecutionOnPay is
 
         evvm.addBalance(
             COMMON_USER_NO_STAKER_2.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             1.67 ether
         );
 
@@ -140,7 +140,7 @@ contract unitTestCorrect_NameService_registrationUsername_SyncExecutionOnPay is
 
         evvm.addBalance(
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             nameService.getPriceToFlushUsername("testflush")
         );
 
@@ -225,14 +225,14 @@ contract unitTestCorrect_NameService_registrationUsername_SyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -286,14 +286,14 @@ contract unitTestCorrect_NameService_registrationUsername_SyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -347,12 +347,12 @@ contract unitTestCorrect_NameService_registrationUsername_SyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount() * 50
         );
     }
@@ -405,12 +405,12 @@ contract unitTestCorrect_NameService_registrationUsername_SyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             (evvm.getRewardAmount() * 50) + 0.001 ether
         );
     }
@@ -466,14 +466,14 @@ contract unitTestCorrect_NameService_registrationUsername_SyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -528,14 +528,14 @@ contract unitTestCorrect_NameService_registrationUsername_SyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -590,12 +590,12 @@ contract unitTestCorrect_NameService_registrationUsername_SyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount() * 50
         );
     }
@@ -649,12 +649,12 @@ contract unitTestCorrect_NameService_registrationUsername_SyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             (evvm.getRewardAmount() * 50) + 0.001 ether
         );
     }

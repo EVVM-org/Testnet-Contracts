@@ -54,7 +54,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
     ) private returns (uint256 totalOfMate, uint256 totalOfPriorityFee) {
         evvm.addBalance(
             user.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             (staking.priceOfStaking() * stakingAmount) + priorityFee
         );
 
@@ -92,7 +92,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
                 evvm.getEvvmID(),
                     address(staking),
                     "",
-                    MATE_TOKEN_ADDRESS,
+                    PRINCIPAL_TOKEN_ADDRESS,
                     staking.priceOfStaking() * amountOfSmate,
                     priorityFee,
                     nonceEVVM,
@@ -107,7 +107,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
                 evvm.getEvvmID(),
                     address(staking),
                     "",
-                    MATE_TOKEN_ADDRESS,
+                    PRINCIPAL_TOKEN_ADDRESS,
                     priorityFee,
                     0,
                     nonceEVVM,
@@ -158,7 +158,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 1001,
@@ -200,7 +200,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -225,7 +225,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(evvm),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 1001,
@@ -267,7 +267,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -296,7 +296,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(0),
                 "smate",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 1001,
@@ -338,7 +338,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -405,7 +405,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -430,7 +430,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 777,
                 totalOfPriorityFee,
                 1001,
@@ -472,7 +472,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -497,7 +497,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 777,
                 1001,
@@ -539,7 +539,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -564,7 +564,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 77,
@@ -606,7 +606,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -631,7 +631,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 1001,
@@ -673,7 +673,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -698,7 +698,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 1001,
@@ -740,7 +740,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -765,7 +765,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 1001,
@@ -807,7 +807,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -834,7 +834,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 1001,
@@ -876,7 +876,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -901,7 +901,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 1001,
@@ -943,7 +943,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -968,7 +968,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 1001,
@@ -1006,7 +1006,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -1075,7 +1075,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             (totalOfMate / 2) + totalOfPriorityFee
         );
@@ -1146,7 +1146,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -1247,7 +1247,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -1294,7 +1294,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -1347,7 +1347,7 @@ contract unitTestRevert_Staking_publicStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );

@@ -65,7 +65,7 @@ contract unitTestCorrect_NameService_addCustomMetadata_AsyncExecutionOnPay is
     ) private returns (uint256 totalPriorityFeeAmount) {
         evvm.addBalance(
             user.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             nameService.getPriceToAddCustomMetadata() + priorityFeeAmount
         );
         totalPriorityFeeAmount = priorityFeeAmount;
@@ -124,14 +124,14 @@ contract unitTestCorrect_NameService_addCustomMetadata_AsyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -185,14 +185,14 @@ contract unitTestCorrect_NameService_addCustomMetadata_AsyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -243,12 +243,12 @@ contract unitTestCorrect_NameService_addCustomMetadata_AsyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             (5 * evvm.getRewardAmount()) +
                 ((nameService.getPriceToAddCustomMetadata() * 50) / 100) +
                 totalPriorityFeeAmount
@@ -303,12 +303,12 @@ contract unitTestCorrect_NameService_addCustomMetadata_AsyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             (5 * evvm.getRewardAmount()) +
                 ((nameService.getPriceToAddCustomMetadata() * 50) / 100) +
                 totalPriorityFeeAmount

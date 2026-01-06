@@ -71,7 +71,7 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         AccountData memory user,
         uint256 priorityFeeAmount
     ) private returns (uint256 totalPriorityFeeAmount) {
-        evvm.addBalance(user.Address, MATE_TOKEN_ADDRESS, priorityFeeAmount);
+        evvm.addBalance(user.Address, PRINCIPAL_TOKEN_ADDRESS, priorityFeeAmount);
 
         totalPriorityFeeAmount = priorityFeeAmount;
     }
@@ -113,7 +113,7 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amountPriorityFee,
                 0,
                 1001,
@@ -148,12 +148,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -205,12 +205,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -245,7 +245,7 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amountPriorityFee,
                 0,
                 1001,
@@ -280,12 +280,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -319,7 +319,7 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amountPriorityFee,
                 0,
                 1001,
@@ -354,12 +354,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -393,7 +393,7 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amountPriorityFee,
                 0,
                 1001,
@@ -428,12 +428,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -467,7 +467,7 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amountPriorityFee,
                 0,
                 1001,
@@ -502,12 +502,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -541,7 +541,7 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amountPriorityFee,
                 0,
                 1001,
@@ -576,12 +576,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -615,7 +615,7 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
                 evvm.getEvvmID(),
                 address(evvm),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amountPriorityFee,
                 0,
                 1001,
@@ -650,12 +650,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -689,7 +689,7 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
                 evvm.getEvvmID(),
                 address(0),
                 "nameservice",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amountPriorityFee,
                 0,
                 1001,
@@ -724,12 +724,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -798,12 +798,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -837,7 +837,7 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 777,
                 0,
                 1001,
@@ -872,12 +872,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -911,7 +911,7 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amountPriorityFee,
                 1,
                 1001,
@@ -946,12 +946,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -985,7 +985,7 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amountPriorityFee,
                 0,
                 777,
@@ -1020,12 +1020,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -1059,7 +1059,7 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amountPriorityFee,
                 0,
                 1001,
@@ -1094,12 +1094,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -1133,7 +1133,7 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amountPriorityFee,
                 0,
                 1001,
@@ -1168,12 +1168,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -1223,12 +1223,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -1278,12 +1278,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -1345,12 +1345,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -1400,12 +1400,12 @@ contract unitTestRevert_NameService_acceptOffer is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             amountPriorityFee
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }

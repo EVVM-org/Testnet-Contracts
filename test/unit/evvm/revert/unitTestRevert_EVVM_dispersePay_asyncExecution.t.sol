@@ -374,7 +374,7 @@ contract unitTestRevert_EVVM_dispersePay_asyncExecution is Test, Constants {
         evvm.dispersePay(
             COMMON_USER_NO_STAKER_1.Address,
             toData,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             0.2 ether,
             0.01 ether,
             110011,

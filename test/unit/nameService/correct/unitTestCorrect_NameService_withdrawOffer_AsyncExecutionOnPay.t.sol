@@ -74,7 +74,7 @@ contract unitTestCorrect_NameService_withdrawOffer_AsyncExecutionOnPay is
         AccountData memory user,
         uint256 priorityFeeAmount
     ) private returns (uint256 totalPriorityFeeAmount) {
-        evvm.addBalance(user.Address, MATE_TOKEN_ADDRESS, priorityFeeAmount);
+        evvm.addBalance(user.Address, PRINCIPAL_TOKEN_ADDRESS, priorityFeeAmount);
 
         totalPriorityFeeAmount = priorityFeeAmount;
     }
@@ -131,14 +131,14 @@ contract unitTestCorrect_NameService_withdrawOffer_AsyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             checkDataBefore.amount
         );
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_3.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             evvm.getRewardAmount() + (((checkDataBefore.amount * 1) / 796))
         );
@@ -193,14 +193,14 @@ contract unitTestCorrect_NameService_withdrawOffer_AsyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             checkDataBefore.amount
         );
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_3.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             evvm.getRewardAmount() +
                 (((checkDataBefore.amount * 1) / 796)) +
@@ -252,12 +252,12 @@ contract unitTestCorrect_NameService_withdrawOffer_AsyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             checkDataBefore.amount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount() + (((checkDataBefore.amount * 1) / 796))
         );
     }
@@ -311,12 +311,12 @@ contract unitTestCorrect_NameService_withdrawOffer_AsyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             checkDataBefore.amount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount() +
                 (((checkDataBefore.amount * 1) / 796)) +
                 totalPriorityFee

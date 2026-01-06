@@ -110,8 +110,8 @@ contract fuzzTest_EVVM_payMultiple is Test, Constants, EvvmStructs {
             input.amount[0] > 0 &&
                 input.amount[1] > 0 &&
                 input.token[0] != input.token[1] &&
-                input.token[0] != MATE_TOKEN_ADDRESS &&
-                input.token[1] != MATE_TOKEN_ADDRESS &&
+                input.token[0] != PRINCIPAL_TOKEN_ADDRESS &&
+                input.token[1] != PRINCIPAL_TOKEN_ADDRESS &&
                 !(input.priorityFlag[0] && input.priorityFlag[1] && input.nonce[0] == input.nonce[1])
         );
 
@@ -228,7 +228,7 @@ contract fuzzTest_EVVM_payMultiple is Test, Constants, EvvmStructs {
             }
 
             assertEq(
-                evvm.getBalance(FISHER.Address, MATE_TOKEN_ADDRESS),
+                evvm.getBalance(FISHER.Address, PRINCIPAL_TOKEN_ADDRESS),
                 evvm.getRewardAmount() * 2,
                 "executor did not receive correct reward"
             );
@@ -246,7 +246,7 @@ contract fuzzTest_EVVM_payMultiple is Test, Constants, EvvmStructs {
             assertEq(
                 evvm.getBalance(
                     COMMON_USER_NO_STAKER_3.Address,
-                    MATE_TOKEN_ADDRESS
+                    PRINCIPAL_TOKEN_ADDRESS
                 ),
                 0
             );

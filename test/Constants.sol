@@ -55,7 +55,7 @@ abstract contract Constants is Test {
     bytes32 constant DEPOSIT_HISTORY_SMATE_IDENTIFIER = bytes32(uint256(1));
     bytes32 constant WITHDRAW_HISTORY_SMATE_IDENTIFIER = bytes32(uint256(2));
 
-    address constant MATE_TOKEN_ADDRESS =
+    address constant PRINCIPAL_TOKEN_ADDRESS =
         0x0000000000000000000000000000000000000001;
 
     address constant ETHER_ADDRESS = 0x0000000000000000000000000000000000000000;
@@ -210,7 +210,6 @@ abstract contract Constants is Test {
         if (address(p2pSwap) == address(0)) revert();
 
         evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x01);
-        
 
         executeBeforeSetUp();
     }
@@ -309,7 +308,7 @@ abstract contract Constants is Test {
                     evvm.getEvvmID(),
                     address(nameService),
                     "",
-                    MATE_TOKEN_ADDRESS,
+                    PRINCIPAL_TOKEN_ADDRESS,
                     0,
                     priorityFeeAmount,
                     nonceEVVM,
@@ -372,7 +371,7 @@ abstract contract Constants is Test {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amountToOffer,
                 priorityFeeAmountEVVM,
                 nonceEVVM,
@@ -423,7 +422,7 @@ abstract contract Constants is Test {
                     evvm.getEvvmID(),
                     address(nameService),
                     "",
-                    MATE_TOKEN_ADDRESS,
+                    PRINCIPAL_TOKEN_ADDRESS,
                     0,
                     priorityFeeAmountEVVM,
                     nonceEVVM,
@@ -490,7 +489,7 @@ abstract contract Constants is Test {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToAddCustomMetadata(),
                 priorityFeeAmountEVVM,
                 nonceEVVM,
@@ -533,7 +532,7 @@ abstract contract Constants is Test {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToFlushUsername(username),
                 priorityFeeAmountEVVM,
                 nonceEVVM,
@@ -580,7 +579,7 @@ abstract contract Constants is Test {
     ) internal virtual {
         evvm.addBalance(
             user.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             nameService.getPriceOfRegistration(username)
         );
 
@@ -627,7 +626,7 @@ abstract contract Constants is Test {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceOfRegistration(username),
                 0,
                 evvm.getNextCurrentSyncNonce(COMMON_USER_NO_STAKER_1.Address),
@@ -668,7 +667,7 @@ abstract contract Constants is Test {
 
         evvm.addBalance(
             user.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             nameService.getPriceToAddCustomMetadata()
         );
 
@@ -690,7 +689,7 @@ abstract contract Constants is Test {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToAddCustomMetadata(),
                 0,
                 nonceEVVM,
@@ -751,7 +750,7 @@ abstract contract Constants is Test {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToRemoveCustomMetadata(),
                 priorityFeeAmountEVVM,
                 nonceEVVM,
@@ -802,7 +801,7 @@ abstract contract Constants is Test {
                     evvm.getEvvmID(),
                     address(nameService),
                     "",
-                    MATE_TOKEN_ADDRESS,
+                    PRINCIPAL_TOKEN_ADDRESS,
                     0,
                     priorityFeeAmountEVVM,
                     nonceEVVM,
@@ -862,7 +861,7 @@ abstract contract Constants is Test {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.seePriceToRenew(usernameToRenew),
                 priorityFeeAmountEVVM,
                 nonceEVVM,
@@ -905,7 +904,7 @@ abstract contract Constants is Test {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToFlushCustomMetadata(username),
                 priorityFeeAmountEVVM,
                 nonceEVVM,
@@ -950,7 +949,7 @@ abstract contract Constants is Test {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceOfRegistration(username),
                 priorityFeeAmountEVVM,
                 nonceEVVM,
@@ -976,7 +975,7 @@ abstract contract Constants is Test {
         bytes memory signatureNameService;
         bytes memory signatureEVVM;
 
-        evvm.addBalance(user.Address, MATE_TOKEN_ADDRESS, amountToOffer);
+        evvm.addBalance(user.Address, PRINCIPAL_TOKEN_ADDRESS, amountToOffer);
 
         (v, r, s) = vm.sign(
             user.PrivateKey,
@@ -996,7 +995,7 @@ abstract contract Constants is Test {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amountToOffer,
                 0,
                 nonceEVVM,

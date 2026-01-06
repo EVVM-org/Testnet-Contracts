@@ -113,7 +113,7 @@ contract unitTestCorrect_EVVM_disperseCaPay is Test, Constants {
             0.000001 ether
         );
         assertEq(
-            evvm.getBalance(address(this), MATE_TOKEN_ADDRESS),
+            evvm.getBalance(address(this), PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount()
         );
     }

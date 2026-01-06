@@ -786,7 +786,7 @@ contract unitTestCorrect_EVVM_payMultiple is Test, Constants, EvvmStructs {
         );
 
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount() * 8
         );
 

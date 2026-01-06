@@ -66,7 +66,7 @@ contract unitTestCorrect_P2PSwap_makeOrder is Test, Constants {
     function test__unit_correct__makeOrder_paySync_noPriorityFee() external {
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0;
@@ -139,7 +139,7 @@ contract unitTestCorrect_P2PSwap_makeOrder is Test, Constants {
             market
         );
         assertEq(marketInfo.tokenA, ETHER_ADDRESS);
-        assertEq(marketInfo.tokenB, MATE_TOKEN_ADDRESS);
+        assertEq(marketInfo.tokenB, PRINCIPAL_TOKEN_ADDRESS);
         assertEq(marketInfo.maxSlot, 1);
         assertEq(marketInfo.ordersAvailable, 1);
 
@@ -153,7 +153,7 @@ contract unitTestCorrect_P2PSwap_makeOrder is Test, Constants {
     function test__unit_correct__makeOrder_paySync_priorityFee() external {
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0.0001 ether;
@@ -168,7 +168,7 @@ contract unitTestCorrect_P2PSwap_makeOrder is Test, Constants {
         );
 
         // Fund p2pswap address for rewarding
-        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
+        addBalance(address(p2pSwap), PRINCIPAL_TOKEN_ADDRESS, 50000000000000000000);
 
         // create signatures
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
@@ -236,7 +236,7 @@ contract unitTestCorrect_P2PSwap_makeOrder is Test, Constants {
         );
 
         assertEq(marketInfo.tokenA, ETHER_ADDRESS);
-        assertEq(marketInfo.tokenB, MATE_TOKEN_ADDRESS);
+        assertEq(marketInfo.tokenB, PRINCIPAL_TOKEN_ADDRESS);
         assertEq(marketInfo.maxSlot, 1);
         assertEq(marketInfo.ordersAvailable, 1);
         assertEq(evvm.getBalance(COMMON_USER_NO_STAKER_1.Address, tokenA), 0);
@@ -250,7 +250,7 @@ contract unitTestCorrect_P2PSwap_makeOrder is Test, Constants {
     function test__unit_correct__makeOrder_payAsync_priorityFee() external {
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0.0001 ether;
@@ -265,7 +265,7 @@ contract unitTestCorrect_P2PSwap_makeOrder is Test, Constants {
         );
 
         // Fund p2pswap address for rewarding
-        addBalance(address(p2pSwap), MATE_TOKEN_ADDRESS, 50000000000000000000);
+        addBalance(address(p2pSwap), PRINCIPAL_TOKEN_ADDRESS, 50000000000000000000);
 
         // create signatures
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
@@ -333,7 +333,7 @@ contract unitTestCorrect_P2PSwap_makeOrder is Test, Constants {
         );
 
         assertEq(marketInfo.tokenA, ETHER_ADDRESS);
-        assertEq(marketInfo.tokenB, MATE_TOKEN_ADDRESS);
+        assertEq(marketInfo.tokenB, PRINCIPAL_TOKEN_ADDRESS);
         assertEq(marketInfo.maxSlot, 1);
         assertEq(marketInfo.ordersAvailable, 1);
         assertEq(evvm.getBalance(COMMON_USER_NO_STAKER_1.Address, tokenA), 0);
@@ -347,7 +347,7 @@ contract unitTestCorrect_P2PSwap_makeOrder is Test, Constants {
     function test__unit_correct__makeOrder_payAsync_noPriorityFee() external {
         uint256 nonceP2PSwap = 14569;
         address tokenA = ETHER_ADDRESS;
-        address tokenB = MATE_TOKEN_ADDRESS;
+        address tokenB = PRINCIPAL_TOKEN_ADDRESS;
         uint256 amountA = 0.001 ether;
         uint256 amountB = 0.01 ether;
         uint256 priorityFee = 0;
@@ -420,7 +420,7 @@ contract unitTestCorrect_P2PSwap_makeOrder is Test, Constants {
             market
         );
         assertEq(marketInfo.tokenA, ETHER_ADDRESS);
-        assertEq(marketInfo.tokenB, MATE_TOKEN_ADDRESS);
+        assertEq(marketInfo.tokenB, PRINCIPAL_TOKEN_ADDRESS);
         assertEq(marketInfo.maxSlot, 1);
         assertEq(marketInfo.ordersAvailable, 1);
 

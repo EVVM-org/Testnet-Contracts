@@ -53,7 +53,7 @@ contract unitTestCorrect_Staking_goldenStaking is Test, Constants {
     ) private returns (uint256 totalOfMate) {
         evvm.addBalance(
             user,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             (staking.priceOfStaking() * stakingAmount) + priorityFee
         );
 
@@ -75,7 +75,7 @@ contract unitTestCorrect_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 0,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -104,7 +104,7 @@ contract unitTestCorrect_Staking_goldenStaking is Test, Constants {
         history = staking.getAddressHistory(GOLDEN_STAKER.Address);
 
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             calculateRewardPerExecution(1)
         );
         assertEq(history[0].timestamp, block.timestamp);
@@ -122,7 +122,7 @@ contract unitTestCorrect_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 0,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -152,7 +152,7 @@ contract unitTestCorrect_Staking_goldenStaking is Test, Constants {
         assert(evvm.isAddressStaker(GOLDEN_STAKER.Address));
 
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             calculateRewardPerExecution(2) + staking.priceOfStaking()
         );
 
@@ -176,7 +176,7 @@ contract unitTestCorrect_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 0,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -198,14 +198,14 @@ contract unitTestCorrect_Staking_goldenStaking is Test, Constants {
             staking.getTimeToUserUnlockFullUnstakingTime(GOLDEN_STAKER.Address)
         );
 
-        console2.log(evvm.getBalance(address(staking), MATE_TOKEN_ADDRESS));
+        console2.log(evvm.getBalance(address(staking), PRINCIPAL_TOKEN_ADDRESS));
 
         staking.goldenStaking(false, 2, "");
 
         vm.stopPrank();
 
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             (calculateRewardPerExecution(1)) + (staking.priceOfStaking() * 2)
         );
 

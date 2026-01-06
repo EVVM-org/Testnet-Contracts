@@ -76,7 +76,7 @@ contract fuzzTest_EVVM_caPay is Test, Constants {
         );
 
         assertEq(
-            evvm.getBalance(address(c), MATE_TOKEN_ADDRESS),
+            evvm.getBalance(address(c), PRINCIPAL_TOKEN_ADDRESS),
             input.isCaStaker ? evvm.getRewardAmount() : 0
         );
     }

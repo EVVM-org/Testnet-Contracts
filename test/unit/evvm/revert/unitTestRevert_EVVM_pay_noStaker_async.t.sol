@@ -15,33 +15,13 @@ pragma abicoder v2;
 
 import "forge-std/Test.sol";
 import "forge-std/console2.sol";
+import "test/Constants.sol";
+import "@evvm/testnet-contracts/library/Erc191TestBuilder.sol";
 
-import {Constants} from "test/Constants.sol";
-import {
-    EvvmStructs
-} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
-
-import {Staking} from "@evvm/testnet-contracts/contracts/staking/Staking.sol";
-import {
-    NameService
-} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
-import {
-    NameServiceStructs
-} from "@evvm/testnet-contracts/contracts/nameService/lib/NameServiceStructs.sol";
 import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
 import {
-    Erc191TestBuilder
-} from "@evvm/testnet-contracts/library/Erc191TestBuilder.sol";
-import {
-    Estimator
-} from "@evvm/testnet-contracts/contracts/staking/Estimator.sol";
-import {
-    EvvmStorage
-} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
-import {
-    Treasury
-} from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
-
+    ErrorsLib
+} from "@evvm/testnet-contracts/contracts/evvm/lib/ErrorsLib.sol";
 contract unitTestRevert_EVVM_pay_noStaker_async is Test, Constants {
     AccountData COMMON_USER_NO_STAKER_3 = WILDCARD_USER;
 
@@ -58,12 +38,12 @@ contract unitTestRevert_EVVM_pay_noStaker_async is Test, Constants {
      * but in the executor test an fisher try to execute the payment who obivously
      * is not the executor.
      * Function to test:
-     * bSigAt[section]: incorrect signature // bad signature
+     * InvalidSignature_[section]: incorrect signature // bad signature
      * wValAt[section]: wrong value
      * some denominations on test can be explicit expleined
      */
 
-    function test__unit_revert__pay_noStaker_async__bSigAtFrom() external {
+    function test__unit_revert__pay_noStaker_async__InvalidSignature_From() external {
         addBalance(COMMON_USER_NO_STAKER_2.Address, ETHER_ADDRESS, 0.11 ether);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -87,7 +67,7 @@ contract unitTestRevert_EVVM_pay_noStaker_async is Test, Constants {
 
         vm.startPrank(COMMON_USER_NO_STAKER_3.Address);
 
-        vm.expectRevert();
+        vm.expectRevert(ErrorsLib.InvalidSignature.selector);
         evvm.pay(
             COMMON_USER_NO_STAKER_2.Address,
             COMMON_USER_NO_STAKER_3.Address,
@@ -109,7 +89,7 @@ contract unitTestRevert_EVVM_pay_noStaker_async is Test, Constants {
         );
     }
 
-    function test__unit_revert__pay_noStaker_async__bSigAtToAddress() external {
+    function test__unit_revert__pay_noStaker_async__InvalidSignature_ToAddress() external {
         addBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS, 0.11 ether);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -155,7 +135,7 @@ contract unitTestRevert_EVVM_pay_noStaker_async is Test, Constants {
         );
     }
 
-    function test__unit_revert__pay_noStaker_async__bSigAtToIdentity()
+    function test__unit_revert__pay_noStaker_async__InvalidSignature_ToIdentity()
         external
     {
         _execute_makeRegistrationUsername(
@@ -217,10 +197,10 @@ contract unitTestRevert_EVVM_pay_noStaker_async is Test, Constants {
         );
     }
 
-    function test__unit_revert__pay_noStaker_async__bSigAtToken() external {
+    function test__unit_revert__pay_noStaker_async__InvalidSignature_Token() external {
         addBalance(
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             0.11 ether
         );
 
@@ -251,7 +231,7 @@ contract unitTestRevert_EVVM_pay_noStaker_async is Test, Constants {
             COMMON_USER_NO_STAKER_1.Address,
             COMMON_USER_NO_STAKER_2.Address,
             "",
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             0.1 ether,
             0.01 ether,
             1001,
@@ -265,13 +245,13 @@ contract unitTestRevert_EVVM_pay_noStaker_async is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0.11 ether
         );
     }
 
-    function test__unit_revert__pay_noStaker_async__bSigAtAmount() external {
+    function test__unit_revert__pay_noStaker_async__InvalidSignature_Amount() external {
         addBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS, 1.11 ether);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             COMMON_USER_NO_STAKER_1.PrivateKey,
@@ -317,7 +297,7 @@ contract unitTestRevert_EVVM_pay_noStaker_async is Test, Constants {
         );
     }
 
-    function test__unit_revert__pay_noStaker_async__bSigAtPriorityFee()
+    function test__unit_revert__pay_noStaker_async__InvalidSignature_PriorityFee()
         external
     {
         addBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS, 1.11 ether);
@@ -366,7 +346,7 @@ contract unitTestRevert_EVVM_pay_noStaker_async is Test, Constants {
         );
     }
 
-    function test__unit_revert__pay_noStaker_async__bSigAtNonceNumber()
+    function test__unit_revert__pay_noStaker_async__InvalidSignature_NonceNumber()
         external
     {
         addBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS, 0.11 ether);
@@ -415,7 +395,7 @@ contract unitTestRevert_EVVM_pay_noStaker_async is Test, Constants {
         );
     }
 
-    function test__unit_revert__pay_noStaker_async__bSigAtPriorityFlag()
+    function test__unit_revert__pay_noStaker_async__InvalidSignature_PriorityFlag()
         external
     {
         addBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS, 0.11 ether);
@@ -464,7 +444,7 @@ contract unitTestRevert_EVVM_pay_noStaker_async is Test, Constants {
         );
     }
 
-    function test__unit_revert__pay_noStaker_async__bSigAtToExecutor()
+    function test__unit_revert__pay_noStaker_async__InvalidSignature_ToExecutor()
         external
     {
         addBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS, 0.11 ether);

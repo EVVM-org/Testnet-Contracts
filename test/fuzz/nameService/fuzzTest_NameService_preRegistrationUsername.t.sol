@@ -170,14 +170,14 @@ contract fuzzTest_NameService_preRegistrationUsername is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -194,7 +194,7 @@ contract fuzzTest_NameService_preRegistrationUsername is Test, Constants {
 
         addBalance(
             selectedUser.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             input.priorityFeeAmount
         );
 
@@ -249,14 +249,14 @@ contract fuzzTest_NameService_preRegistrationUsername is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -292,7 +292,7 @@ contract fuzzTest_NameService_preRegistrationUsername is Test, Constants {
 
         uint256 balanceStakerBefore = evvm.getBalance(
             COMMON_USER_STAKER.Address,
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
 
         vm.startPrank(COMMON_USER_STAKER.Address);
@@ -326,12 +326,12 @@ contract fuzzTest_NameService_preRegistrationUsername is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount() + balanceStakerBefore
         );
     }
@@ -347,7 +347,7 @@ contract fuzzTest_NameService_preRegistrationUsername is Test, Constants {
 
         addBalance(
             selectedUser.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             input.priorityFeeAmount
         );
 
@@ -373,7 +373,7 @@ contract fuzzTest_NameService_preRegistrationUsername is Test, Constants {
 
         uint256 balanceStakerBefore = evvm.getBalance(
             COMMON_USER_STAKER.Address,
-            MATE_TOKEN_ADDRESS
+            PRINCIPAL_TOKEN_ADDRESS
         );
 
         vm.startPrank(COMMON_USER_STAKER.Address);
@@ -407,12 +407,12 @@ contract fuzzTest_NameService_preRegistrationUsername is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount() +
                 balanceStakerBefore +
                 input.priorityFeeAmount

@@ -81,7 +81,7 @@ contract unitTestCorrect_EVVM_caPay is Test, Constants {
             0.001 ether
         );
         assertEq(
-            evvm.getBalance(address(this), MATE_TOKEN_ADDRESS),
+            evvm.getBalance(address(this), PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount()
         );
     }

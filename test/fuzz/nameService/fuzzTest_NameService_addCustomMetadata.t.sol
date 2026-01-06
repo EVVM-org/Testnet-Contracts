@@ -73,7 +73,7 @@ contract fuzzTest_NameService_addCustomMetadata is Test, Constants {
     ) private returns (uint256 totalPriorityFeeAmount) {
         evvm.addBalance(
             user.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             nameService.getPriceToAddCustomMetadata() + priorityFeeAmount
         );
         totalPriorityFeeAmount = priorityFeeAmount;
@@ -229,14 +229,14 @@ contract fuzzTest_NameService_addCustomMetadata is Test, Constants {
             assertEq(
                 evvm.getBalance(
                     COMMON_USER_NO_STAKER_1.Address,
-                    MATE_TOKEN_ADDRESS
+                    PRINCIPAL_TOKEN_ADDRESS
                 ),
                 0
             );
             assertEq(
                 evvm.getBalance(
                     COMMON_USER_NO_STAKER_2.Address,
-                    MATE_TOKEN_ADDRESS
+                    PRINCIPAL_TOKEN_ADDRESS
                 ),
                 0
             );
@@ -314,14 +314,14 @@ contract fuzzTest_NameService_addCustomMetadata is Test, Constants {
             assertEq(
                 evvm.getBalance(
                     COMMON_USER_NO_STAKER_1.Address,
-                    MATE_TOKEN_ADDRESS
+                    PRINCIPAL_TOKEN_ADDRESS
                 ),
                 0
             );
             assertEq(
                 evvm.getBalance(
                     COMMON_USER_NO_STAKER_2.Address,
-                    MATE_TOKEN_ADDRESS
+                    PRINCIPAL_TOKEN_ADDRESS
                 ),
                 0
             );
@@ -371,7 +371,7 @@ contract fuzzTest_NameService_addCustomMetadata is Test, Constants {
 
             amountBeforeExecution = evvm.getBalance(
                 COMMON_USER_STAKER.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             );
             vm.startPrank(COMMON_USER_STAKER.Address);
             nameService.addCustomMetadata(
@@ -405,12 +405,12 @@ contract fuzzTest_NameService_addCustomMetadata is Test, Constants {
             assertEq(
                 evvm.getBalance(
                     COMMON_USER_NO_STAKER_1.Address,
-                    MATE_TOKEN_ADDRESS
+                    PRINCIPAL_TOKEN_ADDRESS
                 ),
                 0
             );
             assertEq(
-                evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+                evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
                 amountBeforeExecution +
                     ((5 * evvm.getRewardAmount()) +
                         ((nameService.getPriceToAddCustomMetadata() * 50) /
@@ -462,7 +462,7 @@ contract fuzzTest_NameService_addCustomMetadata is Test, Constants {
 
             amountBeforeExecution = evvm.getBalance(
                 COMMON_USER_STAKER.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             );
             vm.startPrank(COMMON_USER_STAKER.Address);
             nameService.addCustomMetadata(
@@ -496,12 +496,12 @@ contract fuzzTest_NameService_addCustomMetadata is Test, Constants {
             assertEq(
                 evvm.getBalance(
                     COMMON_USER_NO_STAKER_1.Address,
-                    MATE_TOKEN_ADDRESS
+                    PRINCIPAL_TOKEN_ADDRESS
                 ),
                 0
             );
             assertEq(
-                evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+                evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
                 amountBeforeExecution +
                     ((5 * evvm.getRewardAmount()) +
                         ((nameService.getPriceToAddCustomMetadata() * 50) /

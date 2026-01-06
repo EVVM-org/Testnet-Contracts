@@ -70,7 +70,7 @@ contract fuzzTest_NameService_withdrawOffer is Test, Constants {
         AccountData memory user,
         uint256 priorityFeeAmount
     ) private returns (uint256 totalPriorityFeeAmount) {
-        evvm.addBalance(user.Address, MATE_TOKEN_ADDRESS, priorityFeeAmount);
+        evvm.addBalance(user.Address, PRINCIPAL_TOKEN_ADDRESS, priorityFeeAmount);
 
         totalPriorityFeeAmount = priorityFeeAmount;
     }
@@ -178,11 +178,11 @@ contract fuzzTest_NameService_withdrawOffer is Test, Constants {
         assertEq(checkDataAfter.expireDate, checkDataBefore.expireDate);
 
         assertEq(
-            evvm.getBalance(selectedUser.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(selectedUser.Address, PRINCIPAL_TOKEN_ADDRESS),
             checkDataBefore.amount
         );
         assertEq(
-            evvm.getBalance(selectedExecuter.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(selectedExecuter.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount() + (((checkDataBefore.amount * 1) / 796))
         );
     }
@@ -272,11 +272,11 @@ contract fuzzTest_NameService_withdrawOffer is Test, Constants {
         assertEq(checkDataAfter.expireDate, checkDataBefore.expireDate);
 
         assertEq(
-            evvm.getBalance(selectedUser.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(selectedUser.Address, PRINCIPAL_TOKEN_ADDRESS),
             checkDataBefore.amount
         );
         assertEq(
-            evvm.getBalance(selectedExecuter.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(selectedExecuter.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount() +
                 (((checkDataBefore.amount * 1) / 796)) +
                 input.priorityFeeAmountEVVM

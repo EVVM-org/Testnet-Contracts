@@ -58,7 +58,7 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
     {
         evvm.addBalance(
             user.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             nameService.getPriceToAddCustomMetadata() + priorityFeeAmount
         );
 
@@ -105,7 +105,7 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToAddCustomMetadata(),
                 totalPriorityFeeAmount,
                 1001,
@@ -147,12 +147,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -210,12 +210,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -251,7 +251,7 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToAddCustomMetadata(),
                 totalPriorityFeeAmount,
                 1001,
@@ -291,12 +291,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -331,7 +331,7 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToAddCustomMetadata(),
                 totalPriorityFeeAmount,
                 1001,
@@ -371,12 +371,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -413,7 +413,7 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToAddCustomMetadata(),
                 totalPriorityFeeAmount,
                 1001,
@@ -453,12 +453,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -495,7 +495,7 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToAddCustomMetadata(),
                 totalPriorityFeeAmount,
                 1001,
@@ -535,12 +535,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -575,7 +575,7 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToAddCustomMetadata(),
                 totalPriorityFeeAmount,
                 1001,
@@ -615,12 +615,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -657,7 +657,7 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
                 evvm.getEvvmID(),
                 address(evvm),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToAddCustomMetadata(),
                 totalPriorityFeeAmount,
                 1001,
@@ -697,12 +697,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -739,7 +739,7 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
                 evvm.getEvvmID(),
                 address(0),
                 "mtenameservices",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToAddCustomMetadata(),
                 totalPriorityFeeAmount,
                 1001,
@@ -779,12 +779,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -861,12 +861,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -901,7 +901,7 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 7,
                 totalPriorityFeeAmount,
                 1001,
@@ -941,12 +941,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -983,7 +983,7 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToAddCustomMetadata(),
                 7,
                 1001,
@@ -1023,12 +1023,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -1065,7 +1065,7 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToAddCustomMetadata(),
                 totalPriorityFeeAmount,
                 777,
@@ -1105,12 +1105,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -1147,7 +1147,7 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToAddCustomMetadata(),
                 totalPriorityFeeAmount,
                 1001,
@@ -1187,12 +1187,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -1229,7 +1229,7 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
                 evvm.getEvvmID(),
                 address(nameService),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 nameService.getPriceToAddCustomMetadata(),
                 totalPriorityFeeAmount,
                 1001,
@@ -1269,12 +1269,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -1328,12 +1328,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -1387,12 +1387,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -1448,12 +1448,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalPriceToAddCustomMetadata + totalPriorityFeeAmount
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }
@@ -1506,12 +1506,12 @@ contract unitTestRevert_NameService_addCustomMetadata is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             0
         );
     }

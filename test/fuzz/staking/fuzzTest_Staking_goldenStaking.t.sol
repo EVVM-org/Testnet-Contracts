@@ -71,7 +71,7 @@ contract fuzzTest_Staking_goldenStaking is Test, Constants {
     ) private returns (uint256 totalAmount) {
         evvm.addBalance(
             user,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             staking.priceOfStaking() * stakingAmount
         );
 
@@ -93,7 +93,7 @@ contract fuzzTest_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 amount,
                 0,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -128,7 +128,7 @@ contract fuzzTest_Staking_goldenStaking is Test, Constants {
 
             amountBefore = evvm.getBalance(
                 GOLDEN_STAKER.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             );
             if (input[i].isStaking) {
                 // staking
@@ -201,7 +201,7 @@ contract fuzzTest_Staking_goldenStaking is Test, Constants {
                 .getAddressHistoryByIndex(GOLDEN_STAKER.Address, i + 1);
 
             assertEq(
-                evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+                evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
                 amountBefore +
                     calculateRewardPerExecution(
                         evvm.isAddressStaker(GOLDEN_STAKER.Address) ? 1 : 0

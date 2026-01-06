@@ -472,7 +472,7 @@ contract unitTestCorrect_EVVM_dispersePay_sync is Test, Constants, EvvmStructs {
         );
 
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount()
         );
     }
@@ -559,7 +559,7 @@ contract unitTestCorrect_EVVM_dispersePay_sync is Test, Constants, EvvmStructs {
             0.00000001 ether
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount()
         );
     }
@@ -643,7 +643,7 @@ contract unitTestCorrect_EVVM_dispersePay_sync is Test, Constants, EvvmStructs {
         );
         assertEq(evvm.getBalance(COMMON_USER_STAKER.Address, ETHER_ADDRESS), 0);
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount()
         );
     }
@@ -730,7 +730,7 @@ contract unitTestCorrect_EVVM_dispersePay_sync is Test, Constants, EvvmStructs {
             0.00000001 ether
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount()
         );
     }

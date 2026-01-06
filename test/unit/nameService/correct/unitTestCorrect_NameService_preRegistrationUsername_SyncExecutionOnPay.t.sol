@@ -111,14 +111,14 @@ contract unitTestCorrect_NameService_preRegistrationUsername_SyncExecutionOnPay 
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -127,7 +127,7 @@ contract unitTestCorrect_NameService_preRegistrationUsername_SyncExecutionOnPay 
     function test__unit_correct__preRegistrationUsername__nS_PF() external {
         uint256 totalPriorityFeeAmount = addBalance(
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             0.001 ether
         );
 
@@ -171,14 +171,14 @@ contract unitTestCorrect_NameService_preRegistrationUsername_SyncExecutionOnPay 
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
@@ -226,12 +226,12 @@ contract unitTestCorrect_NameService_preRegistrationUsername_SyncExecutionOnPay 
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount()
         );
     }
@@ -239,7 +239,7 @@ contract unitTestCorrect_NameService_preRegistrationUsername_SyncExecutionOnPay 
     function test__unit_correct__preRegistrationUsername__S_PF() external {
         uint256 totalPriorityFeeAmount = addBalance(
             COMMON_USER_NO_STAKER_1.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             0.001 ether
         );
 
@@ -283,12 +283,12 @@ contract unitTestCorrect_NameService_preRegistrationUsername_SyncExecutionOnPay 
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount() + totalPriorityFeeAmount
         );
     }

@@ -76,7 +76,7 @@ contract fuzzTest_NameService_flushUsername is Test, Constants {
     {
         evvm.addBalance(
             user.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             nameService.getPriceToFlushUsername(usernameToFlushCustomMetadata) +
                 priorityFeeAmount
         );
@@ -200,12 +200,12 @@ contract fuzzTest_NameService_flushUsername is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(userToExecuteTx.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(userToExecuteTx.Address, PRINCIPAL_TOKEN_ADDRESS),
             ((5 * evvm.getRewardAmount()) * amountOfSlotsBefore) +
                 totalPriorityFeeAmount
         );
@@ -285,12 +285,12 @@ contract fuzzTest_NameService_flushUsername is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(userToExecuteTx.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(userToExecuteTx.Address, PRINCIPAL_TOKEN_ADDRESS),
             ((5 * evvm.getRewardAmount()) * amountOfSlotsBefore) +
                 totalPriorityFeeAmount
         );

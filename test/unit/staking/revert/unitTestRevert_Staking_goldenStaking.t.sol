@@ -51,7 +51,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
     ) private returns (uint256 totalOfMate, uint256 totalOfPriorityFee) {
         evvm.addBalance(
             user,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             (staking.priceOfStaking() * stakingAmount) + priorityFee
         );
 
@@ -82,7 +82,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                     evvm.getEvvmID(),
                     address(staking),
                     "",
-                    MATE_TOKEN_ADDRESS,
+                    PRINCIPAL_TOKEN_ADDRESS,
                     staking.priceOfStaking() * amountOfSmate,
                     priorityFee,
                     nonceEVVM,
@@ -97,7 +97,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                     evvm.getEvvmID(),
                     address(staking),
                     "",
-                    MATE_TOKEN_ADDRESS,
+                    PRINCIPAL_TOKEN_ADDRESS,
                     priorityFee,
                     0,
                     nonceEVVM,
@@ -149,7 +149,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 evvm.getNextCurrentSyncNonce(COMMON_USER_NO_STAKER_1.Address),
@@ -174,7 +174,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_1.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             totalOfMate + totalOfPriorityFee
         );
@@ -194,7 +194,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -230,7 +230,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -253,7 +253,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
 
         assert(!evvm.isAddressStaker(GOLDEN_STAKER.Address));
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             totalOfMate + totalOfPriorityFee
         );
     }
@@ -271,7 +271,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(this),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -294,7 +294,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
 
         assert(!evvm.isAddressStaker(GOLDEN_STAKER.Address));
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             totalOfMate + totalOfPriorityFee
         );
     }
@@ -316,7 +316,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(0),
                 "staking",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -339,7 +339,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
 
         assert(!evvm.isAddressStaker(GOLDEN_STAKER.Address));
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             totalOfMate + totalOfPriorityFee
         );
     }
@@ -380,7 +380,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
 
         assert(!evvm.isAddressStaker(GOLDEN_STAKER.Address));
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             totalOfMate + totalOfPriorityFee
         );
     }
@@ -398,7 +398,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 1,
                 totalOfPriorityFee,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -421,7 +421,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
 
         assert(!evvm.isAddressStaker(GOLDEN_STAKER.Address));
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             totalOfMate + totalOfPriorityFee
         );
     }
@@ -439,7 +439,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 1000,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -462,7 +462,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
 
         assert(!evvm.isAddressStaker(GOLDEN_STAKER.Address));
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             totalOfMate + totalOfPriorityFee
         );
     }
@@ -480,7 +480,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 777,
@@ -503,7 +503,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
 
         assert(!evvm.isAddressStaker(GOLDEN_STAKER.Address));
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             totalOfMate + totalOfPriorityFee
         );
     }
@@ -521,7 +521,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -544,7 +544,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
 
         assert(!evvm.isAddressStaker(GOLDEN_STAKER.Address));
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             totalOfMate + totalOfPriorityFee
         );
     }
@@ -562,7 +562,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 totalOfPriorityFee,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -585,7 +585,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
 
         assert(!evvm.isAddressStaker(GOLDEN_STAKER.Address));
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             totalOfMate + totalOfPriorityFee
         );
     }
@@ -605,7 +605,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 0,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -630,7 +630,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
 
         assert(evvm.isAddressStaker(GOLDEN_STAKER.Address));
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             getAmountOfRewardsPerExecution(1)
         );
     }
@@ -650,7 +650,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 0,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -675,7 +675,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
 
         assert(evvm.isAddressStaker(GOLDEN_STAKER.Address));
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             getAmountOfRewardsPerExecution(1)
         );
     }
@@ -699,7 +699,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
                 evvm.getEvvmID(),
                 address(staking),
                 "",
-                MATE_TOKEN_ADDRESS,
+                PRINCIPAL_TOKEN_ADDRESS,
                 totalOfMate,
                 0,
                 evvm.getNextCurrentSyncNonce(GOLDEN_STAKER.Address),
@@ -728,7 +728,7 @@ contract unitTestRevert_Staking_goldenStaking is Test, Constants {
 
         assert(!evvm.isAddressStaker(GOLDEN_STAKER.Address));
         assertEq(
-            evvm.getBalance(GOLDEN_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(GOLDEN_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             getAmountOfRewardsPerExecution(1) + totalOfMate
         );
     }

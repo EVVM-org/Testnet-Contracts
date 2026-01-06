@@ -78,7 +78,7 @@ contract unitTestCorrect_NameService_makeOffer_AsyncExecutionOnPay is
     {
         evvm.addBalance(
             user.Address,
-            MATE_TOKEN_ADDRESS,
+            PRINCIPAL_TOKEN_ADDRESS,
             offerAmount + priorityFeeAmount
         );
 
@@ -134,14 +134,14 @@ contract unitTestCorrect_NameService_makeOffer_AsyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_3.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             evvm.getRewardAmount() + (totalOfferAmount * 125) / 100_000
         );
@@ -194,14 +194,14 @@ contract unitTestCorrect_NameService_makeOffer_AsyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_3.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             evvm.getRewardAmount() +
                 ((totalOfferAmount * 125) / 100_000) +
@@ -255,12 +255,12 @@ contract unitTestCorrect_NameService_makeOffer_AsyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount() + (totalOfferAmount * 125) / 100_000
         );
     }
@@ -311,12 +311,12 @@ contract unitTestCorrect_NameService_makeOffer_AsyncExecutionOnPay is
         assertEq(
             evvm.getBalance(
                 COMMON_USER_NO_STAKER_2.Address,
-                MATE_TOKEN_ADDRESS
+                PRINCIPAL_TOKEN_ADDRESS
             ),
             0
         );
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, MATE_TOKEN_ADDRESS),
+            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
             evvm.getRewardAmount() +
                 ((totalOfferAmount * 125) / 100_000) +
                 priorityFeeAmount
