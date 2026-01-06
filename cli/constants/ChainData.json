@@ -1022,5 +1022,58 @@
       "GasService": ""
     },
     "ExplorerToAddress": "https://testnet.cyberscan.co/address/"
+  },
+  "98867": {
+    "Chain": "Plume Testnet",
+    "Hyperlane": {
+      "DomainId": 0,
+      "MailboxAddress": ""
+    },
+    "LayerZero": {
+      "EId": 0,
+      "EndpointAddress": ""
+    },
+    "Axelar": {
+      "ChainName": "",
+      "Gateway": "",
+      "GasService": ""
+    },
+    "ExplorerToAddress": "https://testnet-explorer.plume.org/address/"
+  },
+
+  "763373": {
+    "Chain": "Ink Sepolia Testnet",
+    "Hyperlane": {
+      "DomainId": 0,
+      "MailboxAddress": ""
+    },
+    "LayerZero": {
+      "EId": 0,
+      "EndpointAddress": ""
+    },
+    "Axelar": {
+      "ChainName": "",
+      "Gateway": "",
+      "GasService": ""
+    },
+    "ExplorerToAddress": "https://explorer-sepolia.inkonchain.com/address/"
+  },
+
+  "5042002": {
+    "Chain": "Arc Testnet",
+    "Hyperlane": {
+      "DomainId": 0,
+      "MailboxAddress": ""
+    },
+    "LayerZero": {
+      "EId": 0,
+      "EndpointAddress": ""
+    },
+    "Axelar": {
+      "ChainName": "",
+      "Gateway": "",
+      "GasService": ""
+    },
+    "ExplorerToAddress": "https://testnet.arcscan.app/address/"
   }
 }
