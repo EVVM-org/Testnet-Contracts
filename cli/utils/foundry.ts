@@ -913,7 +913,7 @@ export async function contractTesting() {
     );
 
   if (print === "json" || print === "markdown") {
-    const path = "./testResults";
+    const path = "./output/testResults";
 
     await checkDirectoryPath(path);
 
@@ -937,7 +937,7 @@ export async function contractTesting() {
     const outputContent = result.stdout.toString();
     const fileExtension = print === "json" ? "json" : "md";
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-"); // Replace colon and dot for filename safety
-    const outputPath = `./testResults/test-results-${timestamp}.${fileExtension}`;
+    const outputPath = `${path}/test-results-${timestamp}.${fileExtension}`;
     await stopPreparingTestAnimation(500);
 
     await writeFilePath(outputPath, outputContent);
