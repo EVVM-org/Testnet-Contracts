@@ -733,16 +733,15 @@ contract Evvm is EvvmStorage {
 
         if (size == 0) revert ErrorsLib.NotAnCA();
 
-        uint256 acomulatedAmount = 0;
         if (balances[msg.sender][token] < amount)
             revert ErrorsLib.InsufficientBalance();
+
+        uint256 acomulatedAmount = 0;
 
         balances[msg.sender][token] -= amount;
 
         for (uint256 i = 0; i < toData.length; i++) {
             acomulatedAmount += toData[i].amount;
-            if (acomulatedAmount > amount) revert ErrorsLib.InvalidAmount();
-
             balances[toData[i].toAddress][token] += toData[i].amount;
         }
 
