@@ -539,9 +539,7 @@ contract Evvm is EvvmStorage {
             results[iteration] = true;
         }
 
-        if (isSenderStaker) {
-            _giveReward(msg.sender, successfulTransactions);
-        }
+        if (isSenderStaker) _giveReward(msg.sender, successfulTransactions);
     }
 
     /**
@@ -692,9 +690,7 @@ contract Evvm is EvvmStorage {
 
         _updateBalance(from, to, token, amount);
 
-        if (isAddressStaker(msg.sender)) {
-            _giveReward(msg.sender, 1);
-        }
+        if (isAddressStaker(msg.sender)) _giveReward(msg.sender, 1);
     }
 
     /**
@@ -752,9 +748,7 @@ contract Evvm is EvvmStorage {
 
         if (acomulatedAmount != amount) revert ErrorsLib.InvalidAmount();
 
-        if (isAddressStaker(msg.sender)) {
-            _giveReward(msg.sender, 1);
-        }
+        if (isAddressStaker(msg.sender)) _giveReward(msg.sender, 1);
     }
 
     //░▒▓█Treasury exclusive functions██████████████████████████████████████████▓▒░
@@ -872,13 +866,11 @@ contract Evvm is EvvmStorage {
         uint256 value
     ) internal {
         uint256 fromBalance = balances[from][token];
-        if (fromBalance < value) {
-            revert ErrorsLib.InsufficientBalance();
-        } else {
-            unchecked {
-                balances[from][token] = fromBalance - value;
-                balances[to][token] += value;
-            }
+        if (fromBalance < value) revert ErrorsLib.InsufficientBalance();
+
+        unchecked {
+            balances[from][token] = fromBalance - value;
+            balances[to][token] += value;
         }
     }
 
