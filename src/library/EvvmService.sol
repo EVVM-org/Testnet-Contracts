@@ -37,4 +37,8 @@ abstract contract EvvmService is
             )
         ) revert InvalidServiceSignature();
     }
+
+    function getEvvmID() internal view returns (uint256) {
+        return evvm.getEvvmID();
+    }
 }
