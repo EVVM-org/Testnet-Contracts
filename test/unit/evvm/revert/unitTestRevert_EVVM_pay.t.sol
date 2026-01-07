@@ -37,7 +37,7 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         return (_amount, _priorityFee);
     }
 
-    function test__unit_revert__InvalidSignature_evvmID() external {
+    function test__unit_revert__pay__InvalidSignature_evvmID() external {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -97,7 +97,7 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
     }
 
-    function test__unit_revert__InvalidSignature_signer() external {
+    function test__unit_revert__pay__InvalidSignature_signer() external {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -157,7 +157,9 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
     }
 
-    function test__unit_revert__InvalidSignature_receiverAddress() external {
+    function test__unit_revert__pay__InvalidSignature_receiverAddress()
+        external
+    {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -217,7 +219,9 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
     }
 
-    function test__unit_revert__InvalidSignature_receiverIdentity() external {
+    function test__unit_revert__pay__InvalidSignature_receiverIdentity()
+        external
+    {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -277,7 +281,7 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
     }
 
-    function test__unit_revert__InvalidSignature_token() external {
+    function test__unit_revert__pay__InvalidSignature_token() external {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -337,7 +341,7 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
     }
 
-    function test__unit_revert__InvalidSignature_amount() external {
+    function test__unit_revert__pay__InvalidSignature_amount() external {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -397,7 +401,7 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
     }
 
-    function test__unit_revert__InvalidSignature_priorityFee() external {
+    function test__unit_revert__pay__InvalidSignature_priorityFee() external {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -457,7 +461,7 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
     }
 
-    function test__unit_revert__InvalidSignature_nonce() external {
+    function test__unit_revert__pay__InvalidSignature_nonce() external {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -517,7 +521,7 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
     }
 
-    function test__unit_revert__InvalidSignature_priorityFlag() external {
+    function test__unit_revert__pay__InvalidSignature_priorityFlag() external {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -577,7 +581,7 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
     }
 
-    function test__unit_revert__InvalidSignature_executor() external {
+    function test__unit_revert__pay__InvalidSignature_executor() external {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -637,7 +641,7 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
     }
 
-    function test__unit_revert__SenderIsNotTheExecutor() external {
+    function test__unit_revert__pay__SenderIsNotTheExecutor() external {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -706,7 +710,7 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
     }
 
-    function test__unit_revert__AsyncNonceAlreadyUsed() external {
+    function test__unit_revert__pay__AsyncNonceAlreadyUsed() external {
         (uint256 amountBefore, uint256 priorityFeeBefore) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -787,7 +791,7 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
     }
 
-    function test__unit_revert__SyncNonceMismatch() external {
+    function test__unit_revert__pay__SyncNonceMismatch() external {
         (uint256 amountBefore, uint256 priorityFeeBefore) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -868,7 +872,7 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
     }
 
-    function test__unit_revert__InsufficientBalance_amount() external {
+    function test__unit_revert__pay__InsufficientBalance_amount() external {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -929,7 +933,9 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
     }
 
-    function test__unit_revert__InsufficientBalance_priorityFee() external {
+    function test__unit_revert__pay__InsufficientBalance_priorityFee()
+        external
+    {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
