@@ -996,74 +996,12 @@ contract unitTestRevert_EVVM_pay is Test, Constants {
         );
 
         assertEq(
-            evvm.getBalance(COMMON_USER_STAKER.Address, PRINCIPAL_TOKEN_ADDRESS),
+            evvm.getBalance(
+                COMMON_USER_STAKER.Address,
+                PRINCIPAL_TOKEN_ADDRESS
+            ),
             0,
             "Fisher does not receive principal token reward because pay reverted"
         );
-
     }
-
-    /*
-    function test__unit_revert__() external {
-        (
-            uint256 amount,
-            uint256 priorityFee
-        ) = _addBalance(
-            COMMON_USER_NO_STAKER_1,
-            ETHER_ADDRESS,
-            0.10 ether,
-            0.01 ether
-        );
-
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
-            COMMON_USER_NO_STAKER_1.PrivateKey,
-            Erc191TestBuilder.buildMessageSignedForPay(
-                evvm.getEvvmID(),
-                COMMON_USER_NO_STAKER_2.Address,
-                "",
-                ETHER_ADDRESS,
-                amount,
-                priorityFee,
-                0,
-                false,
-                address(0)
-            )
-        );
-        bytes memory signatureEVVM = Erc191TestBuilder.buildERC191Signature(
-            v,
-            r,
-            s
-        );
-
-        vm.startPrank(COMMON_USER_NO_STAKER_3.Address);
-
-        evvm.pay(
-            COMMON_USER_NO_STAKER_1.Address,
-            COMMON_USER_NO_STAKER_2.Address,
-            "",
-            ETHER_ADDRESS,
-            amount,
-            priorityFee,
-            0,
-            false,
-            address(0),
-            signatureEVVM
-        );
-
-        vm.stopPrank();
-
-        assertEq(
-            evvm.getBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS),
-            amount + priorityFee,
-            "Sender balance must be the same because pay reverted"
-        );
-
-        assertEq(
-            evvm.getBalance(COMMON_USER_NO_STAKER_2.Address, ETHER_ADDRESS),
-            0,
-            "Receiver balance must be 0 because pay reverted"
-        );
-    }
-
-    */
 }
