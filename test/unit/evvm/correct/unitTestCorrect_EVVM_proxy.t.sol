@@ -16,30 +16,13 @@ pragma abicoder v2;
 
 import "forge-std/Test.sol";
 import "forge-std/console2.sol";
+import "test/Constants.sol";
+import "@evvm/testnet-contracts/library/Erc191TestBuilder.sol";
 
-import {Constants} from "test/Constants.sol";
-
-import {Staking} from "@evvm/testnet-contracts/contracts/staking/Staking.sol";
-import {
-    NameService
-} from "@evvm/testnet-contracts/contracts/nameService/NameService.sol";
 import {Evvm} from "@evvm/testnet-contracts/contracts/evvm/Evvm.sol";
 import {
-    Erc191TestBuilder
-} from "@evvm/testnet-contracts/library/Erc191TestBuilder.sol";
-import {
-    Estimator
-} from "@evvm/testnet-contracts/contracts/staking/Estimator.sol";
-import {
-    EvvmStorage
-} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStorage.sol";
-import {
-    EvvmStructs
-} from "@evvm/testnet-contracts/contracts/evvm/lib/EvvmStructs.sol";
-import {
-    Treasury
-} from "@evvm/testnet-contracts/contracts/treasury/Treasury.sol";
-
+    ErrorsLib
+} from "@evvm/testnet-contracts/contracts/evvm/lib/ErrorsLib.sol";
 contract unitTestCorrect_EVVM_proxy is Test, Constants {
     /**
      * Naming Convention for Init Test Functions
@@ -652,83 +635,4 @@ contract unitTestCorrect_EVVM_proxy is Test, Constants {
     }
 }
 
-interface ITartarusV1 {
-    function burnToken(address user, address token, uint256 amount) external;
-}
 
-contract TartarusV1 is EvvmStorage {
-    function burnToken(address user, address token, uint256 amount) external {
-        if (balances[user][token] < amount) {
-            revert();
-        }
-
-        balances[user][token] -= amount;
-    }
-}
-
-interface ITartarusV2 {
-    function burnToken(address user, address token, uint256 amount) external;
-
-    function fullTransfer(address from, address to, address token) external;
-}
-
-contract TartarusV2 is EvvmStorage {
-    function fullTransfer(address from, address to, address token) external {
-        balances[to][token] += balances[from][token];
-        balances[from][token] -= balances[from][token];
-    }
-}
-
-interface ITartarusV3 {
-    function burnToken(address user, address token, uint256 amount) external;
-
-    function getCounter() external view returns (uint256);
-}
-
-// Primero definimos la interfaz
-interface ICounter {
-    function increment() external;
-
-    function getCounter() external view returns (uint256);
-}
-
-contract TartarusV3 is EvvmStorage {
-    address public immutable counterAddress;
-
-    constructor(address _counterAddress) {
-        counterAddress = _counterAddress;
-    }
-
-    function burnToken(address user, address token, uint256 amount) external {
-        if (balances[user][token] < amount) {
-            revert();
-        }
-
-        balances[user][token] -= amount;
-
-        ICounter(counterAddress).increment();
-    }
-
-    function getCounter() external view returns (uint256) {
-        // Usamos la interfaz para la llamada
-        (bool success, bytes memory data) = counterAddress.staticcall(
-            abi.encodeWithSignature("getCounter()")
-        );
-        if (!success) {
-            revert();
-        }
-        return abi.decode(data, (uint256));
-    }
-}
-
-contract CounterDummy {
-    uint256 counterNum;
-
-    function increment() external {
-        counterNum++;
-    }
-
-    function getCounter() external view returns (uint256) {
-        return counterNum;
-    }
-}
