@@ -110,9 +110,8 @@ contract Evvm is EvvmStorage {
      * - Part of the time-delayed governance system for critical operations
      */
     modifier onlyAdmin() {
-        if (msg.sender != admin.current) {
-            revert();
-        }
+        if (msg.sender != admin.current) revert ErrorsLib.SenderIsNotAdmin();
+
         _;
     }
 
@@ -155,6 +154,10 @@ contract Evvm is EvvmStorage {
         address _stakingContractAddress,
         EvvmMetadata memory _evvmMetadata
     ) {
+        if (
+            _initialOwner == address(0) || _stakingContractAddress == address(0)
+        ) revert ErrorsLib.AddressCantBeZero();
+
         evvmMetadata = _evvmMetadata;
 
         stakingContractAddress = _stakingContractAddress;
@@ -202,9 +205,12 @@ contract Evvm is EvvmStorage {
         address _nameServiceAddress,
         address _treasuryAddress
     ) external {
-        if (breakerSetupNameServiceAddress == 0x00) {
-            revert();
-        }
+        if (breakerSetupNameServiceAddress == 0x00)
+            revert ErrorsLib.BreakerExploded();
+
+        if (_nameServiceAddress == address(0) || _treasuryAddress == address(0))
+            revert ErrorsLib.AddressCantBeZero();
+
         nameServiceAddress = _nameServiceAddress;
         balances[nameServiceAddress][evvmMetadata.principalTokenAddress] =
             10000 *
@@ -221,7 +227,7 @@ contract Evvm is EvvmStorage {
     function setEvvmID(uint256 newEvvmID) external onlyAdmin {
         if (evvmMetadata.EvvmID != 0) {
             if (block.timestamp > windowTimeToChangeEvvmID)
-                revert ErrorsLib.WindowToChangeEvvmIDExpired();
+                revert ErrorsLib.WindowExpired();
         }
 
         evvmMetadata.EvvmID = newEvvmID;
@@ -263,7 +269,8 @@ contract Evvm is EvvmStorage {
      * @custom:upgrade-safe Preserves storage layout between upgrades
      */
     fallback() external {
-        if (currentImplementation == address(0)) revert();
+        if (currentImplementation == address(0))
+            revert ErrorsLib.ImplementationIsNotActive();
 
         assembly {
             /**
@@ -942,23 +949,11 @@ contract Evvm is EvvmStorage {
      * @dev Executes the proxy upgrade to the new implementation contract
      */
     function acceptImplementation() external onlyAdmin {
-        if (block.timestamp < timeToAcceptImplementation) revert();
+        if (block.timestamp < timeToAcceptImplementation)
+            revert ErrorsLib.TimeLockNotExpired();
         currentImplementation = proposalImplementation;
         proposalImplementation = address(0);
         timeToAcceptImplementation = 0;
-    }
-
-    //█ NameService Integration Functions ████████████████████████████████████████
-
-    /**
-     * @notice Updates the NameService contract address for identity resolution
-     * @dev Allows admin to change the NameService integration address
-     * @param _nameServiceAddress Address of the new NameService contract
-     */
-    function setNameServiceAddress(
-        address _nameServiceAddress
-    ) external onlyAdmin {
-        nameServiceAddress = _nameServiceAddress;
     }
 
     //█ Admin Management Functions ███████████████████████████████████████████████
@@ -969,12 +964,14 @@ contract Evvm is EvvmStorage {
      * @param _newOwner Address of the proposed new admin
      */
     function proposeAdmin(address _newOwner) external onlyAdmin {
-        if (_newOwner == address(0) || _newOwner == admin.current) {
-            revert();
-        }
+        if (_newOwner == address(0) || _newOwner == admin.current)
+            revert ErrorsLib.IncorrectAddressInput();
 
-        admin.proposal = _newOwner;
-        admin.timeToAccept = block.timestamp + TIME_TO_ACCEPT_PROPOSAL;
+        admin = AddressTypeProposal({
+            current: admin.current,
+            proposal: _newOwner,
+            timeToAccept: block.timestamp + TIME_TO_ACCEPT_PROPOSAL
+        });
     }
 
     /**
@@ -982,8 +979,11 @@ contract Evvm is EvvmStorage {
      * @dev Allows current admin to reject proposed admin changes
      */
     function rejectProposalAdmin() external onlyAdmin {
-        admin.proposal = address(0);
-        admin.timeToAccept = 0;
+        admin = AddressTypeProposal({
+            current: admin.current,
+            proposal: address(0),
+            timeToAccept: 0
+        });
     }
 
     /**
@@ -991,17 +991,17 @@ contract Evvm is EvvmStorage {
      * @dev Can only be called by the proposed admin after the time delay
      */
     function acceptAdmin() external {
-        if (block.timestamp < admin.timeToAccept) {
-            revert();
-        }
-        if (msg.sender != admin.proposal) {
-            revert();
-        }
+        if (block.timestamp < admin.timeToAccept)
+            revert ErrorsLib.TimeLockNotExpired();
 
-        admin.current = admin.proposal;
+        if (msg.sender != admin.proposal)
+            revert ErrorsLib.SenderIsNotTheProposedAdmin();
 
-        admin.proposal = address(0);
-        admin.timeToAccept = 0;
+        admin = AddressTypeProposal({
+            current: admin.proposal,
+            proposal: address(0),
+            timeToAccept: 0
+        });
     }
 
     //█ Reward System Functions ███████████████████████████████████████████████████████████████

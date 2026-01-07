@@ -4,14 +4,21 @@
 pragma solidity ^0.8.0;
 
 library ErrorsLib {
+    error SenderIsNotAdmin();
+    error ImplementationIsNotActive();
     error InvalidSignature();
     error SenderIsNotTheExecutor();
     error SyncNonceMismatch();
     error AsyncNonceAlreadyUsed();
-    error NotAnStaker();
     error InsufficientBalance();
     error InvalidAmount();
     error NotAnCA();
     error SenderIsNotTreasury();
-    error WindowToChangeEvvmIDExpired();
+
+    error BreakerExploded();
+    error WindowExpired();
+    error AddressCantBeZero();
+    error IncorrectAddressInput();
+    error TimeLockNotExpired();
+    error SenderIsNotTheProposedAdmin();
 }
