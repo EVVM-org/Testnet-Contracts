@@ -759,7 +759,9 @@ contract unitTestRevert_EVVM_payMultiple is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__payMultiple__SKIP_SyncNonceMismatch() external {
+    function test__unit_correct__payMultiple__SKIP_SyncNonceMismatch()
+        external
+    {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -796,9 +798,7 @@ contract unitTestRevert_EVVM_payMultiple is Test, Constants, EvvmStructs {
 
         vm.startPrank(COMMON_USER_NO_STAKER_3.Address);
 
-        (uint256 successfulTransactions, ) = evvm.payMultiple(
-            payData
-        );
+        (uint256 successfulTransactions, ) = evvm.payMultiple(payData);
         vm.stopPrank();
 
         assertEq(
@@ -820,8 +820,70 @@ contract unitTestRevert_EVVM_payMultiple is Test, Constants, EvvmStructs {
         );
     }
 
-    /*
-    function test__unit_correct__payMultiple__SKIP_() external {
+    function test__unit_correct__payMultiple__SKIP_InsufficientBalance_amount()
+        external
+    {
+        (uint256 amount, uint256 priorityFee) = _addBalance(
+            COMMON_USER_NO_STAKER_1,
+            ETHER_ADDRESS,
+            0.10 ether,
+            0.01 ether
+        );
+
+        EvvmStructs.PayData[] memory payData = new EvvmStructs.PayData[](1);
+
+        payData[0] = EvvmStructs.PayData(
+            COMMON_USER_NO_STAKER_1.Address,
+            COMMON_USER_NO_STAKER_2.Address,
+            "",
+            ETHER_ADDRESS,
+            /* 🢃 exceeds balance 🢃 */
+            (amount + priorityFee) * 10,
+            priorityFee,
+            0,
+            false,
+            address(0),
+            _execute_makeSignaturePay(
+                COMMON_USER_NO_STAKER_1,
+                COMMON_USER_NO_STAKER_2.Address,
+                "",
+                ETHER_ADDRESS,
+                /* 🢃 exceeds balance 🢃 */
+                (amount + priorityFee) * 10,
+                priorityFee,
+                0,
+                false,
+                address(0)
+            )
+        );
+
+        vm.startPrank(COMMON_USER_NO_STAKER_3.Address);
+
+        (uint256 successfulTransactions, ) = evvm.payMultiple(payData);
+        vm.stopPrank();
+
+        assertEq(
+            successfulTransactions,
+            0,
+            "There should be 0 successful transactions"
+        );
+
+        assertEq(
+            evvm.getBalance(COMMON_USER_NO_STAKER_1.Address, ETHER_ADDRESS),
+            amount + priorityFee,
+            "Sender balance must be the same because pay skipped"
+        );
+
+        assertEq(
+            evvm.getBalance(COMMON_USER_NO_STAKER_2.Address, ETHER_ADDRESS),
+            0,
+            "Receiver balance must be 0 because pay skipped"
+        );
+    }
+
+    function test__unit_correct__payMultiple__SKIP_InsufficientBalance_priotityFee()
+        external
+    {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -837,7 +899,8 @@ contract unitTestRevert_EVVM_payMultiple is Test, Constants, EvvmStructs {
             "",
             ETHER_ADDRESS,
             amount,
-            priorityFee,
+            /* 🢃 exceeds balance 🢃 */
+            (amount + priorityFee) * 10,
             0,
             false,
             address(0),
@@ -847,18 +910,17 @@ contract unitTestRevert_EVVM_payMultiple is Test, Constants, EvvmStructs {
                 "",
                 ETHER_ADDRESS,
                 amount,
-                priorityFee,
+                /* 🢃 exceeds balance 🢃 */
+                (amount + priorityFee) * 10,
                 0,
                 false,
                 address(0)
             )
         );
 
-        vm.startPrank(COMMON_USER_NO_STAKER_3.Address);
+        vm.startPrank(COMMON_USER_STAKER.Address);
 
-        (uint256 successfulTransactions, ) = evvm.payMultiple(
-            payData
-        );
+        (uint256 successfulTransactions, ) = evvm.payMultiple(payData);
         vm.stopPrank();
 
         assertEq(
@@ -879,5 +941,4 @@ contract unitTestRevert_EVVM_payMultiple is Test, Constants, EvvmStructs {
             "Receiver balance must be 0 because pay skipped"
         );
     }
-    */
 }
