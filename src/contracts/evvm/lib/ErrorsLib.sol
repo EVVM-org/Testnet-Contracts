@@ -10,7 +10,7 @@ library ErrorsLib {
     error AsyncNonceAlreadyUsed();
     error NotAnStaker();
     error InsufficientBalance();
-    error InvalidAmount(uint256, uint256);
+    error InvalidAmount();
     error NotAnCA();
     error SenderIsNotTreasury();
     error WindowToChangeEvvmIDExpired();

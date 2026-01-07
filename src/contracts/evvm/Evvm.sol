@@ -601,10 +601,8 @@ contract Evvm is EvvmStorage {
             )
         ) revert ErrorsLib.InvalidSignature();
 
-        if (executor != address(0)) {
-            if (msg.sender != executor)
-                revert ErrorsLib.SenderIsNotTheExecutor();
-        }
+        if ((executor != address(0)) && (msg.sender != executor))
+            revert ErrorsLib.SenderIsNotTheExecutor();
 
         if (priorityFlag) {
             if (asyncUsedNonce[from][nonce])
@@ -614,11 +612,13 @@ contract Evvm is EvvmStorage {
                 revert ErrorsLib.SyncNonceMismatch();
         }
 
-        if (balances[from][token] < amount + priorityFee)
+        bool isSenderStaker = isAddressStaker(msg.sender);
+
+        if (balances[from][token] < amount + (isSenderStaker ? priorityFee : 0))
             revert ErrorsLib.InsufficientBalance();
 
         uint256 acomulatedAmount = 0;
-        balances[from][token] -= (amount + priorityFee);
+        balances[from][token] -= (amount + (isSenderStaker ? priorityFee : 0));
         address to_aux;
         for (uint256 i = 0; i < toData.length; i++) {
             acomulatedAmount += toData[i].amount;
@@ -641,13 +641,11 @@ contract Evvm is EvvmStorage {
         }
 
         if (acomulatedAmount != amount)
-            revert ErrorsLib.InvalidAmount(acomulatedAmount, amount);
+            revert ErrorsLib.InvalidAmount();
 
-        if (isAddressStaker(msg.sender)) {
+        if (isSenderStaker) {
             _giveReward(msg.sender, 1);
             balances[msg.sender][token] += priorityFee;
-        } else {
-            balances[from][token] += priorityFee;
         }
 
         if (priorityFlag) {
@@ -749,13 +747,13 @@ contract Evvm is EvvmStorage {
         for (uint256 i = 0; i < toData.length; i++) {
             acomulatedAmount += toData[i].amount;
             if (acomulatedAmount > amount)
-                revert ErrorsLib.InvalidAmount(acomulatedAmount, amount);
+                revert ErrorsLib.InvalidAmount();
 
             balances[toData[i].toAddress][token] += toData[i].amount;
         }
 
         if (acomulatedAmount != amount)
-            revert ErrorsLib.InvalidAmount(acomulatedAmount, amount);
+            revert ErrorsLib.InvalidAmount();
 
         if (isAddressStaker(msg.sender)) {
             _giveReward(msg.sender, 1);
