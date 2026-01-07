@@ -929,6 +929,7 @@ contract Evvm is EvvmStorage {
      * @param _newImpl Address of the new implementation contract
      */
     function proposeImplementation(address _newImpl) external onlyAdmin {
+        if (_newImpl == address(0)) revert ErrorsLib.IncorrectAddressInput();
         proposalImplementation = _newImpl;
         timeToAcceptImplementation =
             block.timestamp +
