@@ -399,13 +399,11 @@ contract Evvm is EvvmStorage {
             )
             : to_address;
 
-        if (!_updateBalance(from, to, token, amount))
-            revert ErrorsLib.InsufficientBalance();
+        _updateBalance(from, to, token, amount);
 
         if (isAddressStaker(msg.sender)) {
             if (priorityFee > 0) {
-                if (!_updateBalance(from, msg.sender, token, priorityFee))
-                    revert ErrorsLib.InsufficientBalance();
+                _updateBalance(from, msg.sender, token, priorityFee);
             }
             _giveReward(msg.sender, 1);
         }
@@ -445,6 +443,7 @@ contract Evvm is EvvmStorage {
     function payMultiple(
         PayData[] memory payData
     ) external returns (uint256 successfulTransactions, bool[] memory results) {
+        bool isSenderStaker = isAddressStaker(msg.sender);
         address to_aux;
         results = new bool[](payData.length);
         for (uint256 iteration = 0; iteration < payData.length; iteration++) {
@@ -508,47 +507,37 @@ contract Evvm is EvvmStorage {
                 : payData[iteration].to_address;
 
             if (
-                payData[iteration].priorityFee + payData[iteration].amount >
+                (isSenderStaker ? payData[iteration].priorityFee : 0) +
+                    payData[iteration].amount >
                 balances[payData[iteration].from][payData[iteration].token]
             ) {
                 results[iteration] = false;
                 continue;
             }
 
-            if (
-                !_updateBalance(
-                    payData[iteration].from,
-                    to_aux,
-                    payData[iteration].token,
-                    payData[iteration].amount
-                )
-            ) {
-                results[iteration] = false;
-                continue;
-            } else {
-                if (
-                    payData[iteration].priorityFee > 0 &&
-                    isAddressStaker(msg.sender)
-                ) {
-                    if (
-                        !_updateBalance(
-                            payData[iteration].from,
-                            msg.sender,
-                            payData[iteration].token,
-                            payData[iteration].priorityFee
-                        )
-                    ) {
-                        results[iteration] = false;
-                        continue;
-                    }
-                }
+            /// @dev Because of the previous check, _updateBalance can´t fail
+            
+            _updateBalance(
+                payData[iteration].from,
+                to_aux,
+                payData[iteration].token,
+                payData[iteration].amount
+            );
 
-                successfulTransactions++;
-                results[iteration] = true;
+            if (payData[iteration].priorityFee > 0 && isSenderStaker) {
+                _updateBalance(
+                    payData[iteration].from,
+                    msg.sender,
+                    payData[iteration].token,
+                    payData[iteration].priorityFee
+                );
             }
+
+            successfulTransactions++;
+            results[iteration] = true;
         }
 
-        if (isAddressStaker(msg.sender)) {
+        if (isSenderStaker) {
             _giveReward(msg.sender, successfulTransactions);
         }
     }
@@ -702,8 +691,7 @@ contract Evvm is EvvmStorage {
 
         if (size == 0) revert ErrorsLib.NotAnCA();
 
-        if (!_updateBalance(from, to, token, amount))
-            revert ErrorsLib.InsufficientBalance();
+        _updateBalance(from, to, token, amount);
 
         if (isAddressStaker(msg.sender)) {
             _giveReward(msg.sender, 1);
@@ -879,23 +867,21 @@ contract Evvm is EvvmStorage {
      * @param to Address to transfer tokens to
      * @param token Address of the token contract
      * @param value Amount of tokens to transfer
-     * @return success True if transfer completed, false if insufficient balance
      */
     function _updateBalance(
         address from,
         address to,
         address token,
         uint256 value
-    ) internal returns (bool) {
+    ) internal {
         uint256 fromBalance = balances[from][token];
         if (fromBalance < value) {
-            return false;
+            revert ErrorsLib.InsufficientBalance();
         } else {
             unchecked {
                 balances[from][token] = fromBalance - value;
                 balances[to][token] += value;
             }
-            return true;
         }
     }
 
