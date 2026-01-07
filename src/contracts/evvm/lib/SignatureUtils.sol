@@ -2,8 +2,12 @@
 // Full license terms available at: https://www.evvm.info/docs/EVVMNoncommercialLicense
 pragma solidity ^0.8.0;
 
-import {SignatureUtil} from "@evvm/testnet-contracts/library/utils/SignatureUtil.sol";
-import {AdvancedStrings} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
+import {
+    SignatureUtil
+} from "@evvm/testnet-contracts/library/utils/SignatureUtil.sol";
+import {
+    AdvancedStrings
+} from "@evvm/testnet-contracts/library/utils/AdvancedStrings.sol";
 
 library SignatureUtils {
     /**
