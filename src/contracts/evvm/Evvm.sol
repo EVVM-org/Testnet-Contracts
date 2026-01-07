@@ -474,14 +474,10 @@ contract Evvm is EvvmStorage {
                 /// @dev priorityFlag == true (async)
 
                 if (
-                    !asyncUsedNonce[payData[iteration].from][
+                    asyncUsedNonce[payData[iteration].from][
                         payData[iteration].nonce
                     ]
                 ) {
-                    asyncUsedNonce[payData[iteration].from][
-                        payData[iteration].nonce
-                    ] = true;
-                } else {
                     results[iteration] = false;
                     continue;
                 }
@@ -489,22 +485,13 @@ contract Evvm is EvvmStorage {
                 /// @dev priorityFlag == false (sync)
 
                 if (
-                    nextSyncUsedNonce[payData[iteration].from] ==
+                    nextSyncUsedNonce[payData[iteration].from] !=
                     payData[iteration].nonce
                 ) {
-                    nextSyncUsedNonce[payData[iteration].from]++;
-                } else {
                     results[iteration] = false;
                     continue;
                 }
             }
-
-            to_aux = !AdvancedStrings.equal(payData[iteration].to_identity, "")
-                ? NameService(nameServiceAddress)
-                    .verifyStrictAndGetOwnerOfIdentity(
-                        payData[iteration].to_identity
-                    )
-                : payData[iteration].to_address;
 
             if (
                 (isSenderStaker ? payData[iteration].priorityFee : 0) +
@@ -515,8 +502,15 @@ contract Evvm is EvvmStorage {
                 continue;
             }
 
+            to_aux = !AdvancedStrings.equal(payData[iteration].to_identity, "")
+                ? NameService(nameServiceAddress)
+                    .verifyStrictAndGetOwnerOfIdentity(
+                        payData[iteration].to_identity
+                    )
+                : payData[iteration].to_address;
+
             /// @dev Because of the previous check, _updateBalance can´t fail
-            
+
             _updateBalance(
                 payData[iteration].from,
                 to_aux,
@@ -531,6 +525,14 @@ contract Evvm is EvvmStorage {
                     payData[iteration].token,
                     payData[iteration].priorityFee
                 );
+            }
+
+            if (payData[iteration].priorityFlag) {
+                asyncUsedNonce[payData[iteration].from][
+                    payData[iteration].nonce
+                ] = true;
+            } else {
+                nextSyncUsedNonce[payData[iteration].from]++;
             }
 
             successfulTransactions++;
