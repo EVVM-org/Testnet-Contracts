@@ -640,8 +640,7 @@ contract Evvm is EvvmStorage {
             balances[to_aux][token] += toData[i].amount;
         }
 
-        if (acomulatedAmount != amount)
-            revert ErrorsLib.InvalidAmount();
+        if (acomulatedAmount != amount) revert ErrorsLib.InvalidAmount();
 
         if (isSenderStaker) {
             _giveReward(msg.sender, 1);
@@ -746,14 +745,12 @@ contract Evvm is EvvmStorage {
 
         for (uint256 i = 0; i < toData.length; i++) {
             acomulatedAmount += toData[i].amount;
-            if (acomulatedAmount > amount)
-                revert ErrorsLib.InvalidAmount();
+            if (acomulatedAmount > amount) revert ErrorsLib.InvalidAmount();
 
             balances[toData[i].toAddress][token] += toData[i].amount;
         }
 
-        if (acomulatedAmount != amount)
-            revert ErrorsLib.InvalidAmount();
+        if (acomulatedAmount != amount) revert ErrorsLib.InvalidAmount();
 
         if (isAddressStaker(msg.sender)) {
             _giveReward(msg.sender, 1);
