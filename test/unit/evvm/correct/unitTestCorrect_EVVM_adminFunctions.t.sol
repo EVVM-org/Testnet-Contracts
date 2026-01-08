@@ -59,17 +59,22 @@ contract unitTestCorrect_EVVM_adminFunctions is Test, Constants {
 
         executeBeforeSetUp();
     }
-    /**
-     * Function to test: payNoStaker_sync
-     * PF: Includes priority fee
-     * nPF: No priority fee
-     * EX: Includes executor execution
-     * nEX: Does not include executor execution
-     * ID: Uses a NameService identity
-     * AD: Uses an address
-     */
 
-    function test__unit_correct__set_owner() external {
+    function test__unit_correct__proposeAdmin() external {
+        vm.startPrank(ADMIN.Address);
+
+        evvm.proposeAdmin(COMMON_USER_NO_STAKER_1.Address);
+
+        vm.stopPrank();
+
+        assertEq(
+            evvm.getCurrentAdmin(),
+            ADMIN.Address,
+            "Admin should be proposed not changed yet"
+        );
+    }
+
+    function test__unit_correct__acceptAdmin() external {
         vm.startPrank(ADMIN.Address);
 
         evvm.proposeAdmin(COMMON_USER_NO_STAKER_1.Address);
@@ -84,10 +89,14 @@ contract unitTestCorrect_EVVM_adminFunctions is Test, Constants {
 
         vm.stopPrank();
 
-        assertEq(evvm.getCurrentAdmin(), COMMON_USER_NO_STAKER_1.Address);
+        assertEq(
+            evvm.getCurrentAdmin(),
+            COMMON_USER_NO_STAKER_1.Address,
+            "Admin should be changed"
+        );
     }
 
-    function test__unit_correct__cancel_set_owner() external {
+    function test__unit_correct__rejectProposalAdmin() external {
         vm.startPrank(ADMIN.Address);
 
         evvm.proposeAdmin(COMMON_USER_NO_STAKER_1.Address);
@@ -98,10 +107,12 @@ contract unitTestCorrect_EVVM_adminFunctions is Test, Constants {
 
         vm.stopPrank();
 
-        assertEq(evvm.getCurrentAdmin(), ADMIN.Address);
+        assertEq(
+            evvm.getCurrentAdmin(),
+            ADMIN.Address,
+            "Admin should be same because proposal was rejected"
+        );
     }
-
-    //_addMateToTotalSupply getEraPrincipalToken
 
     function test__unit_correct__setEvvmID() external {
         vm.startPrank(ADMIN.Address);
@@ -116,6 +127,6 @@ contract unitTestCorrect_EVVM_adminFunctions is Test, Constants {
 
         vm.stopPrank();
 
-        assertEq(evvm.getEvvmID(), 777);
+        assertEq(evvm.getEvvmID(), 777, "EvvmID should be changed");
     }
 }
