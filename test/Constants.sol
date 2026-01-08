@@ -1164,7 +1164,6 @@ contract HelperCa {
     }
 }
 
-
 interface ITartarusV1 {
     function burnToken(address user, address token, uint256 amount) external;
 }
