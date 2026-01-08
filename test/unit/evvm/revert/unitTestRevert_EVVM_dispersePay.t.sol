@@ -66,7 +66,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
      * AD: Uses an address
      */
 
-    function test__unit_correct__dispersePay__InvalidSignature_evvmID()
+    function test__unit_revert__dispersePay__InvalidSignature_evvmID()
         external
     {
         (uint256 amount, uint256 priorityFee) = _addBalance(
@@ -141,7 +141,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__dispersePay__InvalidSignature_signer()
+    function test__unit_revert__dispersePay__InvalidSignature_signer()
         external
     {
         (uint256 amount, uint256 priorityFee) = _addBalance(
@@ -207,7 +207,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__dispersePay__InvalidSignature_hashList()
+    function test__unit_revert__dispersePay__InvalidSignature_hashList()
         external
     {
         (uint256 amount, uint256 priorityFee) = _addBalance(
@@ -282,7 +282,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__dispersePay__InvalidSignature_token()
+    function test__unit_revert__dispersePay__InvalidSignature_token()
         external
     {
         (uint256 amount, uint256 priorityFee) = _addBalance(
@@ -347,7 +347,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__dispersePay__InvalidSignature_amount()
+    function test__unit_revert__dispersePay__InvalidSignature_amount()
         external
     {
         (uint256 amount, uint256 priorityFee) = _addBalance(
@@ -414,7 +414,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__dispersePay__InvalidSignature_priorityFee()
+    function test__unit_revert__dispersePay__InvalidSignature_priorityFee()
         external
     {
         (uint256 amount, uint256 priorityFee) = _addBalance(
@@ -480,7 +480,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__dispersePay__InvalidSignature_nonce()
+    function test__unit_revert__dispersePay__InvalidSignature_nonce()
         external
     {
         (uint256 amount, uint256 priorityFee) = _addBalance(
@@ -546,7 +546,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__dispersePay__InvalidSignature_priorityFlag()
+    function test__unit_revert__dispersePay__InvalidSignature_priorityFlag()
         external
     {
         (uint256 amount, uint256 priorityFee) = _addBalance(
@@ -612,7 +612,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__dispersePay__InvalidSignature_executor()
+    function test__unit_revert__dispersePay__InvalidSignature_executor()
         external
     {
         (uint256 amount, uint256 priorityFee) = _addBalance(
@@ -678,7 +678,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__dispersePay__SenderIsNotTheExecutor()
+    function test__unit_revert__dispersePay__SenderIsNotTheExecutor()
         external
     {
         (uint256 amount, uint256 priorityFee) = _addBalance(
@@ -745,7 +745,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__dispersePay__AsyncNonceAlreadyUsed() external {
+    function test__unit_revert__dispersePay__AsyncNonceAlreadyUsed() external {
         _addBalance(COMMON_USER_NO_STAKER_1, ETHER_ADDRESS, 0.1 ether, 0 ether);
 
         _execute_makePay(
@@ -827,7 +827,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__dispersePay__SyncNonceMismatch() external {
+    function test__unit_revert__dispersePay__SyncNonceMismatch() external {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -894,7 +894,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__dispersePay__InsufficientBalance_amount() external {
+    function test__unit_revert__dispersePay__InsufficientBalance_amount() external {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -963,7 +963,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__dispersePay__InsufficientBalance_priorityFee() external {
+    function test__unit_revert__dispersePay__InsufficientBalance_priorityFee() external {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
@@ -1030,7 +1030,7 @@ contract unitTestRevert_EVVM_dispersePay is Test, Constants, EvvmStructs {
         );
     }
 
-    function test__unit_correct__dispersePay__InvalidAmount() external {
+    function test__unit_revert__dispersePay__InvalidAmount() external {
         (uint256 amount, uint256 priorityFee) = _addBalance(
             COMMON_USER_NO_STAKER_1,
             ETHER_ADDRESS,
