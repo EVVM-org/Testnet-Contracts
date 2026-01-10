@@ -28,7 +28,9 @@ contract fuzzTest_EVVM_pay is Test, Constants {
         evvm.setPointStaker(COMMON_USER_STAKER.Address, 0x00);
     }
 
-    function _makeRandomUsername(uint16 seed) private returns (string memory username) {
+    function _makeRandomUsername(
+        uint16 seed
+    ) private returns (string memory username) {
         // Generate a length between 4 and 12 characters (inclusive)
         uint256 minLen = 4;
         uint256 maxExtra = 8; // allows lengths from 4 to 12
@@ -38,7 +40,9 @@ contract fuzzTest_EVVM_pay is Test, Constants {
 
         // Ensure first character is a letter (A-Z or a-z)
         uint256 r0 = uint256(keccak256(abi.encodePacked(seed, "first"))) % 52;
-        usernameBytes[0] = r0 < 26 ? bytes1(uint8(r0 + 65)) : bytes1(uint8(r0 + 71));
+        usernameBytes[0] = r0 < 26
+            ? bytes1(uint8(r0 + 65))
+            : bytes1(uint8(r0 + 71));
 
         // Fill remaining characters with digits (0-9), uppercase (A-Z) or lowercase (a-z)
         for (uint256 i = 1; i < len; i++) {
@@ -92,7 +96,9 @@ contract fuzzTest_EVVM_pay is Test, Constants {
         uint136 asyncNonce;
     }
 
-    function test__fuzz__pay__toAddress(PayInputsToAddress memory input) external {
+    function test__fuzz__pay__toAddress(
+        PayInputsToAddress memory input
+    ) external {
         vm.assume(
             input.amount > 0 &&
                 input.token != PRINCIPAL_TOKEN_ADDRESS &&
@@ -180,8 +186,9 @@ contract fuzzTest_EVVM_pay is Test, Constants {
         uint16 seedUsername;
     }
 
-
-    function test__fuzz__pay__toIdentity(PayInputsToIdentity memory input) external {
+    function test__fuzz__pay__toIdentity(
+        PayInputsToIdentity memory input
+    ) external {
         vm.assume(
             input.amount > 0 &&
                 input.token != PRINCIPAL_TOKEN_ADDRESS &&
